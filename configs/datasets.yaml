@@ -1,0 +1,47 @@
+datasets:
+
+  customers:
+    file: customers.csv
+    staging_table: stg_customers
+    load_strategy: replace
+    primary_key:
+      - customer_id
+    required_columns:
+      - customer_id
+      - name
+      - email
+      - country
+      - age
+      - signup_date
+    unique_columns:
+      - customer_id
+    non_null_columns:
+      - customer_id
+      - email
+
+  products:
+    file: products.csv
+    staging_table: stg_products
+    load_strategy: replace
+    primary_key:
+      - product_id
+    required_columns:
+      - product_id
+      - category
+      - name
+      - price_usd
+      - cost_usd
+      - margin_usd
+
+  orders:
+    file: orders.csv
+    staging_table: stg_orders
+    load_strategy: replace
+    primary_key:
+      - order_id
+    required_columns:
+      - order_id
+      - customer_id
+      - order_time
+      - subtotal_usd
+      - total_usd
