@@ -1,37 +1,34 @@
-from datetime import datetime
-
 from core.discovery import discover_datasets
-from core.validation import validate_dataset
 from core.ingestion import ingest_dataset
-from core.metadata import generate_run_id
+from core.validation import validate_dataset
+
+from utils.metadata_logger import MetadataLogger
 
 
 def run_pipeline():
 
-    run_id = generate_run_id()
+    logger = MetadataLogger()
 
-    pipeline_start = datetime.now()
-
-    datasets = discover_datasets()
-
-    processed = 0
-    skipped = 0
-    total_rows = 0
+    run = logger.create_pipeline_run()
 
     print("=" * 80)
     print("OPENINGEST")
     print("=" * 80)
+    print(f"Run ID : {run.run_id}")
+    print("=" * 80)
 
-    print(f"Run ID : {run_id}")
+    datasets = discover_datasets()
 
-    print()
+    run.datasets = datasets
+
+    processed = 0
+    skipped = 0
 
     for dataset in datasets:
 
+        print()
         print("=" * 80)
-
         print(dataset.name.upper())
-
         print("=" * 80)
 
         if not dataset.registered:
@@ -42,9 +39,9 @@ def run_pipeline():
 
             continue
 
-        result = validate_dataset(dataset)
+        validation = validate_dataset(dataset)
 
-        if not result["valid"]:
+        if not validation["valid"]:
 
             print("Schema Validation Failed")
 
@@ -56,36 +53,25 @@ def run_pipeline():
 
         processed += 1
 
-        total_rows += dataset.rows_loaded
+        run.total_rows += dataset.rows_loaded
 
-        print(
-            f"SUCCESS ({dataset.rows_loaded:,} rows)"
-        )
+        logger.log_dataset(run, dataset)
 
-        print()
+    run.status = "SUCCESS"
 
-    pipeline_end = datetime.now()
+    logger.finish_pipeline(run)
 
-    duration = (
-        pipeline_end - pipeline_start
-    ).total_seconds()
-
+    print()
     print("=" * 80)
-
     print("PIPELINE SUMMARY")
-
     print("=" * 80)
 
-    print(f"Run ID      : {run_id}")
-
-    print(f"Datasets    : {len(datasets)}")
-
-    print(f"Processed   : {processed}")
-
-    print(f"Skipped     : {skipped}")
-
-    print(f"Rows Loaded : {total_rows:,}")
-
-    print(f"Duration    : {round(duration,2)} sec")
+    print(f"Run ID            : {run.run_id}")
+    print(f"Datasets Found    : {len(run.datasets)}")
+    print(f"Processed         : {processed}")
+    print(f"Skipped           : {skipped}")
+    print(f"Rows Loaded       : {run.total_rows:,}")
+    print(f"Duration          : {run.total_duration} sec")
+    print(f"Status            : {run.status}")
 
     print("=" * 80)
