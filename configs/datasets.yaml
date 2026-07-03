@@ -4,8 +4,10 @@ datasets:
     file: customers.csv
     staging_table: stg_customers
     load_strategy: replace
+
     primary_key:
       - customer_id
+
     required_columns:
       - customer_id
       - name
@@ -13,18 +15,39 @@ datasets:
       - country
       - age
       - signup_date
+
     unique_columns:
       - customer_id
+
     non_null_columns:
       - customer_id
       - email
+
+
+  orders:
+    file: orders.csv
+    staging_table: stg_orders
+    load_strategy: replace
+
+    primary_key:
+      - order_id
+
+    required_columns:
+      - order_id
+      - customer_id
+      - order_time
+      - subtotal_usd
+      - total_usd
+
 
   products:
     file: products.csv
     staging_table: stg_products
     load_strategy: replace
+
     primary_key:
       - product_id
+
     required_columns:
       - product_id
       - category
@@ -33,15 +56,47 @@ datasets:
       - cost_usd
       - margin_usd
 
-  orders:
-    file: orders.csv
-    staging_table: stg_orders
+
+  sessions:
+    file: sessions.csv
+    staging_table: stg_sessions
     load_strategy: replace
+
     primary_key:
-      - order_id
+      - session_id
+
     required_columns:
-      - order_id
+      - session_id
       - customer_id
-      - order_time
-      - subtotal_usd
-      - total_usd
+      - start_time
+      - device
+      - source
+      - country
+
+
+  employees:
+    file: employees.csv
+    staging_table: stg_employees
+    load_strategy: replace
+
+    primary_key:
+      - employee_id
+
+    required_columns:
+      - employee_id
+      - first_name
+      - last_name
+      - department
+      - email
+      - hire_date
+      - salary
+      - is_active
+
+    unique_columns:
+      - employee_id
+      - email
+
+    non_null_columns:
+      - employee_id
+      - email
+      - department

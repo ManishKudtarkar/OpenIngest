@@ -1,0 +1,4 @@
+employee_id,first_name,last_name,department,email,hire_date,salary,is_active
+1,Ava,Patel,Engineering,ava.patel@openingest.com,2024-02-12,95000.00,True
+2,Liam,Chen,Finance,liam.chen@openingest.com,2023-09-01,87000.50,True
+3,Noah,Garcia,Operations,noah.garcia@openingest.com,2022-06-20,73000.00,False

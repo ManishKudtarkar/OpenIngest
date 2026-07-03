@@ -91,3 +91,19 @@ CREATE TABLE fact_orders (
     device VARCHAR(50),
     source VARCHAR(50)
 );
+
+CREATE TABLE IF NOT EXISTS stg_sessions (
+
+    session_id TEXT PRIMARY KEY,
+
+    customer_id TEXT,
+
+    start_time TIMESTAMP,
+
+    device TEXT,
+
+    source TEXT,
+
+    country TEXT
+
+);

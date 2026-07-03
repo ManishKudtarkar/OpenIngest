@@ -1,0 +1,72 @@
+datasets:
+  customers:
+    type_checks:
+      customer_id: integer
+      age: integer
+      email: string
+      signup_date: datetime
+
+    range_checks:
+      age:
+        min: 0
+        max: 120
+
+    regex_checks:
+      email: '^[^@\s]+@[^@\s]+\.[^@\s]+$'
+
+    custom_rules:
+      - name: customer_email_not_placeholder
+        condition: "email.str.lower() != 'test@example.com'"
+        message: "Customer email must not be a placeholder"
+
+  orders:
+    type_checks:
+      order_id: integer
+      customer_id: integer
+      subtotal_usd: number
+      total_usd: number
+      order_time: datetime
+
+    range_checks:
+      subtotal_usd:
+        min: 0
+      total_usd:
+        min: 0
+
+    custom_rules:
+      - name: total_not_exceed_subtotal
+        condition: "total_usd <= subtotal_usd"
+        message: "Total must not exceed subtotal"
+
+  products:
+    type_checks:
+      product_id: integer
+      price_usd: number
+      cost_usd: number
+      margin_usd: number
+
+    range_checks:
+      price_usd:
+        min: 0
+      cost_usd:
+        min: 0
+
+  sessions:
+    type_checks:
+      session_id: integer
+      customer_id: integer
+      start_time: datetime
+
+  employees:
+    type_checks:
+      employee_id: integer
+      hire_date: datetime
+      salary: number
+      is_active: boolean
+
+    range_checks:
+      salary:
+        min: 0
+
+    regex_checks:
+      email: '^[^@\s]+@[^@\s]+\.[^@\s]+$'

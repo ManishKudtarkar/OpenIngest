@@ -24,6 +24,16 @@ class Dataset:
 
     schema_valid: bool = False
 
+    auto_created_table: bool = False
+
+    quality_checked: bool = False
+
+    quality_score: float = 0.0
+
+    quality_status: str = "NOT_RUN"
+
+    quality_summary: Optional[str] = None
+
     load_status: str = "Pending"
 
     rows_loaded: int = 0

@@ -1,11 +1,13 @@
 import pandas as pd
 
+from utils.metadata_logger import ensure_metadata_schema
 from utils.db import get_engine
 
 
 def pipeline_report():
 
     engine = get_engine()
+    ensure_metadata_schema(engine)
 
     latest_run = pd.read_sql(
         """
@@ -26,13 +28,20 @@ def pipeline_report():
     datasets = pd.read_sql(
         f"""
         SELECT
-            dataset_name,
-            rows_loaded,
-            duration_seconds,
-            status
+            d.dataset_name,
+            d.rows_loaded,
+            d.duration_seconds,
+            d.status,
+            COALESCE(d.auto_created_table, FALSE) AS auto_created_table,
+            COALESCE(q.status, 'NOT RUN') AS quality_status,
+            COALESCE(q.score, 0) AS quality_score
         FROM pipeline_dataset_runs
-        WHERE run_id='{run.run_id}'
-        ORDER BY dataset_name;
+        d
+        LEFT JOIN pipeline_quality_runs q
+            ON q.run_id = d.run_id
+            AND q.dataset_name = d.dataset_name
+        WHERE d.run_id='{run.run_id}'
+        ORDER BY d.dataset_name;
         """,
         engine,
     )
@@ -61,6 +70,8 @@ def pipeline_report():
             f"{row.status:<12}"
             f"{row.rows_loaded:>8,} rows"
             f"   {row.duration_seconds:>6} sec"
+            f"   Auto-created table: {'YES' if row.auto_created_table else 'NO'}"
+            f"   Quality: {row.quality_status} ({row.quality_score:.2f}%)"
         )
 
     print("=" * 80)

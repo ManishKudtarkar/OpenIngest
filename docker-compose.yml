@@ -1,83 +1,104 @@
+version: "3.8"
+
 x-airflow-common: &airflow-common
   image: apache/airflow:2.9.3
+  user: "50000:0"
+  working_dir: /opt/airflow
+
   environment:
     AIRFLOW__CORE__EXECUTOR: LocalExecutor
-    AIRFLOW__CORE__LOAD_EXAMPLES: "false"
-    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "true"
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
-    AIRFLOW__CORE__FERNET_KEY: "7M7w4Y9m8g4fQ1l2h3k5n6p8r0s2t4u6"
-    AIRFLOW__WEBSERVER__SECRET_KEY: "airflow_shared_secret_12345"
+    AIRFLOW__CORE__FERNET_KEY: 7M7w4Y9m8g4fQ1l2h3k5n6p8r0s2t4u6
+    AIRFLOW__WEBSERVER__SECRET_KEY: airflow_shared_secret_12345
+    AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "True"
     PYTHONPATH: /opt/airflow
+
   volumes:
-    - ./dags:/opt/airflow/dags
+    - ./core:/opt/airflow/core
+    - ./models:/opt/airflow/models
+    - ./configs:/opt/airflow/configs
+    - ./utils:/opt/airflow/utils
     - ./scripts:/opt/airflow/scripts
     - ./sql:/opt/airflow/sql
-    - ./utils:/opt/airflow/utils
     - ./data:/opt/airflow/data
+    - ./dags:/opt/airflow/dags
     - ./.env:/opt/airflow/.env
     - ./requirements.txt:/opt/airflow/requirements.txt
-  working_dir: /opt/airflow
-  user: "${AIRFLOW_UID:-50000}:0"
+
   depends_on:
     postgres:
       condition: service_healthy
 
 services:
+
   postgres:
     image: postgres:15
+
     environment:
       POSTGRES_USER: airflow
       POSTGRES_PASSWORD: airflow
       POSTGRES_DB: airflow
+
+    volumes:
+      - postgres-db-volume:/var/lib/postgresql/data
+
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "airflow"]
       interval: 10s
       retries: 5
       start_period: 5s
-    volumes:
-      - postgres-db-volume:/var/lib/postgresql/data
 
   airflow-init:
     <<: *airflow-common
-    entrypoint: /bin/bash
-    command:
-      - -c
-      - |
-        pip install --no-cache-dir -r /opt/airflow/requirements.txt
-        airflow db migrate
-        airflow users create \
-          --username admin \
-          --password admin \
-          --firstname Manish \
-          --lastname Admin \
-          --role Admin \
-          --email admin@example.com || true
 
-  airflow-webserver:
-    <<: *airflow-common
-    depends_on:
-      airflow-init:
-        condition: service_completed_successfully
-    ports:
-      - "8080:8080"
     entrypoint: /bin/bash
-    command:
-      - -c
-      - |
-        pip install --no-cache-dir -r /opt/airflow/requirements.txt
-        airflow webserver
+
+    command: >
+      -c "
+      pip install --no-cache-dir -r /opt/airflow/requirements.txt &&
+      airflow db migrate &&
+      airflow users create
+      --username admin
+      --password admin
+      --firstname Manish
+      --lastname Admin
+      --role Admin
+      --email admin@example.com || true
+      "
 
   airflow-scheduler:
     <<: *airflow-common
+
+    entrypoint: /bin/bash
+
+    command: >
+      -c "
+      pip install --no-cache-dir -r /opt/airflow/requirements.txt &&
+      airflow scheduler
+      "
+
     depends_on:
       airflow-init:
         condition: service_completed_successfully
+
+  airflow-webserver:
+    <<: *airflow-common
+
     entrypoint: /bin/bash
-    command:
-      - -c
-      - |
-        pip install --no-cache-dir -r /opt/airflow/requirements.txt
-        airflow scheduler
+
+    command: >
+      -c "
+      pip install --no-cache-dir -r /opt/airflow/requirements.txt &&
+      airflow webserver
+      "
+
+    ports:
+      - "8080:8080"
+
+    depends_on:
+      airflow-init:
+        condition: service_completed_successfully
 
 volumes:
   postgres-db-volume:

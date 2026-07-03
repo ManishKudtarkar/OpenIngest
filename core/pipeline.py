@@ -1,5 +1,6 @@
 from core.discovery import discover_datasets
 from core.ingestion import ingest_dataset
+from core.quality import run_quality_checks
 from core.validation import validate_dataset
 
 from utils.metadata_logger import MetadataLogger
@@ -44,6 +45,23 @@ def run_pipeline():
         if not validation["valid"]:
 
             print("Schema Validation Failed")
+
+            skipped += 1
+
+            continue
+
+        quality_result = run_quality_checks(dataset)
+
+        logger.log_quality_result(run.run_id, dataset, quality_result)
+
+        print(
+            f"Quality Check : {quality_result['status']} "
+            f"({quality_result['score']:.2f}%)"
+        )
+
+        if not quality_result["passed"]:
+
+            print("Data Quality Failed")
 
             skipped += 1
 
