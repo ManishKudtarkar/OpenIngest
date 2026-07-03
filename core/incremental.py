@@ -260,7 +260,7 @@ def load_incremental_dataset(dataset, df: pd.DataFrame, engine: Engine) -> Dict[
     _ensure_unique_index(engine, dataset.table, primary_key_columns)
 
     state = _load_incremental_state(engine, dataset.name)
-    last_watermark_value = state["last_watermark_value"] if state else None
+    last_watermark_value: Optional[str] = str(state["last_watermark_value"]) if state and state.get("last_watermark_value") is not None else None
 
     candidates = _filter_by_watermark(df, incremental_column, last_watermark_value)
 

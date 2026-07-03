@@ -88,22 +88,22 @@ def ingest_dataset(dataset: Dataset) -> Dataset:
     # Load Strategy
     # --------------------------------------------------
 
-    strategy = dataset.config.get(
+    strategy = (dataset.config or {}).get(
         "load_strategy",
         "replace",
     )
 
-    dataset.load_strategy = strategy.lower()
-    dataset.incremental_column = dataset.config.get("incremental_column") or dataset.config.get("watermark_column")
+    dataset.load_strategy = str(strategy).lower()
+    dataset.incremental_column = (dataset.config or {}).get("incremental_column") or (dataset.config or {}).get("watermark_column")
 
     if strategy.lower() == "incremental":
         load_result = load_incremental_dataset(dataset, df, engine)
-        dataset.rows_loaded = load_result["rows_loaded"]
-        dataset.load_mode = load_result["load_mode"]
-        dataset.watermark_value = load_result["watermark_value"]
+        dataset.rows_loaded = int(load_result["rows_loaded"])
+        dataset.load_mode = str(load_result["load_mode"])
+        dataset.watermark_value = load_result.get("watermark_value")
     elif strategy.lower() == "replace":
         with engine.begin() as conn:
-            conn.execute(text(f"TRUNCATE TABLE {quote_table_name(dataset.table)};"))
+            conn.execute(text(f"TRUNCATE TABLE {quote_table_name(dataset.table or dataset.name)};"))
 
         df.to_sql(
             dataset.table,
