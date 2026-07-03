@@ -272,7 +272,7 @@ def load_incremental_dataset(dataset, df: pd.DataFrame, engine: Engine) -> Incre
     state = _load_incremental_state(engine, dataset.name)
     last_watermark_value: Optional[str] = str(state["last_watermark_value"]) if state and state.get("last_watermark_value") is not None else None
 
-    candidates = _filter_by_watermark(df, incremental_column, last_watermark_value)
+    candidates = _filter_by_watermark(df, incremental_column or "", last_watermark_value)
 
     if hash_columns:
         candidates = _apply_hash_change_detection(
