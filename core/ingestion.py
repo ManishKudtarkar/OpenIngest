@@ -98,9 +98,9 @@ def ingest_dataset(dataset: Dataset) -> Dataset:
 
     if strategy.lower() == "incremental":
         load_result = load_incremental_dataset(dataset, df, engine)
-        dataset.rows_loaded = int(load_result["rows_loaded"])
-        dataset.load_mode = str(load_result["load_mode"])
-        dataset.watermark_value = load_result.get("watermark_value")
+        dataset.rows_loaded = load_result["rows_loaded"]
+        dataset.load_mode = load_result["load_mode"]
+        dataset.watermark_value = load_result["watermark_value"]
     elif strategy.lower() == "replace":
         with engine.begin() as conn:
             conn.execute(text(f"TRUNCATE TABLE {quote_table_name(dataset.table or dataset.name)};"))

@@ -2,7 +2,17 @@ from __future__ import annotations
 
 import hashlib
 from datetime import datetime
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, TypedDict
+
+
+class IncrementalResult(TypedDict):
+    rows_loaded: int
+    load_mode: str
+    load_strategy: str
+    incremental_column: Optional[str]
+    watermark_value: Optional[str]
+    hash_based_change_detection: bool
+    upserted: bool
 
 import pandas as pd
 from sqlalchemy import MetaData, Table, text
@@ -246,10 +256,10 @@ def _upsert_dataframe(
             conn.execute(statement)
 
 
-def load_incremental_dataset(dataset, df: pd.DataFrame, engine: Engine) -> Dict[str, object]:
+def load_incremental_dataset(dataset, df: pd.DataFrame, engine: Engine) -> IncrementalResult:
     config = dataset.config or {}
     primary_key_columns = list(dict.fromkeys(config.get("primary_key", [])))
-    incremental_column = config.get("incremental_column") or config.get("watermark_column")
+    incremental_column: Optional[str] = config.get("incremental_column") or config.get("watermark_column") or None
     hash_columns = list(dict.fromkeys(config.get("hash_columns", [])))
 
     if not primary_key_columns:
