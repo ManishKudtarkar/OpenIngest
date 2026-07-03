@@ -46,3 +46,6 @@ exclude = ["data*", "sql*", "dags*", "docs*", "tests*"]
 minversion = "8.0"
 addopts = "-q"
 testpaths = ["tests"]
+
+[tool.ruff]
+exclude = ["build"]

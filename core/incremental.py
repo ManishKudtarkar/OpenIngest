@@ -5,7 +5,7 @@ from datetime import datetime
 from typing import Dict, List, Optional
 
 import pandas as pd
-from sqlalchemy import MetaData, Table, inspect, text
+from sqlalchemy import MetaData, Table, text
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.engine import Engine
 
@@ -191,8 +191,9 @@ def _apply_hash_change_detection(
         return df.copy()
 
     selected_columns = list(dict.fromkeys(primary_key_columns + hash_columns))
+    quoted_cols = ", ".join(f'"{c}"' for c in selected_columns)
     target_df = pd.read_sql(
-        text(f"SELECT {', '.join(f'\"{column}\"' for column in selected_columns)} FROM {_quote_table_name(table_name)}"),
+        text(f"SELECT {quoted_cols} FROM {_quote_table_name(table_name)}"),
         engine,
     )
 
