@@ -15,6 +15,8 @@ OpenIngest is a production-inspired data ingestion framework that automatically 
 
 New datasets can be onboarded without writing new ingestion code or new Airflow DAGs.
 
+> **New here?** Start with the [Getting Started guide](docs/GETTING_STARTED.md) — it explains the problem, the mental model, and walks you through adding your first dataset in under 10 minutes.
+
 ---
 
 ## Architecture
