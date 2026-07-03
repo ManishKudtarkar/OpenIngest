@@ -4,6 +4,11 @@ import hashlib
 from datetime import datetime
 from typing import Dict, List, Optional, TypedDict
 
+import pandas as pd
+from sqlalchemy import MetaData, Table, text
+from sqlalchemy.dialects.postgresql import insert as pg_insert
+from sqlalchemy.engine import Engine
+
 
 class IncrementalResult(TypedDict):
     rows_loaded: int
@@ -13,11 +18,6 @@ class IncrementalResult(TypedDict):
     watermark_value: Optional[str]
     hash_based_change_detection: bool
     upserted: bool
-
-import pandas as pd
-from sqlalchemy import MetaData, Table, text
-from sqlalchemy.dialects.postgresql import insert as pg_insert
-from sqlalchemy.engine import Engine
 
 
 def ensure_incremental_schema(engine: Engine) -> None:
