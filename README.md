@@ -6,8 +6,10 @@
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue)
 ![Airflow](https://img.shields.io/badge/Apache%20Airflow-2.9-red)
 ![Docker](https://img.shields.io/badge/Docker-Ready-blue)
-![CI](https://github.com/your-username/OpenIngest/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/manishkudtarkar/OpenIngest/actions/workflows/ci.yml/badge.svg)
+![Coverage](https://img.shields.io/badge/coverage-pytest--cov-brightgreen)
 ![License](https://img.shields.io/badge/License-MIT-green)
+![Version](https://img.shields.io/badge/version-1.0.0-blue)
 
 OpenIngest is a production-inspired data ingestion framework that automatically discovers datasets, validates schemas, runs data quality checks, ingests data into PostgreSQL, records execution metadata, and dynamically generates Apache Airflow DAGs — all driven by configuration.
 
@@ -61,7 +63,7 @@ Apache Airflow Scheduler
 **1. Clone and install**
 
 ```bash
-git clone https://github.com/your-username/OpenIngest.git
+git clone https://github.com/manishkudtarkar/OpenIngest.git
 cd OpenIngest
 pip install -e ".[dev]"
 ```
@@ -273,7 +275,22 @@ GitHub Actions runs on every push and pull request to `main`:
 
 ---
 
+## CI Status
+
+GitHub Actions runs automatically on every push and pull request to `main`.
+
+```text
+✓ Ruff        — lint
+✓ Mypy        — type check
+✓ Pytest      — tests + coverage
+✓ GitHub Actions — passing
+```
+
+---
+
 ## Example Run
+
+The demo pipeline processes **174,777 rows** across 5 datasets in a single run.
 
 ```bash
 openingest run
@@ -330,9 +347,13 @@ Status            : SUCCESS
 - ✅ Incremental loading (watermarks + CDC)
 - ✅ CLI (`openingest run`, `openingest validate`)
 - ✅ GitHub Actions CI (lint, type check, tests)
+- 🔲 S3 / Azure Blob / GCS connectors
 - 🔲 Excel, JSON, Parquet support
 - 🔲 REST API connectors
-- 🔲 Cloud storage connectors (S3, Azure Blob, GCS)
+- 🔲 Scheduling without Airflow (cron mode)
+- 🔲 Data lineage visualization
+- 🔲 Slack / Email notifications
+- 🔲 Plugin architecture for custom connectors
 - 🔲 Web dashboard
 - 🔲 AI-assisted pipeline generation
 
