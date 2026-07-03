@@ -32,11 +32,14 @@ def pipeline_report():
             d.rows_loaded,
             d.duration_seconds,
             d.status,
+            COALESCE(d.load_strategy, 'replace') AS load_strategy,
+            COALESCE(d.load_mode, 'FULL') AS load_mode,
+            COALESCE(d.incremental_column, '') AS incremental_column,
+            COALESCE(d.watermark_value, '') AS watermark_value,
             COALESCE(d.auto_created_table, FALSE) AS auto_created_table,
             COALESCE(q.status, 'NOT RUN') AS quality_status,
             COALESCE(q.score, 0) AS quality_score
-        FROM pipeline_dataset_runs
-        d
+        FROM pipeline_dataset_runs d
         LEFT JOIN pipeline_quality_runs q
             ON q.run_id = d.run_id
             AND q.dataset_name = d.dataset_name
@@ -70,6 +73,8 @@ def pipeline_report():
             f"{row.status:<12}"
             f"{row.rows_loaded:>8,} rows"
             f"   {row.duration_seconds:>6} sec"
+            f"   Load: {row.load_strategy}/{row.load_mode}"
+            f"   Watermark: {row.incremental_column or '-'}={row.watermark_value or '-'}"
             f"   Auto-created table: {'YES' if row.auto_created_table else 'NO'}"
             f"   Quality: {row.quality_status} ({row.quality_score:.2f}%)"
         )

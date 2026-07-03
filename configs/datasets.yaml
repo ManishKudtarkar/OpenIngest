@@ -27,7 +27,18 @@ datasets:
   orders:
     file: orders.csv
     staging_table: stg_orders
-    load_strategy: replace
+    load_strategy: incremental
+    incremental_column: order_time
+    hash_columns:
+      - customer_id
+      - order_time
+      - payment_method
+      - discount_pct
+      - subtotal_usd
+      - total_usd
+      - country
+      - device
+      - source
 
     primary_key:
       - order_id

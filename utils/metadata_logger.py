@@ -26,6 +26,61 @@ def ensure_metadata_schema(engine):
         conn.execute(
             text(
                 """
+                ALTER TABLE IF EXISTS pipeline_dataset_runs
+                ADD COLUMN IF NOT EXISTS load_strategy VARCHAR(20);
+                """
+            )
+        )
+
+        conn.execute(
+            text(
+                """
+                ALTER TABLE IF EXISTS pipeline_dataset_runs
+                ADD COLUMN IF NOT EXISTS load_mode VARCHAR(20);
+                """
+            )
+        )
+
+        conn.execute(
+            text(
+                """
+                ALTER TABLE IF EXISTS pipeline_dataset_runs
+                ADD COLUMN IF NOT EXISTS incremental_column VARCHAR(100);
+                """
+            )
+        )
+
+        conn.execute(
+            text(
+                """
+                ALTER TABLE IF EXISTS pipeline_dataset_runs
+                ADD COLUMN IF NOT EXISTS watermark_value TEXT;
+                """
+            )
+        )
+
+        conn.execute(
+            text(
+                """
+                CREATE TABLE IF NOT EXISTS pipeline_incremental_state (
+                    dataset_name VARCHAR(100) PRIMARY KEY,
+                    target_table VARCHAR(100),
+                    load_strategy VARCHAR(20),
+                    primary_key_columns TEXT,
+                    incremental_column VARCHAR(100),
+                    hash_columns TEXT,
+                    last_watermark_value TEXT,
+                    last_rows_loaded BIGINT,
+                    last_source_rows BIGINT,
+                    last_loaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                );
+                """
+            )
+        )
+
+        conn.execute(
+            text(
+                """
                 CREATE TABLE IF NOT EXISTS pipeline_quality_runs (
                     id SERIAL PRIMARY KEY,
                     run_id VARCHAR(50),
@@ -77,6 +132,10 @@ class MetadataLogger:
                         "auto_created_table",
                         False,
                     ),
+                    "load_strategy": getattr(dataset, "load_strategy", None),
+                    "load_mode": getattr(dataset, "load_mode", None),
+                    "incremental_column": getattr(dataset, "incremental_column", None),
+                    "watermark_value": getattr(dataset, "watermark_value", None),
                     "loaded_at": datetime.now(),
                 }
             ]

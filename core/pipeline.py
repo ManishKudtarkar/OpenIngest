@@ -6,7 +6,7 @@ from core.validation import validate_dataset
 from utils.metadata_logger import MetadataLogger
 
 
-def run_pipeline():
+def run_pipeline(dry_run: bool = False, dataset_filter: str | None = None):
 
     logger = MetadataLogger()
 
@@ -19,6 +19,15 @@ def run_pipeline():
     print("=" * 80)
 
     datasets = discover_datasets()
+
+    if dataset_filter:
+        datasets = [d for d in datasets if d.name == dataset_filter]
+        if not datasets:
+            print(f"Error: dataset '{dataset_filter}' not found.")
+            return
+
+    if dry_run:
+        print("[DRY RUN] Validation only — no data will be loaded.")
 
     run.datasets = datasets
 
@@ -65,6 +74,11 @@ def run_pipeline():
 
             skipped += 1
 
+            continue
+
+        if dry_run:
+            print(f"  [DRY RUN] {dataset.name} — would ingest (skipping)")
+            processed += 1
             continue
 
         dataset = ingest_dataset(dataset)

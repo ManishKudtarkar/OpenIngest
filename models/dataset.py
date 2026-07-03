@@ -13,6 +13,10 @@ class Dataset:
     registered: bool = False
     table: Optional[str] = None
     config: Optional[Dict] = None
+    load_strategy: str = "replace"
+    incremental_column: Optional[str] = None
+    load_mode: str = "FULL"
+    watermark_value: Optional[str] = None
 
     rows: int = 0
     columns: List[str] = field(default_factory=list)

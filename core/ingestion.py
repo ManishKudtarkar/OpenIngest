@@ -5,6 +5,7 @@ import pandas as pd
 from sqlalchemy import text
 
 from core.schema import ensure_table_exists, quote_table_name
+from core.incremental import load_incremental_dataset
 from core.validation import validate_dataset
 from models.dataset import Dataset
 from utils.db import get_engine
@@ -92,21 +93,44 @@ def ingest_dataset(dataset: Dataset) -> Dataset:
         "replace",
     )
 
-    if strategy.lower() == "replace":
+    dataset.load_strategy = strategy.lower()
+    dataset.incremental_column = dataset.config.get("incremental_column") or dataset.config.get("watermark_column")
+
+    if strategy.lower() == "incremental":
+        load_result = load_incremental_dataset(dataset, df, engine)
+        dataset.rows_loaded = load_result["rows_loaded"]
+        dataset.load_mode = load_result["load_mode"]
+        dataset.watermark_value = load_result["watermark_value"]
+    elif strategy.lower() == "replace":
         with engine.begin() as conn:
             conn.execute(text(f"TRUNCATE TABLE {quote_table_name(dataset.table)};"))
 
-    # --------------------------------------------------
-    # Load into PostgreSQL
-    # --------------------------------------------------
+        df.to_sql(
+            dataset.table,
+            engine,
+            if_exists="append",
+            index=False,
+            method="multi",
+        )
 
-    df.to_sql(
-        dataset.table,
-        engine,
-        if_exists="append",
-        index=False,
-        method="multi",
-    )
+        dataset.load_mode = "FULL"
+        dataset.rows_loaded = len(df)
+        dataset.watermark_value = None
+    else:
+        df.to_sql(
+            dataset.table,
+            engine,
+            if_exists="append",
+            index=False,
+            method="multi",
+        )
+
+        dataset.load_mode = "APPEND"
+        dataset.rows_loaded = len(df)
+        dataset.watermark_value = None
+
+    if strategy.lower() == "incremental":
+        pass
 
     # --------------------------------------------------
     # Metadata
@@ -114,7 +138,8 @@ def ingest_dataset(dataset: Dataset) -> Dataset:
 
     dataset.finished_at = datetime.now()
 
-    dataset.rows_loaded = len(df)
+    if strategy.lower() != "incremental":
+        dataset.rows_loaded = len(df)
 
     dataset.duration_seconds = round(
         time.time() - start,

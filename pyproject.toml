@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "openingest"
+version = "0.1.0"
+description = "Configuration-driven data ingestion framework with quality checks, metadata, and orchestration"
+readme = "docs/USABILITY_AND_OBSERVABILITY.md"
+requires-python = ">=3.10"
+authors = [
+  { name = "OpenIngest Contributors" }
+]
+license = { text = "MIT" }
+dependencies = [
+  "pandas",
+  "sqlalchemy",
+  "psycopg2-binary",
+  "python-dotenv",
+  "PyYAML==6.0.2"
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0",
+  "pytest-cov>=5.0",
+  "ruff>=0.4",
+  "mypy>=1.10"
+]
+web = [
+  "streamlit>=1.36"
+]
+
+[project.scripts]
+openingest = "scripts.openingest:main"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["core*", "models*", "utils*", "scripts*"]
+exclude = ["data*", "sql*", "dags*", "docs*", "tests*"]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = "-q"
+testpaths = ["tests"]
