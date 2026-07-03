@@ -1,6 +1,6 @@
 from airflow.operators.python import PythonOperator
 
-from core.airflow.runner import run_dataset, run_quality_check
+from core.airflow.runner import run_ingest, run_quality_check
 
 
 def create_ingestion_task(dag, dataset):
@@ -10,7 +10,7 @@ def create_ingestion_task(dag, dataset):
 
     return PythonOperator(
         task_id=f"ingest_{dataset.name}",
-        python_callable=run_dataset,
+        python_callable=run_ingest,
         op_kwargs={
             "dataset_name": dataset.name,
             "run_id": "{{ dag_run.run_id }}",

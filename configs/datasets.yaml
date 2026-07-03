@@ -111,3 +111,82 @@ datasets:
       - employee_id
       - email
       - department
+
+
+  events:
+    file: events.csv
+    staging_table: stg_events
+    load_strategy: incremental
+    incremental_column: timestamp
+    hash_columns:
+      - session_id
+      - event_type
+      - product_id
+      - amount_usd
+
+    primary_key:
+      - event_id
+
+    required_columns:
+      - event_id
+      - session_id
+      - timestamp
+      - event_type
+      - product_id
+      - qty
+      - cart_size
+      - payment
+      - discount_pct
+      - amount_usd
+
+    non_null_columns:
+      - event_id
+      - session_id
+      - timestamp
+      - event_type
+
+
+  order_items:
+    file: order_items.csv
+    staging_table: stg_order_items
+    load_strategy: replace
+
+    required_columns:
+      - order_id
+      - product_id
+      - unit_price_usd
+      - quantity
+      - line_total_usd
+
+    non_null_columns:
+      - order_id
+      - product_id
+      - quantity
+      - line_total_usd
+
+
+  reviews:
+    file: reviews.csv
+    staging_table: stg_reviews
+    load_strategy: incremental
+    incremental_column: review_time
+    hash_columns:
+      - order_id
+      - product_id
+      - rating
+
+    primary_key:
+      - review_id
+
+    required_columns:
+      - review_id
+      - order_id
+      - product_id
+      - rating
+      - review_text
+      - review_time
+
+    non_null_columns:
+      - review_id
+      - order_id
+      - rating

@@ -72,7 +72,7 @@ def _is_datetime_series(series: pd.Series) -> bool:
     if pd.api.types.is_numeric_dtype(cleaned):
         return False
 
-    parsed = pd.to_datetime(cleaned, errors="coerce")
+    parsed = pd.to_datetime(cleaned, errors="coerce", format="mixed")
 
     return parsed.notna().all()
 
@@ -97,10 +97,14 @@ def infer_postgres_type(series: pd.Series) -> str:
     if _is_bool_series(series):
         return "BOOLEAN"
 
+    if pd.api.types.is_integer_dtype(series):
+        max_val = int(series.abs().max()) if not series.empty else 0
+        return "BIGINT" if max_val > 2_147_483_647 else "INTEGER"
+
     is_numeric, is_integer = _is_numeric_series(series)
 
     if is_numeric:
-        if is_integer:
+        if is_integer and not series.isna().any():
             return "INTEGER"
 
         return "DOUBLE PRECISION"
