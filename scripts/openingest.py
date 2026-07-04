@@ -12,6 +12,17 @@ from core.discovery import discover_datasets
 from core.pipeline import run_pipeline
 from core.reporting import pipeline_report
 from core.validation import validate_dataset
+from scripts.commands.init import run_init
+from scripts.commands.add_dataset import run_add_dataset
+from scripts.commands.doctor import run_doctor
+from scripts.commands.discover import run_discover
+from scripts.commands.profile import run_profile
+from scripts.commands.infer import run_infer
+from scripts.commands.version import run_version, run_upgrade
+from scripts.commands.graph import run_graph
+from scripts.commands.docker_cmd import run_docker_init
+from scripts.commands.airflow_cmd import run_airflow_build
+from scripts.commands.schedule import run_schedule
 from scripts.dashboard import show_dashboard
 from scripts.data_quality_checks import run_data_quality_checks
 import pandas as pd
@@ -108,6 +119,32 @@ def main() -> int:
     subparsers.add_parser("quality", help="Run quality checks for all registered datasets")
     subparsers.add_parser("report", help="Show latest pipeline execution report")
     subparsers.add_parser("dashboard", help="Show monitoring dashboard")
+    subparsers.add_parser("doctor", help="Check environment and connectivity")
+    subparsers.add_parser("add-dataset", help="Interactively register a new dataset")
+    subparsers.add_parser("discover", help="Scan data/raw/ and register unregistered CSVs")
+    subparsers.add_parser("version", help="Show OpenIngest version")
+    subparsers.add_parser("upgrade", help="Upgrade OpenIngest to the latest version")
+    subparsers.add_parser("graph", help="Visualize the pipeline as ASCII graph")
+
+    profile_parser = subparsers.add_parser("profile", help="Profile a CSV file")
+    profile_parser.add_argument("file", help="CSV filename or path")
+
+    infer_parser = subparsers.add_parser("infer", help="Infer datasets.yaml config from a CSV")
+    infer_parser.add_argument("file", help="CSV filename or path")
+
+    schedule_parser = subparsers.add_parser("schedule", help="Set pipeline schedule (daily, hourly, cron)")
+    schedule_parser.add_argument("schedule", help="Preset (daily/hourly/weekly/monthly) or cron expression")
+
+    docker_parser = subparsers.add_parser("docker", help="Docker subcommands")
+    docker_sub = docker_parser.add_subparsers(dest="docker_command", required=True)
+    docker_sub.add_parser("init", help="Generate docker-compose.yml")
+
+    airflow_parser = subparsers.add_parser("airflow", help="Airflow subcommands")
+    airflow_sub = airflow_parser.add_subparsers(dest="airflow_command", required=True)
+    airflow_sub.add_parser("build", help="Generate Airflow DAG from datasets.yaml")
+
+    init_parser = subparsers.add_parser("init", help="Scaffold a new OpenIngest project")
+    init_parser.add_argument("project_name", help="Name of the project directory to create")
 
     history_parser = subparsers.add_parser("history", help="Show pipeline and dataset history")
     history_parser.add_argument("--limit", type=int, default=20, help="Number of recent pipeline runs")
@@ -136,6 +173,44 @@ def main() -> int:
     if args.command == "history":
         run_history(limit=args.limit)
         return 0
+
+    if args.command == "doctor":
+        return run_doctor()
+
+    if args.command == "add-dataset":
+        return run_add_dataset()
+
+    if args.command == "init":
+        return run_init(args.project_name)
+
+    if args.command == "discover":
+        return run_discover()
+
+    if args.command == "profile":
+        return run_profile(args.file)
+
+    if args.command == "infer":
+        return run_infer(args.file)
+
+    if args.command == "version":
+        return run_version()
+
+    if args.command == "upgrade":
+        return run_upgrade()
+
+    if args.command == "graph":
+        return run_graph()
+
+    if args.command == "schedule":
+        return run_schedule(args.schedule)
+
+    if args.command == "docker":
+        if args.docker_command == "init":
+            return run_docker_init()
+
+    if args.command == "airflow":
+        if args.airflow_command == "build":
+            return run_airflow_build()
 
     return 1
 

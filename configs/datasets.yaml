@@ -85,34 +85,6 @@ datasets:
       - country
 
 
-  employees:
-    file: employees.csv
-    staging_table: stg_employees
-    load_strategy: replace
-
-    primary_key:
-      - employee_id
-
-    required_columns:
-      - employee_id
-      - first_name
-      - last_name
-      - department
-      - email
-      - hire_date
-      - salary
-      - is_active
-
-    unique_columns:
-      - employee_id
-      - email
-
-    non_null_columns:
-      - employee_id
-      - email
-      - department
-
-
   events:
     file: events.csv
     staging_table: stg_events

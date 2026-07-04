@@ -1,0 +1,2 @@
+cron: 0 0 * * *
+schedule: '@daily'
