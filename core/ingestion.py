@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 import time
 from datetime import datetime
+from pathlib import Path
 
 import pandas as pd
 from sqlalchemy import text
@@ -12,11 +15,42 @@ from utils.db import get_engine
 
 
 class DatasetIngestionError(Exception):
-    """
-    Raised whenever a dataset cannot be ingested.
-    """
+    """Raised whenever a dataset cannot be ingested."""
     pass
 
+
+def _read_dataset(dataset: Dataset) -> pd.DataFrame:
+    """
+    Read source data via the ConnectorRegistry (v2.0).
+
+    Supports CSV, Excel, JSON, Parquet, S3, Azure Blob, GCS, REST API.
+    Falls back to pd.read_csv for legacy datasets without an explicit source block.
+    """
+    config = dataset.config or {}
+    source_cfg = config.get("source", {})
+
+    if source_cfg:
+        # Explicit source block → use connector registry
+        source_type: str = source_cfg.get("type", "csv").lower()
+        try:
+            from core.connectors.registry import ConnectorRegistry
+            connector = ConnectorRegistry.get(source_type, source_cfg)
+            return connector.read()
+        except ImportError as exc:
+            raise DatasetIngestionError(str(exc)) from exc
+    else:
+        # Legacy path — read from dataset.file with auto format detection
+        file_path = dataset.file
+        file_ext = Path(str(file_path)).suffix.lower()
+
+        if file_ext in (".xlsx", ".xls"):
+            return pd.read_excel(file_path, engine="openpyxl")
+        if file_ext == ".json":
+            return pd.read_json(file_path)
+        if file_ext in (".parquet", ".pq"):
+            return pd.read_parquet(file_path)
+
+        return pd.read_csv(file_path)
 
 def ingest_dataset(dataset: Dataset) -> Dataset:
     """
@@ -67,10 +101,11 @@ def ingest_dataset(dataset: Dataset) -> Dataset:
     start = time.time()
 
     # --------------------------------------------------
-    # Read CSV
+    # Read source data via ConnectorRegistry (v2.0)
+    # Supports: csv, excel, json, parquet, s3, azure, gcs, rest
     # --------------------------------------------------
 
-    df = pd.read_csv(dataset.file)
+    df = _read_dataset(dataset)
 
     # --------------------------------------------------
     # Database Connection

@@ -4,10 +4,12 @@ import { Menu, X } from "lucide-react";
 import GithubIcon from "./GithubIcon";
 
 const NAV = [
-  { label: "Features", href: "#features" },
-  { label: "How It Works", href: "#architecture" },
-  { label: "CLI", href: "#cli" },
-  { label: "Docs", href: "#docs" },
+  { label: "Features",    href: "#features" },
+  { label: "How It Works",href: "#architecture" },
+  { label: "Connectors",  href: "#connectors" },
+  { label: "CLI",         href: "#cli" },
+  { label: "Roadmap",     href: "#roadmap" },
+  { label: "Docs",        href: "#docs" },
 ];
 
 export default function Navbar() {

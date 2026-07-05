@@ -135,6 +135,21 @@ def main() -> int:
     schedule_parser = subparsers.add_parser("schedule", help="Set pipeline schedule (daily, hourly, cron)")
     schedule_parser.add_argument("schedule", help="Preset (daily/hourly/weekly/monthly) or cron expression")
 
+    scheduler_parser = subparsers.add_parser("scheduler", help="Built-in scheduler (no Airflow required)")
+    scheduler_sub = scheduler_parser.add_subparsers(dest="scheduler_command", required=True)
+    sched_start = scheduler_sub.add_parser("start", help="Start the built-in cron scheduler")
+    sched_start.add_argument(
+        "--cron",
+        metavar="EXPR",
+        help='Cron expression or preset (@daily, @hourly, "0 * * * *"). '
+             "Defaults to schedule in configs/pipeline.yaml.",
+    )
+    sched_start.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Run in dry-run mode (no DB writes) on each scheduled tick.",
+    )
+
     docker_parser = subparsers.add_parser("docker", help="Docker subcommands")
     docker_sub = docker_parser.add_subparsers(dest="docker_command", required=True)
     docker_sub.add_parser("init", help="Generate docker-compose.yml")
@@ -203,6 +218,19 @@ def main() -> int:
 
     if args.command == "schedule":
         return run_schedule(args.schedule)
+
+    if args.command == "scheduler":
+        if args.scheduler_command == "start":
+            from core.scheduler import Scheduler
+            from utils.config_loader import load_pipeline_config
+            cron_arg = args.cron or None
+            if not cron_arg:
+                cfg = load_pipeline_config()
+                cron_arg = cfg.get("cron") or cfg.get("schedule") or "@daily"
+            dry = getattr(args, "dry_run", False)
+            s = Scheduler(cron_expression=cron_arg, dry_run=dry)
+            s.start()
+            return 0
 
     if args.command == "docker":
         if args.docker_command == "init":

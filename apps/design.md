@@ -116,12 +116,13 @@ Fonts:
 8. CLI Demo — interactive terminal with real commands
 9. Airflow Section — real DAG structure with 8 datasets
 10. Load Strategies — explain replace/append/incremental
-11. Stats — 174,777 rows, 4.21s, 8 datasets, 100% quality
-12. Roadmap — all 5 milestones done + upcoming
-13. Getting Started — 5-step install walkthrough
-14. Docs cards
-15. CTA
-16. Footer
+11. Connectors Section (v2.0) — all source connectors with interactive config preview
+12. Stats — 174,777 rows, 4.21s, 8 datasets, 100% quality
+13. Roadmap — collapsible v2.0/v2.5/v3.0 with real snippets
+14. Getting Started — 5-step install walkthrough
+15. Docs cards
+16. CTA
+17. Footer
 
 ---
 
@@ -254,17 +255,88 @@ Real 5-step flow from docs/GETTING_STARTED.md:
 Completed (all 5 milestones):
   M1 Discovery · M2 Metadata · M3 Docker + Airflow · M4 Schema inference · M5 Quality + Incremental + CLI + CI
 
-Upcoming:
-  S3 / Azure Blob / GCS connectors
-  Excel, JSON, Parquet support
-  REST API connectors
-  Cron mode (no Airflow needed)
-  Data lineage visualization
-  Slack / Email notifications
-  Plugin architecture for custom connectors
-  Web dashboard (Streamlit)
-  AI-assisted pipeline generation
-  PyPI release
+### Version 2.0 — Multi-format + Cloud (Up Next)
+
+Multi-format Support:
+  - Excel (.xlsx) connector
+  - JSON connector
+  - Parquet connector
+  - CSV already done ✅
+
+Cloud Storage Connectors:
+  - Amazon S3 connector
+  - Azure Blob Storage connector
+  - Google Cloud Storage connector
+
+  Config example:
+    source:
+      type: s3
+      bucket: company-data
+      key: customers/customers.csv
+
+REST API Connector:
+  - GET / POST with headers + auth
+  - Bearer token + env var support (${TOKEN})
+  - Pagination handling
+
+  Config example:
+    source:
+      type: rest
+      url: https://api.company.com/orders
+      method: GET
+      headers:
+        Authorization: Bearer ${TOKEN}
+
+### Version 2.5 — Scheduling + Observability (Planned)
+
+Cron Mode (no Airflow required):
+  - openingest run --schedule "0 * * * *"
+  - openingest scheduler start
+  - Built-in cron engine
+
+Notifications:
+  - Slack webhook on success / fail
+  - Email notifications
+  - Retry policies
+
+  Config example:
+    notifications:
+      slack:
+        webhook: ${SLACK_URL}
+
+  Example message:
+    Pipeline: SUCCESS
+    Datasets: 5  Rows: 141,200  Duration: 47 sec
+
+Data Profiling:
+  - Automatic dataset profiling
+  - Column statistics + distributions
+
+### Version 3.0 — Enterprise Platform (Future)
+
+Plugin Architecture:
+  - pip install openingest-s3
+  - pip install openingest-snowflake
+  - pip install openingest-salesforce
+  - ConnectorRegistry.register(...)
+
+  Config example:
+    source:
+      type: snowflake
+
+Data Lineage Visualization:
+  - Visual pipeline lineage graph
+  - Source → staging → warehouse flow
+  - Dependency tracking
+
+  Example lineage:
+    customers.csv → Schema Validation → Quality Checks → stg_customers → warehouse.customers
+
+Enterprise:
+  - Web dashboard (Streamlit)
+  - RBAC (role-based access control)
+  - Multi-environment support
+  - PyPI public release
 
 ---
 

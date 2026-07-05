@@ -8,6 +8,7 @@ import CodeExample from "./components/CodeExample";
 import CLISection from "./components/CLISection";
 import AirflowSection from "./components/AirflowSection";
 import LoadStrategies from "./components/LoadStrategies";
+import ConnectorsSection from "./components/ConnectorsSection";
 import Stats from "./components/Stats";
 import GettingStarted from "./components/GettingStarted";
 import Roadmap from "./components/Roadmap";
@@ -29,6 +30,7 @@ export default function Home() {
         <CLISection />
         <AirflowSection />
         <LoadStrategies />
+        <ConnectorsSection />
         <Stats />
         <GettingStarted />
         <Roadmap />

@@ -162,3 +162,118 @@ datasets:
       - review_id
       - order_id
       - rating
+
+
+  employees:
+    file: employees.csv
+    staging_table: stg_employees
+    load_strategy: replace
+
+    primary_key:
+      - employee_id
+
+    required_columns:
+      - employee_id
+      - name
+      - email
+      - department
+      - role
+      - hire_date
+      - salary
+      - is_active
+
+    unique_columns:
+      - employee_id
+
+    non_null_columns:
+      - employee_id
+      - email
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# v2.0 Source Connector Examples
+# Uncomment and adapt to use cloud / multi-format / REST API sources.
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Example: Amazon S3 source
+# customers_s3:
+#   source:
+#     type: s3
+#     bucket: company-data
+#     key: customers/customers.csv
+#     aws_access_key_id: ${AWS_ACCESS_KEY_ID}
+#     aws_secret_access_key: ${AWS_SECRET_ACCESS_KEY}
+#     region: us-east-1
+#   staging_table: stg_customers
+#   load_strategy: replace
+#   primary_key: [customer_id]
+#   required_columns: [customer_id, name, email]
+
+# Example: Azure Blob Storage source (Parquet)
+# orders_azure:
+#   source:
+#     type: azure
+#     container: company-data
+#     blob: orders/orders.parquet
+#     connection_string: ${AZURE_STORAGE_CONNECTION_STRING}
+#   staging_table: stg_orders
+#   load_strategy: incremental
+#   incremental_column: order_time
+#   primary_key: [order_id]
+#   required_columns: [order_id, customer_id, order_time, total_usd]
+
+# Example: Google Cloud Storage source
+# products_gcs:
+#   source:
+#     type: gcs
+#     bucket: company-data
+#     object: products/products.csv
+#     project: my-gcp-project
+#   staging_table: stg_products
+#   load_strategy: replace
+#   primary_key: [product_id]
+#   required_columns: [product_id, name, price_usd]
+
+# Example: REST API source
+# api_orders:
+#   source:
+#     type: rest
+#     url: https://api.company.com/v1/orders
+#     method: GET
+#     headers:
+#       Authorization: Bearer ${ORDERS_API_TOKEN}
+#       Accept: application/json
+#     record_path: data
+#     pagination:
+#       type: offset
+#       param: offset
+#       limit_param: limit
+#       limit: 500
+#       max_pages: 20
+#   staging_table: stg_api_orders
+#   load_strategy: incremental
+#   incremental_column: created_at
+#   primary_key: [id]
+#   required_columns: [id, customer_id, total, created_at]
+
+# Example: Excel source
+# budget_excel:
+#   source:
+#     type: excel
+#     file: data/raw/budget_2026.xlsx
+#     sheet: Q1
+#   staging_table: stg_budget
+#   load_strategy: replace
+#   required_columns: [department, amount, quarter]
+
+# Example: Parquet source (local)
+# events_parquet:
+#   source:
+#     type: parquet
+#     file: data/raw/events.parquet
+#     columns: [event_id, session_id, timestamp, event_type, amount_usd]
+#   staging_table: stg_events_parquet
+#   load_strategy: incremental
+#   incremental_column: timestamp
+#   primary_key: [event_id]
+#   required_columns: [event_id, session_id, timestamp, event_type]
