@@ -22,7 +22,6 @@ def run_graph() -> int:
     print("     |")
 
     names = list(datasets.keys())
-    col_width = max(len(n) for n in names) + 4
 
     # Show parallel fan-out
     branches = []
