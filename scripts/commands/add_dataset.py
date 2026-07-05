@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Any
 
 import yaml
 
@@ -12,7 +13,7 @@ def _prompt(label: str, default: str = "") -> str:
     return value if value else default
 
 
-def _prompt_list(label: str) -> list:
+def _prompt_list(label: str) -> list[str]:
     print(f"{label} (comma-separated):")
     raw = input("> ").strip()
     return [c.strip() for c in raw.split(",") if c.strip()]
@@ -44,14 +45,14 @@ def run_add_dataset() -> int:
     non_null_columns = _prompt_list("Non-null columns (leave blank to skip)")
     unique_columns = _prompt_list("Unique columns (leave blank to skip)")
 
-    incremental_column = None
-    hash_columns = []
+    incremental_column: str | None = None
+    hash_columns: list[str] = []
 
     if strategy == "incremental":
         incremental_column = _prompt("\nWatermark column (e.g. updated_at)")
         hash_columns = _prompt_list("Hash columns for change detection")
 
-    entry: dict = {
+    entry: dict[str, Any] = {
         "file": csv_file,
         "staging_table": table,
         "load_strategy": strategy,
@@ -72,7 +73,7 @@ def run_add_dataset() -> int:
 
     if not CONFIG_PATH.exists():
         CONFIG_PATH.parent.mkdir(parents=True, exist_ok=True)
-        config = {"datasets": {}}
+        config: dict[str, Any] = {"datasets": {}}
     else:
         with open(CONFIG_PATH) as f:
             config = yaml.safe_load(f) or {}
