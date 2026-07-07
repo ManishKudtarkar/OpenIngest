@@ -32,14 +32,11 @@ export default function Navbar() {
 
         {/* Logo */}
         <a href="#" className="flex items-center gap-2.5 group">
-          <div className="relative w-8 h-8">
-            <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 opacity-80 group-hover:opacity-100 transition-opacity" />
-            <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 blur-md opacity-40 group-hover:opacity-60 transition-opacity" />
-            <svg className="relative w-8 h-8 p-1.5" viewBox="0 0 20 20" fill="none">
-              <path d="M10 2L3 6v8l7 4 7-4V6L10 2z" stroke="white" strokeWidth="1.5" strokeLinejoin="round"/>
-              <path d="M10 2v14M3 6l7 4 7-4" stroke="white" strokeWidth="1.5" strokeLinejoin="round"/>
-            </svg>
-          </div>
+          <img
+            src="/openingest.png"
+            alt="OpenIngest logo"
+            className="w-8 h-8 object-contain"
+          />
           <span className="f-head font-bold text-[15px] tracking-tight text-white">OpenIngest</span>
         </a>
 
