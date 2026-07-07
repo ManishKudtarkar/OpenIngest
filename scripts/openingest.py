@@ -27,6 +27,7 @@ from scripts.dashboard import show_dashboard
 from scripts.data_quality_checks import run_data_quality_checks
 import pandas as pd
 from utils.db import get_engine
+from utils.config_loader import load_pipeline_config
 
 
 engine = get_engine()
@@ -222,7 +223,6 @@ def main() -> int:
     if args.command == "scheduler":
         if args.scheduler_command == "start":
             from core.scheduler import Scheduler
-            from utils.config_loader import load_pipeline_config
             cron_arg = args.cron or None
             if not cron_arg:
                 cfg = load_pipeline_config()
