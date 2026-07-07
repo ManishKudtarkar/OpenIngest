@@ -27,6 +27,9 @@
   --fg4:      #1E293B;
 
   /* Fonts */
+  --font-inter: "Inter";
+  --font-space-grotesk: "Space Grotesk";
+  --font-jetbrains-mono: "JetBrains Mono";
   --font-sans: var(--font-inter);
   --font-head: var(--font-space-grotesk);
   --font-mono: var(--font-jetbrains-mono);
@@ -55,6 +58,26 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
+}
+
+::selection {
+  background: rgba(34, 211, 238, 0.28);
+  color: #ffffff;
+}
+
+:focus-visible {
+  outline: 2px solid rgba(34, 211, 238, 0.7);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* Scrollbar */

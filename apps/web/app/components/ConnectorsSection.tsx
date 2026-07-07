@@ -294,7 +294,7 @@ export default function ConnectorsSection() {
                 <div className="text-[#A5B4FC]">pip install openingest-salesforce</div>
                 <div className="text-[#1E293B]">&nbsp;</div>
                 <div className="text-[#334155] mb-1"># Registers automatically on import</div>
-                <div><span className="text-[#CBD5E1]">ConnectorRegistry</span><span className="text-[#94A3B8]">.register(</span><span className="text-[#34D399]">"snowflake"</span><span className="text-[#94A3B8]">, SnowflakeConnector)</span></div>
+                <div><span className="text-[#CBD5E1]">ConnectorRegistry</span><span className="text-[#94A3B8]">.register(</span><span className="text-[#34D399]">&quot;snowflake&quot;</span><span className="text-[#94A3B8]">, SnowflakeConnector)</span></div>
                 <div className="text-[#1E293B]">&nbsp;</div>
                 <div className="text-[#334155] mb-1"># Then use in YAML:</div>
                 <div><span className="text-[#CBD5E1]">source:</span></div>

@@ -98,11 +98,11 @@ export default function Features() {
       <div className="relative max-w-[1380px] mx-auto px-6 lg:px-12">
         {/* Header */}
         <div className="text-center mb-20 max-w-2xl mx-auto">
-          <div className="inline-flex items-center gap-2 tag text-indigo-400 border-indigo-500/25 bg-indigo-500/8 mb-5">
+          <div className="inline-flex items-center gap-2 tag text-cyan-300 border-cyan-300/25 bg-cyan-300/8 mb-5">
             <Zap size={11} fill="currentColor" />
             Built for production
           </div>
-          <h2 className="f-head text-[42px] md:text-[52px] font-bold text-white leading-[1.1] tracking-[-0.025em] mb-5">
+          <h2 className="f-head text-[42px] md:text-[52px] font-bold text-white leading-[1.1] mb-5">
             Every component you need,{" "}
             <span className="g-text">nothing you don&apos;t.</span>
           </h2>
@@ -116,13 +116,13 @@ export default function Features() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {FEATURES.map(({ icon: Icon, title, desc, src, accent }) => (
             <div key={title}
-              className="group relative panel rounded-2xl p-5 hover:border-white/12 transition-all duration-300 hover:-translate-y-1 overflow-hidden">
+              className="group relative panel rounded-lg p-5 hover:border-white/12 transition-all duration-300 hover:-translate-y-1 overflow-hidden">
               {/* Hover glow */}
-              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"
-                style={{ background: `radial-gradient(circle at 50% 0%, ${accent}0a 0%, transparent 70%)` }} />
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                style={{ background: `linear-gradient(180deg, ${accent}10 0%, transparent 76%)` }} />
 
               <div className="relative">
-                <div className="w-9 h-9 rounded-xl flex items-center justify-center mb-4"
+                <div className="w-9 h-9 rounded-lg flex items-center justify-center mb-4"
                   style={{ background: `${accent}15`, border: `1px solid ${accent}25` }}>
                   <Icon size={17} style={{ color: accent }} />
                 </div>
