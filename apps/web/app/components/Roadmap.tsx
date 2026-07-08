@@ -21,49 +21,39 @@ const VERSIONS = [
     version: "v2.0",
     label: "Multi-format + Cloud",
     headline: "Every data source, one config.",
-    status: "next",
-    accent: "#6366F1",
-    accentBg: "rgba(99,102,241,0.08)",
+    status: "shipped",
+    accent: "#10B981",
     icon: Cloud,
     groups: [
       {
         title: "Multi-format",
         icon: Package,
         items: [
-          { label: "Excel (.xlsx)",         done: false },
-          { label: "JSON + NDJSON",         done: false },
-          { label: "Parquet (columnar)",    done: false },
-          { label: "CSV",                   done: true  },
+          { label: "Excel (.xlsx)",         done: true },
+          { label: "JSON + NDJSON",         done: true },
+          { label: "Parquet (columnar)",    done: true },
+          { label: "CSV",                   done: true },
         ],
       },
       {
         title: "Cloud Storage",
         icon: Cloud,
         items: [
-          { label: "Amazon S3",             done: false },
-          { label: "Azure Blob Storage",    done: false },
-          { label: "Google Cloud Storage",  done: false },
+          { label: "Amazon S3",             done: true },
+          { label: "Azure Blob Storage",    done: true },
+          { label: "Google Cloud Storage",  done: true },
         ],
       },
       {
         title: "REST API",
         icon: Globe,
         items: [
-          { label: "GET / POST + headers",  done: false },
-          { label: "Bearer token + ${ENV}", done: false },
-          { label: "Offset + cursor paging",done: false },
+          { label: "GET / POST + headers",  done: true },
+          { label: "Bearer token + ${ENV}", done: true },
+          { label: "Offset + cursor paging",done: true },
         ],
       },
     ],
-    snippet: {
-      comment: "# S3 source (v2.0)",
-      lines: [
-        ["source:", "#CBD5E1"],
-        ["  type: ", "#94A3B8"], ["s3", "#FBBF24"],
-        ["  bucket: ", "#94A3B8"], ["company-data", "#34D399"],
-        ["  key: ", "#94A3B8"], ["orders/2026.csv", "#34D399"],
-      ],
-    },
     snipLines: [
       [["source:",              "#CBD5E1"]],
       [["  type: ", "#94A3B8"], ["s3",                "#FBBF24"]],
@@ -75,26 +65,25 @@ const VERSIONS = [
     version: "v2.5",
     label: "Scheduling + Observability",
     headline: "Run without Airflow. Know when it fails.",
-    status: "planned",
-    accent: "#8B5CF6",
-    accentBg: "rgba(139,92,246,0.08)",
+    status: "shipped",
+    accent: "#10B981",
     icon: Clock,
     groups: [
       {
         title: "Built-in Cron Scheduler",
         icon: Clock,
         items: [
-          { label: "openingest scheduler start", done: false },
-          { label: "openingest run --schedule",  done: false },
-          { label: "Preset aliases (@daily…)",   done: false },
+          { label: "openingest scheduler start", done: true },
+          { label: "openingest run --schedule",  done: true },
+          { label: "Preset aliases (@daily…)",   done: true },
         ],
       },
       {
         title: "Notifications",
         icon: Bell,
         items: [
-          { label: "Slack webhook on success/fail", done: false },
-          { label: "Email (SMTP) alerts",           done: false },
+          { label: "Slack webhook on success/fail", done: true },
+          { label: "Email (SMTP) alerts",           done: true },
           { label: "Retry policies",                done: false },
         ],
       },
@@ -118,17 +107,16 @@ const VERSIONS = [
     version: "v3.0",
     label: "Enterprise Platform",
     headline: "Extensible. Observable. Enterprise-ready.",
-    status: "future",
-    accent: "#14B8A6",
-    accentBg: "rgba(20,184,166,0.08)",
+    status: "next",
+    accent: "#6366F1",
     icon: Puzzle,
     groups: [
       {
         title: "Plugin Architecture",
         icon: Puzzle,
         items: [
-          { label: "pip install openingest-*",      done: false },
-          { label: "ConnectorRegistry.register()",  done: false },
+          { label: "pip install openingest-*",      done: true },
+          { label: "ConnectorRegistry.register()",  done: true },
           { label: "Custom connector SDK",          done: false },
         ],
       },
@@ -136,9 +124,9 @@ const VERSIONS = [
         title: "Data Lineage",
         icon: GitBranch,
         items: [
-          { label: "Visual lineage graph",          done: false },
-          { label: "Source → staging → warehouse",  done: false },
-          { label: "Mermaid / JSON export",         done: false },
+          { label: "Lineage graph engine",          done: true },
+          { label: "ASCII + Mermaid + JSON export", done: true },
+          { label: "Web lineage visualizer",        done: false },
         ],
       },
       {
@@ -163,9 +151,10 @@ const VERSIONS = [
 ];
 
 const STATUS_META: Record<string, { label: string; pill: string }> = {
-  next:    { label: "Up next",  pill: "text-indigo-400 bg-indigo-500/10 border-indigo-500/25" },
-  planned: { label: "Planned",  pill: "text-violet-400 bg-violet-500/10 border-violet-500/25" },
-  future:  { label: "Future",   pill: "text-teal-400 bg-teal-500/10 border-teal-500/25" },
+  shipped: { label: "Shipped ✓", pill: "text-emerald-400 bg-emerald-500/10 border-emerald-500/25" },
+  next:    { label: "Up next",   pill: "text-indigo-400 bg-indigo-500/10 border-indigo-500/25" },
+  planned: { label: "Planned",   pill: "text-violet-400 bg-violet-500/10 border-violet-500/25" },
+  future:  { label: "Future",    pill: "text-teal-400 bg-teal-500/10 border-teal-500/25" },
 };
 
 // Lineage mini-diagram for v3.0 preview
