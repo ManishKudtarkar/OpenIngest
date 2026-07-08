@@ -1,184 +1,146 @@
 # Getting Started with OpenIngest
 
-## What problem does this solve?
-
-Imagine you work at a company. Every day you receive CSV files:
-
-- `customers.csv` — new customer signups
-- `orders.csv` — new orders placed
-- `products.csv` — product catalog updates
-
-Your job is to load these into a database so analysts can query them.
-
-**Without OpenIngest**, you would write a separate Python script for each file,
-manually create database tables, handle errors yourself, and have no visibility
-into what ran, when, or how many rows were loaded.
-
-**With OpenIngest**, you register the dataset once in a YAML file. Everything
-else — discovery, validation, loading, scheduling, monitoring — happens
-automatically.
+From clone to **174,777 rows loaded in 4.21 seconds** — in under 10 minutes.
 
 ---
 
-## Who is this for?
+## What is OpenIngest?
 
-| You are | OpenIngest helps you |
-|---|---|
-| A data engineering student | Understand how real ingestion pipelines are built |
-| A junior data engineer | See a working example of config-driven ETL |
-| A developer with CSV data | Load it into PostgreSQL without writing SQL |
-| Anyone learning Airflow | See a real dynamic DAG with task groups |
+OpenIngest is a configuration-driven data ingestion framework. You register a dataset in a YAML file. OpenIngest handles everything else: file discovery, schema validation, data quality checks, PostgreSQL loading, metadata logging, and Airflow DAG generation.
+
+No Python per dataset. No SQL DDL. No DAG edits.
 
 ---
 
-## The mental model
+## Prerequisites
 
-Think of OpenIngest as a **post office for your data**.
-
-```
-Your CSV files  →  OpenIngest  →  PostgreSQL database
-```
-
-You don't tell it how to carry each package. You register the address (config)
-and it handles the rest.
+- Python 3.10+
+- Docker Desktop (for PostgreSQL + Airflow)
+- Git
 
 ---
 
-## What happens when you run it?
-
-When you run `openingest run`, this is what happens for every dataset:
-
-```
-Step 1 — DISCOVER
-  Scans data/raw/ and finds your CSV files
-
-Step 2 — VALIDATE SCHEMA
-  Checks that required columns are present
-  Fails early if something is missing
-
-Step 3 — QUALITY CHECK
-  Checks for nulls, duplicates, out-of-range values
-  Gives a quality score (0–100%)
-  Stops ingestion if quality fails
-
-Step 4 — INGEST
-  Loads data into PostgreSQL using the strategy you configured:
-    replace     → wipe and reload
-    append      → add new rows
-    incremental → only load new/changed rows
-
-Step 5 — METADATA
-  Records what ran, how long it took, how many rows loaded
-
-Step 6 — REPORT
-  Prints a summary of the full run
-```
-
-This is exactly what the Airflow DAG shows visually — each step is a separate
-task inside a task group per dataset:
-
-```
-start
-  ├── customers  [discover → validate_schema → quality_check → ingest]
-  ├── orders     [discover → validate_schema → quality_check → ingest]
-  ├── products   [discover → validate_schema → quality_check → ingest]
-  ├── sessions   [discover → validate_schema → quality_check → ingest]
-  └── employees  [discover → validate_schema → quality_check → ingest]
-        ↓
-  pipeline_report
-        ↓
-       end
-```
-
----
-
-## Setup in 5 steps
-
-### Step 1 — Clone the repository
+## Step 1 — Clone and install
 
 ```bash
-git clone https://github.com/manishkudtarkar/OpenIngest.git
+git clone https://github.com/ManishKudtarkar/OpenIngest.git
 cd OpenIngest
-```
-
-### Step 2 — Install the package
-
-```bash
 pip install -e ".[dev]"
 ```
 
-This installs OpenIngest as a local package and gives you the `openingest` CLI.
+This installs OpenIngest as an editable package and registers the `openingest` CLI.
 
-> **Windows users:** if `openingest` is not recognised after install, add the
-> Python Scripts folder to your PATH:
-> ```powershell
-> $env:PATH += ";C:\Users\<you>\AppData\Roaming\Python\Python312\Scripts"
-> ```
+**Windows — if `openingest` command is not found after install:**
 
-### Step 3 — Configure your database
+```powershell
+$env:PATH += ";C:\Users\<you>\AppData\Roaming\Python\Python312\Scripts"
+```
+
+Verify the install:
+
+```bash
+openingest --help
+```
+
+---
+
+## Step 2 — Configure the database
 
 ```bash
 cp .env.example .env
 ```
 
-Open `.env` and set your PostgreSQL connection:
+Open `.env` and set your PostgreSQL connection string:
 
 ```
 DATABASE_URL=postgresql://postgres:password@localhost:5432/openingest
 ```
 
-### Step 4 — Start PostgreSQL and Airflow
+---
+
+## Step 3 — Start PostgreSQL and Airflow
 
 ```bash
 docker compose up -d
 ```
 
 This starts:
-- PostgreSQL on port `5432`
-- Apache Airflow on `http://localhost:8080` (login: `admin` / `admin`)
 
-### Step 5 — Run the pipeline
+| Service | URL / Port |
+|---|---|
+| PostgreSQL | `localhost:5432` |
+| Apache Airflow | `http://localhost:8080` (admin / admin) |
+
+Wait ~30 seconds for Airflow to initialise on first start.
+
+---
+
+## Step 4 — Run the pipeline
 
 ```bash
 openingest run
 ```
 
+OpenIngest will:
+1. Discover all 8 registered datasets
+2. Validate schemas
+3. Run data quality checks
+4. Create staging tables automatically (no SQL needed)
+5. Load data using the configured strategy
+6. Log metadata to PostgreSQL
+7. Print the execution report
+
 Expected output:
 
 ```
-================================================================================
-OPENINGEST
-================================================================================
-Run ID : OI-20260703-3BB09C
+══════════════════════════════════════
+OPENINGEST  ·  OI-20260703-3BB09C
+══════════════════════════════════════
 
-CUSTOMERS
-Quality Check : PASS (100.00%)
+  ✓  customers    →  stg_customers    replace       100.00%
+  ✓  orders       →  stg_orders       incremental    98.50%
+  ✓  products     →  stg_products     replace       100.00%
+  ✓  sessions     →  stg_sessions     replace       100.00%
+  ✓  employees    →  stg_employees    replace       100.00%
+  ✓  events       →  stg_events       incremental    99.20%
+  ✓  order_items  →  stg_order_items  replace       100.00%
+  ✓  reviews      →  stg_reviews      incremental    97.80%
 
-ORDERS
-Quality Check : PASS (98.50%)
+  Run ID      :  OI-20260703-3BB09C
+  Datasets    :  8
+  Rows Loaded :  174,777
+  Duration    :  4.21 sec
+  Status      :  SUCCESS ✓
+══════════════════════════════════════
+```
 
-PIPELINE SUMMARY
-Datasets Found    : 5
-Processed         : 5
-Rows Loaded       : 174,777
-Duration          : 4.21 sec
-Status            : SUCCESS
-================================================================================
+---
+
+## Step 5 — Explore the CLI
+
+```bash
+openingest validate              # Schema-only check, no data loaded
+openingest quality               # Quality scores per dataset
+openingest report                # Latest execution summary
+openingest history --limit 5     # Last 5 pipeline runs
+openingest dashboard             # Full monitoring view
+openingest run --dry-run         # Validate + quality, zero DB writes
+openingest run --dataset orders  # Run a single dataset only
 ```
 
 ---
 
 ## How to add your own dataset
 
-This is the core feature. You do not write any Python code.
+This is the core feature. You do not write Python.
 
-### Step 1 — Drop your CSV into `data/raw/`
+### 1. Drop your file into `data/raw/`
 
 ```
 data/raw/invoices.csv
 ```
 
-### Step 2 — Register it in `configs/datasets.yaml`
+### 2. Register it in `configs/datasets.yaml`
 
 ```yaml
 invoices:
@@ -197,20 +159,73 @@ invoices:
     - amount
 ```
 
-### Step 3 — Run
+### 3. Run
 
 ```bash
 openingest run --dataset invoices
 ```
 
-OpenIngest will discover the file, validate the schema, run quality checks,
-create the PostgreSQL table automatically, load the data, and record metadata.
-
-No Python written. No SQL written. No DAG edited.
+OpenIngest discovers the file, validates the schema, runs quality checks, creates the PostgreSQL table, loads the data, and records metadata. Zero SQL written. Zero Python written. Zero DAG edited.
 
 ---
 
-## Load strategies explained
+## Using cloud sources (v2.0)
+
+You can source data from S3, Azure Blob, GCS, or any REST API instead of local files. Add a `source:` block to the dataset config:
+
+### Amazon S3
+
+```bash
+pip install openingest[s3]
+```
+
+```yaml
+customers_cloud:
+  source:
+    type: s3
+    bucket: my-data-bucket
+    key: customers/customers.csv
+    region: us-east-1
+    aws_access_key_id: ${AWS_ACCESS_KEY_ID}
+    aws_secret_access_key: ${AWS_SECRET_ACCESS_KEY}
+  staging_table: stg_customers
+  load_strategy: replace
+  primary_key: [customer_id]
+  required_columns: [customer_id, name, email]
+```
+
+### REST API
+
+```bash
+pip install openingest[api]
+```
+
+```yaml
+stripe_charges:
+  source:
+    type: rest
+    url: https://api.stripe.com/v1/charges
+    method: GET
+    headers:
+      Authorization: Bearer ${STRIPE_API_KEY}
+    record_path: data
+    pagination:
+      type: cursor
+      cursor_path: has_more
+      param: starting_after
+      max_pages: 100
+  staging_table: stg_stripe_charges
+  load_strategy: incremental
+  incremental_column: created
+  primary_key: [id]
+  required_columns: [id, amount, currency, created]
+```
+
+See [CONNECTORS.md](CONNECTORS.md) for full documentation on all 9 connectors.
+
+---
+
+## Load strategies
 
 ### `replace` — full reload every run
 
@@ -218,17 +233,15 @@ No Python written. No SQL written. No DAG edited.
 load_strategy: replace
 ```
 
-Wipes the table and reloads everything. Use for reference data like products
-or lookup tables that are fully replaced each time.
+Truncates the staging table and reloads all rows. Use for reference data — product catalogs, employee lists, lookup tables — where the full dataset fits in one load.
 
-### `append` — add new rows only
+### `append` — new rows only
 
 ```yaml
 load_strategy: append
 ```
 
-Adds rows without touching existing ones. Use for event logs where old records
-never change.
+Inserts rows without modifying existing records. Use for immutable event logs where historical records never change.
 
 ### `incremental` — only new and changed rows
 
@@ -237,90 +250,148 @@ load_strategy: incremental
 incremental_column: order_time
 hash_columns:
   - customer_id
-  - amount
-  - status
+  - subtotal_usd
+  - total_usd
+  - payment_method
 ```
 
-Every run:
-1. Filters rows newer than the last watermark (`order_time`)
-2. Detects changed rows via SHA-256 hash of `hash_columns`
-3. Upserts into PostgreSQL using `ON CONFLICT DO UPDATE`
+On each run:
+1. Filters rows newer than the last recorded watermark (`order_time`)
+2. Detects rows that changed via SHA-256 hash of `hash_columns`
+3. Upserts using `ON CONFLICT DO UPDATE`
+4. Saves the new watermark to `pipeline_incremental_state`
 
-Use for orders, transactions, or any dataset where rows are added or updated
-over time. The watermark is persisted in `pipeline_incremental_state` so each
-run picks up exactly where the last one left off.
+The watermark survives restarts and Airflow pod recycling.
 
 ---
 
-## CLI reference
+## What is in PostgreSQL after a run?
 
-```bash
-openingest run                      # Run full pipeline
-openingest run --dry-run            # Validate + quality check, no DB writes
-openingest run --dataset customers  # Run one dataset only
-openingest validate                 # Schema validation only
-openingest quality                  # Quality checks only
-openingest report                   # Latest execution report
-openingest history                  # Full run history
-openingest history --limit 5        # Last 5 runs
-openingest dashboard                # Monitoring dashboard
-```
-
----
-
-## What is in the database after a run?
-
-| Table | What it contains |
+| Table | Contents |
 |---|---|
 | `stg_customers` | Loaded customer data |
 | `stg_orders` | Loaded order data |
 | `stg_products` | Loaded product data |
+| `stg_sessions` | Loaded session data |
+| `stg_employees` | Loaded employee data |
+| `stg_events` | Loaded event data |
+| `stg_order_items` | Loaded order item data |
+| `stg_reviews` | Loaded review data |
 | `pipeline_runs` | One row per pipeline execution |
 | `pipeline_dataset_runs` | One row per dataset per run |
 | `pipeline_quality_runs` | Quality scores per dataset per run |
-| `pipeline_incremental_state` | Watermark state for incremental datasets |
+| `pipeline_incremental_state` | Watermark + hash config per incremental dataset |
 
 ---
 
-## What is Airflow doing?
+## Data quality rules
 
-Airflow is the scheduler. Instead of running `openingest run` manually every
-day, Airflow runs it automatically on a `@daily` schedule.
+Add quality checks in `configs/validation_rules.yaml`:
 
-Open `http://localhost:8080` to see the DAG graph. Each dataset is a
-collapsible task group. Click the `∨` arrow on any group to expand it and see
-all four inner tasks: `discover → validate_schema → quality_check → ingest`.
+```yaml
+customers:
+  type_checks:
+    customer_id: integer
+    age: integer
+    email: string
+    signup_date: datetime
+  range_checks:
+    age:
+      min: 0
+      max: 120
+  regex_checks:
+    email: '^[^@\s]+@[^@\s]+\.[^@\s]+$'
+  custom_rules:
+    - name: no_placeholder_emails
+      condition: "email.str.lower() != 'test@example.com'"
+      message: "Customer email must not be a placeholder"
+```
 
-When you add a new dataset to `datasets.yaml`, a new task group appears in the
-DAG automatically. No DAG code changes needed.
+Supported rule types:
+
+| Rule | What it checks |
+|---|---|
+| `type_checks` | Column values match declared type |
+| `range_checks` | Numeric values within min/max bounds |
+| `regex_checks` | String values match a regex pattern |
+| `custom_rules` | Arbitrary boolean `pandas.DataFrame.eval()` expressions |
+| `non_null_columns` (in datasets.yaml) | No null values |
+| `unique_columns` (in datasets.yaml) | No duplicate values |
+| `primary_key` (in datasets.yaml) | Not null + unique combined |
 
 ---
 
-## Common errors and fixes
+## Notifications (v2.5)
 
-**`DATABASE_URL not found`**
-→ Run `cp .env.example .env` and fill in your database URL.
+Configure in `configs/pipeline.yaml`:
 
-**`openingest` command not found**
-→ Run `pip install -e .` first. On Windows, add the Scripts folder to PATH.
+```yaml
+notifications:
+  slack:
+    webhook: ${SLACK_WEBHOOK_URL}
+    on: [success, failure]
+  email:
+    smtp_host: smtp.gmail.com
+    smtp_port: 587
+    username: ${EMAIL_USERNAME}
+    password: ${EMAIL_PASSWORD}
+    to:
+      - data-team@company.com
+    on: [failure]
+```
 
-**`Schema validation failed — Missing columns`**
-→ Your CSV is missing a column listed in `required_columns`. Fix the CSV or
-update the config.
+Slack message on success:
 
-**`Quality check FAILED`**
-→ Your data has nulls or duplicates in columns configured as `non_null_columns`
-or `unique_columns`. Inspect your CSV.
+```
+✅ OpenIngest — Pipeline SUCCESS
+Run ID   : OI-20260703-3BB09C
+Datasets : 8
+Rows     : 174,777
+Duration : 4.21s
+```
 
-**`Dataset not found`**
-→ The CSV filename must exactly match the `file:` value in `datasets.yaml`.
+---
+
+## Built-in scheduler — no Airflow needed (v2.5)
+
+```bash
+openingest scheduler start --cron "0 6 * * *"   # every day at 6am
+openingest scheduler start --cron @daily
+openingest scheduler start --cron @hourly
+```
+
+The scheduler fires once per matching cron minute, handles SIGTERM cleanly, and supports all standard 5-field cron expressions plus presets (`@daily`, `@hourly`, `@weekly`, `@monthly`).
+
+---
+
+## Airflow
+
+Airflow is the production scheduler. The DAG `openingest_dynamic_pipeline` is generated automatically from `datasets.yaml`.
+
+Open `http://localhost:8080` to see the DAG. Each dataset is a collapsible task group — click to expand and see `discover → validate_schema → quality_check → ingest`.
+
+**Adding a new dataset**: update `datasets.yaml`, restart the Airflow scheduler, and the new task group appears automatically. No DAG edits.
+
+---
+
+## Common errors
+
+| Error | Fix |
+|---|---|
+| `DATABASE_URL not found` | Run `cp .env.example .env` and set `DATABASE_URL` |
+| `openingest` command not found | Run `pip install -e .`, then check PATH (Windows) |
+| `Schema validation failed — Missing columns` | CSV is missing a column in `required_columns` — fix CSV or update config |
+| `Quality check FAILED` | Data has nulls or duplicates in constrained columns — inspect source |
+| `Dataset not found` | CSV filename must exactly match the `file:` value in datasets.yaml |
+| `No connector for type 's3'` | Run `pip install openingest[s3]` |
 
 ---
 
 ## Next steps
 
 1. Add your own CSV to `data/raw/` and register it in `datasets.yaml`
-2. Try `load_strategy: incremental` on a dataset with a timestamp column
-3. Open Airflow at `http://localhost:8080` and watch the DAG run
-4. Run `openingest report` to see the execution summary
-5. Run `openingest dashboard` to see the monitoring dashboard
+2. Try `load_strategy: incremental` on any dataset with a timestamp column
+3. Add a cloud source (`type: s3`, `type: rest`) to an existing dataset
+4. Open Airflow at `http://localhost:8080` and watch the DAG run
+5. Run `openingest dashboard` to see the monitoring view
+6. Set up Slack notifications for pipeline failures
