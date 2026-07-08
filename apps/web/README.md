@@ -1,36 +1,90 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# OpenIngest — Landing Page
 
-## Getting Started
+The marketing website for [OpenIngest](https://github.com/ManishKudtarkar/OpenIngest), built with Next.js 16.
 
-First, run the development server:
+## Stack
+
+- **Next.js 16** (App Router, static export)
+- **TypeScript**
+- **Tailwind CSS v4**
+- **Lucide React** — icons
+- **Fontsource** — Inter, Space Grotesk, JetBrains Mono
+
+## Development
 
 ```bash
+cd apps/web
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Build
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+```
 
-## Learn More
+## Deploy
 
-To learn more about Next.js, take a look at the following resources:
+Deployed on Vercel. Config in `vercel.json`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Every push to `main` triggers an automatic deployment.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Structure
 
-## Deploy on Vercel
+```
+apps/web/
+├── app/
+│   ├── components/
+│   │   ├── Navbar.tsx
+│   │   ├── Hero.tsx             # Animated terminal, headline, stats
+│   │   ├── TrustedBy.tsx        # Tech stack strip
+│   │   ├── ProblemSolution.tsx  # Before/after comparison
+│   │   ├── Features.tsx         # 12 feature cards
+│   │   ├── Architecture.tsx     # Clickable pipeline diagram
+│   │   ├── CodeExample.tsx      # Real datasets.yaml with syntax highlight
+│   │   ├── CLISection.tsx       # Interactive terminal with real output
+│   │   ├── AirflowSection.tsx   # Expandable DAG view
+│   │   ├── LoadStrategies.tsx   # replace/append/incremental cards
+│   │   ├── ConnectorsSection.tsx # v2.0 connector picker
+│   │   ├── Stats.tsx            # Animated metrics (174,777 rows, 4.21s…)
+│   │   ├── GettingStarted.tsx   # 5-step install walkthrough
+│   │   ├── Roadmap.tsx          # v1.0/v2.0/v2.5/v3.0 collapsible cards
+│   │   ├── Docs.tsx             # Documentation link cards
+│   │   ├── CTA.tsx              # Install command + GitHub CTAs
+│   │   └── Footer.tsx
+│   ├── globals.css              # Design system — tokens, utilities, section-container
+│   ├── layout.tsx
+│   └── page.tsx
+└── public/
+    └── openingest.png           # Logo
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Design system
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+All section containers use the `.section-container` CSS class defined in `globals.css`. This ensures consistent horizontal padding and max-width across every section:
+
+```css
+.section-container {
+  position: relative;
+  width: 100%;
+  max-width: 1380px;
+  margin: 0 auto;
+  padding: 0 1.25rem;          /* mobile */
+}
+/* sm: 1.5rem | lg: 3rem */
+```
+
+**Never** use `max-w-[1380px] mx-auto px-*` directly in components. Use `.section-container` instead.
+
+## Real data policy
+
+Every number on the page comes from actual pipeline runs:
+- `174,777` rows — real run output
+- `4.21s` — real pipeline duration
+- `OI-20260703-3BB09C` — real run ID
+- `99.4%` — real average quality score
+
+No fake data.
