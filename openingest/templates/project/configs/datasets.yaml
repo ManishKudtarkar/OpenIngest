@@ -1,0 +1,19 @@
+datasets:
+
+  # Example dataset - replace with your own
+  customers:
+    file: customers.csv
+    staging_table: stg_customers
+    load_strategy: replace
+
+    primary_key:
+      - customer_id
+
+    required_columns:
+      - customer_id
+      - name
+      - email
+
+    non_null_columns:
+      - customer_id
+      - email

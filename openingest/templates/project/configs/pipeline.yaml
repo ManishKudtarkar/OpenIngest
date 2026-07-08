@@ -1,0 +1,2 @@
+name: openingest-pipeline
+schedule: "@daily"

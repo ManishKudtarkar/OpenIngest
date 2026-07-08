@@ -1,7 +1,13 @@
 from pathlib import Path
+
 import yaml
 
-CONFIG_DIR = Path(__file__).resolve().parents[1] / "configs"
+from utils.project import find_project_root
+
+
+def get_config_dir() -> Path:
+    root = find_project_root()
+    return (root or Path.cwd()) / "configs"
 
 
 def _load_yaml(path: Path) -> dict:
@@ -20,21 +26,13 @@ def _load_yaml(path: Path) -> dict:
 
 def load_dataset_config() -> dict:
     """
-    Load datasets.yaml
+    Load datasets.yaml from the current OpenIngest project.
     """
-    return _load_yaml(CONFIG_DIR / "datasets.yaml")
+    return _load_yaml(get_config_dir() / "datasets.yaml")
 
 
 def load_pipeline_config() -> dict:
     """
-    Load pipeline.yaml
-
-    Example:
-
-    cron: "@daily"
-
-    or
-
-    schedule: "0 * * * *"
+    Load pipeline.yaml from the current OpenIngest project.
     """
-    return _load_yaml(CONFIG_DIR / "pipeline.yaml")
+    return _load_yaml(get_config_dir() / "pipeline.yaml")

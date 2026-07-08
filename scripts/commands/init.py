@@ -1,122 +1,74 @@
+from __future__ import annotations
+
+from importlib import resources
 from pathlib import Path
 
 
-DATASETS_YAML = """\
-datasets:
+TEMPLATE_PACKAGE = "openingest.templates"
 
-  # Example dataset — replace with your own
-  customers:
-    file: customers.csv
-    staging_table: stg_customers
-    load_strategy: replace
 
-    primary_key:
-      - customer_id
+def _copy_template_tree(target: Path, project_name: str) -> None:
+    root = resources.files(TEMPLATE_PACKAGE) / "project"
 
-    required_columns:
-      - customer_id
-      - name
-      - email
+    def copy_item(item, relative: Path) -> None:
+        destination = target / relative
 
-    non_null_columns:
-      - customer_id
-      - email
-"""
+        if item.is_dir():
+            destination.mkdir(parents=True, exist_ok=True)
+            for child in item.iterdir():
+                copy_item(child, relative / child.name)
+            return
 
-ENV_FILE = """\
-# OpenIngest environment configuration
-DATABASE_URL=postgresql://user:password@localhost:5432/openingest
-"""
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        content = item.read_bytes()
 
-README = """\
-# {name}
+        if item.name in {"README.md"}:
+            text = content.decode("utf-8").replace("{{ project_name }}", project_name)
+            destination.write_text(text, encoding="utf-8")
+        else:
+            destination.write_bytes(content)
 
-Data ingestion project powered by [OpenIngest](https://github.com/manishkudtarkar/OpenIngest).
-
-## Quick start
-
-```bash
-# Add your CSV files
-cp your_data.csv data/raw/
-
-# Register the dataset
-openingest add-dataset
-
-# Run the pipeline
-openingest run
-```
-
-## Commands
-
-```bash
-openingest run              # Run full pipeline
-openingest run --dry-run    # Validate only, no DB writes
-openingest validate         # Schema validation
-openingest quality          # Quality checks
-openingest report           # Latest execution report
-openingest history          # Run history
-openingest doctor           # Check environment health
-```
-"""
-
-DOCKER_COMPOSE = """\
-version: "3.8"
-
-services:
-  postgres:
-    image: postgres:15
-    environment:
-      POSTGRES_USER: openingest
-      POSTGRES_PASSWORD: openingest
-      POSTGRES_DB: openingest
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-
-volumes:
-  postgres_data:
-"""
+    for child in root.iterdir():
+        copy_item(child, Path(child.name))
 
 
 def run_init(project_name: str) -> int:
-    target = Path(project_name)
+    target = Path(project_name).expanduser()
 
     if target.exists():
-        print(f"Error: '{project_name}' already exists.")
+        print(f"Error: '{target}' already exists.")
         return 1
 
-    dirs = [
-        target / "configs",
-        target / "data" / "raw",
-        target / "data" / "processed",
-        target / "reports",
-        target / "logs",
-        target / "sql",
-    ]
+    _copy_template_tree(target, target.name)
 
-    for d in dirs:
-        d.mkdir(parents=True)
+    for directory in [
+        "configs",
+        "data/raw",
+        "reports",
+        "logs",
+        "plugins",
+        "sql",
+    ]:
+        (target / directory).mkdir(parents=True, exist_ok=True)
 
-    (target / "configs" / "datasets.yaml").write_text(DATASETS_YAML)
-    (target / ".env").write_text(ENV_FILE)
-    (target / "README.md").write_text(README.format(name=project_name))
-    (target / "docker-compose.yml").write_text(DOCKER_COMPOSE)
-    (target / "data" / "raw" / ".gitkeep").write_text("")
-    (target / "reports" / ".gitkeep").write_text("")
-    (target / "logs" / ".gitkeep").write_text("")
+    marker = target / ".openingest"
+    if not marker.exists():
+        marker.write_text("version: 1\n", encoding="utf-8")
 
-    print(f"\nCreated project: {project_name}/\n")
-    print("  configs/datasets.yaml   — register your datasets here")
-    print("  data/raw/               — drop your CSV files here")
-    print("  .env                    — set your DATABASE_URL")
-    print("  docker-compose.yml      — start PostgreSQL with docker compose up -d")
+    print(f"\nCreated OpenIngest project: {target}/\n")
+    print("  .openingest             project marker")
+    print("  configs/datasets.yaml   register your datasets here")
+    print("  configs/pipeline.yaml   pipeline settings")
+    print("  data/raw/               drop your source files here")
+    print("  plugins/                add project-specific extensions")
+    print("  .env                    set your DATABASE_URL")
+    print("  docker-compose.yml      start PostgreSQL with docker compose up -d")
     print()
     print("Next steps:")
-    print(f"  cd {project_name}")
-    print("  # Edit .env with your DATABASE_URL")
-    print("  # Copy CSV files into data/raw/")
-    print("  openingest add-dataset")
+    print(f"  cd {target}")
+    print("  docker compose up -d")
+    print("  openingest doctor")
+    print("  openingest infer customers.csv")
     print("  openingest run")
     print()
 

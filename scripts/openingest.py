@@ -28,9 +28,25 @@ from scripts.data_quality_checks import run_data_quality_checks
 import pandas as pd
 from utils.db import get_engine
 from utils.config_loader import load_pipeline_config
+from utils.project import chdir_project_root
 
-
-engine = get_engine()
+PROJECT_COMMANDS = {
+    "run",
+    "validate",
+    "quality",
+    "report",
+    "dashboard",
+    "add-dataset",
+    "discover",
+    "profile",
+    "infer",
+    "graph",
+    "schedule",
+    "scheduler",
+    "docker",
+    "airflow",
+    "history",
+}
 
 
 def run_validate() -> int:
@@ -70,6 +86,8 @@ def run_validate() -> int:
 
 
 def run_history(limit: int) -> None:
+    engine = get_engine()
+
     print("\n" + "=" * 80)
     print("PIPELINE RUN HISTORY")
     print("=" * 80)
@@ -121,7 +139,12 @@ def main() -> int:
     subparsers.add_parser("report", help="Show latest pipeline execution report")
     subparsers.add_parser("dashboard", help="Show monitoring dashboard")
     subparsers.add_parser("doctor", help="Check environment and connectivity")
-    subparsers.add_parser("add-dataset", help="Interactively register a new dataset")
+    add_dataset_parser = subparsers.add_parser("add-dataset", help="Register a new dataset")
+    add_dataset_parser.add_argument(
+        "file",
+        nargs="?",
+        help="Optional CSV filename or path to prefill dataset registration",
+    )
     subparsers.add_parser("discover", help="Scan data/raw/ and register unregistered CSVs")
     subparsers.add_parser("version", help="Show OpenIngest version")
     subparsers.add_parser("upgrade", help="Upgrade OpenIngest to the latest version")
@@ -167,6 +190,14 @@ def main() -> int:
 
     args = parser.parse_args()
 
+    if args.command in PROJECT_COMMANDS:
+        try:
+            root = chdir_project_root()
+            print(f"OpenIngest project: {root}")
+        except RuntimeError as exc:
+            print(f"Error: {exc}")
+            return 1
+
     if args.command == "run":
         run_pipeline(dry_run=args.dry_run, dataset_filter=args.dataset)
         return 0
@@ -194,7 +225,7 @@ def main() -> int:
         return run_doctor()
 
     if args.command == "add-dataset":
-        return run_add_dataset()
+        return run_add_dataset(args.file)
 
     if args.command == "init":
         return run_init(args.project_name)

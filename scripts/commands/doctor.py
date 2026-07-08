@@ -3,6 +3,8 @@ import os
 import sys
 from pathlib import Path
 
+from utils.project import find_project_root
+
 
 def _check(label: str, passed: bool, detail: str = "") -> bool:
     icon = "PASS" if passed else "FAIL"
@@ -17,6 +19,12 @@ def run_doctor() -> int:
     print("\n== OpenIngest Doctor ===========================================\n")
 
     failures = 0
+    project_root = find_project_root()
+
+    if project_root:
+        _check("OpenIngest project", True, str(project_root))
+    else:
+        _check("OpenIngest project", False, "run openingest init <project>")
 
     # Python version
     major, minor = sys.version_info[:2]
@@ -31,13 +39,14 @@ def run_doctor() -> int:
             failures += 1
 
     # .env file
-    env_exists = Path(".env").exists()
+    env_path = (project_root or Path.cwd()) / ".env"
+    env_exists = env_path.exists()
     if not _check(".env file", env_exists, ".env not found" if not env_exists else ""):
         failures += 1
 
     # DATABASE_URL set
     from dotenv import load_dotenv
-    load_dotenv()
+    load_dotenv(env_path if env_exists else None)
     db_url = os.getenv("DATABASE_URL")
     if not _check("DATABASE_URL set", bool(db_url), "not set in .env" if not db_url else ""):
         failures += 1
@@ -58,18 +67,19 @@ def run_doctor() -> int:
         failures += 1
 
     # configs/datasets.yaml
-    config_exists = Path("configs/datasets.yaml").exists()
+    config_exists = ((project_root or Path.cwd()) / "configs/datasets.yaml").exists()
     if not _check("configs/datasets.yaml", config_exists):
         failures += 1
 
     # data/raw/ directory
-    raw_exists = Path("data/raw").exists()
+    raw_dir = (project_root or Path.cwd()) / "data/raw"
+    raw_exists = raw_dir.exists()
     if not _check("data/raw/ directory", raw_exists):
         failures += 1
 
     # CSV files present
     if raw_exists:
-        csvs = list(Path("data/raw").glob("*.csv"))
+        csvs = list(raw_dir.glob("*.csv"))
         _check("CSV files in data/raw/", bool(csvs), f"{len(csvs)} file(s) found")
 
     # Metadata tables

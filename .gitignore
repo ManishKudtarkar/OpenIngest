@@ -1,6 +1,53 @@
+# Python
 __pycache__/
-*.pyc
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+
+# Virtual environments
 .env
 .venv/
 venv/
+env/
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+*.egg
+*.whl
+MANIFEST
+
+# Pytest / coverage
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Mypy
+.mypy_cache/
+
+# Ruff
+.ruff_cache/
+
+# Logs
 logs/
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Next.js
+apps/web/.next/
+apps/web/node_modules/
+
+# Data files (keep structure, not content)
+data/processed/

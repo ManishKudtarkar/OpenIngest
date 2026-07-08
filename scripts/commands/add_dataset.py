@@ -28,15 +28,19 @@ def _prompt_strategy() -> str:
     return {"1": "replace", "2": "append", "3": "incremental"}.get(choice, "replace")
 
 
-def run_add_dataset() -> int:
+def run_add_dataset(file_arg: str | None = None) -> int:
     print("\n== Add Dataset =========================================\n")
 
-    name = _prompt("Dataset name (e.g. customers)")
+    file_path = Path(file_arg) if file_arg else None
+    default_name = file_path.stem if file_path else ""
+    default_file = file_path.name if file_path else ""
+
+    name = _prompt("Dataset name (e.g. customers)", default_name)
     if not name:
         print("Error: dataset name is required.")
         return 1
 
-    csv_file = _prompt("CSV filename (e.g. customers.csv)", f"{name}.csv")
+    csv_file = _prompt("CSV filename (e.g. customers.csv)", default_file or f"{name}.csv")
     table = _prompt("Staging table", f"stg_{name}")
     strategy = _prompt_strategy()
 

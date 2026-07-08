@@ -1,7 +1,10 @@
+from functools import lru_cache
+
 from sqlalchemy import create_engine
-from utils.config import DATABASE_URL
 
-engine = create_engine(DATABASE_URL)
+from utils.config import get_database_url
 
+
+@lru_cache(maxsize=1)
 def get_engine():
-    return engine
+    return create_engine(get_database_url())

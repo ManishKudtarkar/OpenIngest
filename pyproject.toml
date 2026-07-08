@@ -11,7 +11,7 @@ requires-python = ">=3.10"
 authors = [
   { name = "OpenIngest Contributors" }
 ]
-license = { text = "MIT" }
+license = "MIT"
 dependencies = [
   "pandas",
   "sqlalchemy",
@@ -86,15 +86,23 @@ all = [
 ]
 
 [project.scripts]
-openingest = "scripts.openingest:main"
+openingest = "openingest.cli:main"
 
 [tool.setuptools]
 include-package-data = true
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["core*", "models*", "utils*", "scripts*"]
+include = ["openingest*", "core*", "models*", "utils*", "scripts*"]
 exclude = ["data*", "sql*", "dags*", "docs*", "tests*"]
+
+[tool.setuptools.package-data]
+"openingest.templates" = [
+  "project/**",
+  "project/.env",
+  "project/.openingest",
+  "project/**/.gitkeep",
+]
 
 [tool.pytest.ini_options]
 minversion = "8.0"
