@@ -146,7 +146,7 @@ export default function CLISection() {
       <div className="absolute inset-0 grid-fine opacity-40" />
       <div className="absolute left-0 top-1/2 w-[500px] h-[500px] bg-violet-600/5 rounded-full blur-[100px] -translate-y-1/2" />
 
-      <div className="relative max-w-[1380px] mx-auto px-6 lg:px-12">
+      <div className="section-container">
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 tag text-indigo-400 border-indigo-500/25 bg-indigo-500/8 mb-5">
             Command Line Interface

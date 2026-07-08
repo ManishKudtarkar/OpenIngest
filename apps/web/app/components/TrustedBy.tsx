@@ -26,7 +26,7 @@ export default function TrustedBy() {
   return (
     <section className="relative border-y border-white/6 bg-[#04060d] py-10">
       <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent,rgba(34,211,238,0.05),transparent)]" />
-      <div className="relative max-w-[1380px] mx-auto px-5 sm:px-6 lg:px-12">
+      <div className="section-container">
         <p className="text-center text-[11px] text-[#64748B] uppercase font-semibold mb-7">
           Built on the modern open-source data stack
         </p>

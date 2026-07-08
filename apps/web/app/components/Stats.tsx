@@ -43,7 +43,7 @@ export default function Stats() {
       <div className="absolute inset-0 bg-[#04060d]" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_50%,rgba(99,102,241,0.06),transparent)]" />
 
-      <div className="relative max-w-[1380px] mx-auto px-5 sm:px-6 lg:px-12">
+      <div className="section-container">
 
         {/* Label */}
         <div className="text-center mb-12">

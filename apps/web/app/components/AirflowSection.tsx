@@ -28,7 +28,7 @@ export default function AirflowSection() {
       <div className="absolute inset-0 bg-[#04060d]" />
       <div className="absolute right-0 top-1/2 w-[700px] h-[700px] bg-teal-600/4 rounded-full blur-[120px] -translate-y-1/2" />
 
-      <div className="relative max-w-[1380px] mx-auto px-6 lg:px-12">
+      <div className="section-container">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
 
           {/* Left */}

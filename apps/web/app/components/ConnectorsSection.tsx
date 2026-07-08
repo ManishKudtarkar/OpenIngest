@@ -188,7 +188,7 @@ export default function ConnectorsSection() {
       <div className="absolute inset-0 grid-fine opacity-15" />
       <div className="absolute top-1/2 right-0 w-[700px] h-[700px] bg-indigo-600/4 rounded-full blur-[140px] -translate-y-1/2" />
 
-      <div className="relative max-w-[1380px] mx-auto px-5 sm:px-6 lg:px-12">
+      <div className="section-container">
 
         {/* Header */}
         <div className="text-center mb-16">

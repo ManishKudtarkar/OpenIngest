@@ -109,7 +109,7 @@ export default function CodeExample() {
       <div className="absolute inset-0 bg-[#04060d]" />
       <div className="absolute right-0 top-0 w-[600px] h-[600px] bg-indigo-600/5 rounded-full blur-[120px]" />
 
-      <div className="relative max-w-[1380px] mx-auto px-6 lg:px-12">
+      <div className="section-container">
         <div className="grid lg:grid-cols-2 gap-16 items-start">
 
           {/* Left */}

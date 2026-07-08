@@ -22,7 +22,8 @@ export default function CTA() {
       </div>
       <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-indigo-500/20 to-transparent" />
 
-      <div className="relative max-w-[900px] mx-auto px-6 lg:px-12 text-center">
+      <div className="section-container text-center">
+        <div className="max-w-[720px] mx-auto">
         {/* Badge */}
         <div className="inline-flex items-center gap-2 tag text-indigo-400 border-indigo-500/20 bg-indigo-500/8 mb-8">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
@@ -70,6 +71,7 @@ export default function CTA() {
         <p className="text-[12px] text-[#1E293B] mt-8">
           ⭐ Starring the repo helps others discover OpenIngest
         </p>
+        </div>
       </div>
     </section>
   );

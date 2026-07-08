@@ -198,7 +198,7 @@ export default function Roadmap() {
       <div className="absolute inset-0 grid-fine opacity-20" />
       <div className="absolute top-1/2 left-1/2 w-[900px] h-[400px] bg-indigo-600/5 rounded-full blur-[120px] -translate-x-1/2 -translate-y-1/2" />
 
-      <div className="relative max-w-[1380px] mx-auto px-6 lg:px-12">
+      <div className="section-container">
 
         {/* Header */}
         <div className="text-center mb-16">

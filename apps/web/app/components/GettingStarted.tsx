@@ -70,7 +70,7 @@ export default function GettingStarted() {
       <div className="absolute inset-0 bg-[#080c18]" />
       <div className="absolute left-0 top-0 w-[500px] h-[500px] bg-indigo-600/5 rounded-full blur-[100px]" />
 
-      <div className="relative max-w-[1380px] mx-auto px-6 lg:px-12">
+      <div className="section-container">
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 tag text-emerald-400 border-emerald-500/25 bg-emerald-500/8 mb-5">
             5 steps · &lt;10 minutes

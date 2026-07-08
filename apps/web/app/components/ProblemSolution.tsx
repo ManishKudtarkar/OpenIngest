@@ -25,7 +25,7 @@ export default function ProblemSolution() {
     <section className="relative py-24 overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-b from-[#04060d] via-[#06090f] to-[#04060d]" />
 
-      <div className="relative max-w-[1380px] mx-auto px-5 sm:px-6 lg:px-12">
+      <div className="section-container">
 
         {/* Header */}
         <div className="text-center mb-14">

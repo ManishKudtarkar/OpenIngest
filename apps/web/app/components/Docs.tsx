@@ -17,7 +17,7 @@ export default function Docs() {
       <div className="absolute inset-0 bg-[#080c18]" />
       <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/5 to-transparent" />
 
-      <div className="relative max-w-[1380px] mx-auto px-6 lg:px-12">
+      <div className="section-container">
         <div className="text-center mb-14">
           <div className="inline-flex items-center gap-2 tag text-cyan-400 border-cyan-500/25 bg-cyan-500/8 mb-5">
             Documentation

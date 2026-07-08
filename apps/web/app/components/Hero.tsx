@@ -56,10 +56,8 @@ export default function Hero() {
         <div className="absolute inset-0 noise opacity-60" />
       </div>
 
-      <div className="relative w-full max-w-[1380px] mx-auto px-5 sm:px-6 lg:px-12 pt-28 pb-16">
-        <div className="grid lg:grid-cols-[1fr_1.1fr] gap-12 xl:gap-20 items-center">
-
-          {/* ── LEFT ── */}
+      <div className="section-container pt-28 pb-16">
+        <div className="grid lg:grid-cols-[1fr_1.1fr] gap-12 xl:gap-20 items-center">          {/* ── LEFT ── */}
           <div className="flex flex-col gap-8">
 
             {/* Badge */}

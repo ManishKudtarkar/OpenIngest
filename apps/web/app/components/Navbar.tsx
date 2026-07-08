@@ -29,7 +29,7 @@ export default function Navbar() {
         ? "bg-[#04060d]/88 backdrop-blur-2xl border-b border-white/8 py-3 shadow-[0_18px_60px_rgba(0,0,0,0.22)]"
         : "bg-transparent py-5"
     }`}>
-      <div className="max-w-[1380px] mx-auto px-5 sm:px-6 lg:px-12 flex items-center justify-between">
+      <div className="section-container flex items-center justify-between">
 
         {/* Logo */}
         <a href="#" className="flex items-center gap-3 group rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60">

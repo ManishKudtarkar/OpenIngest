@@ -217,3 +217,29 @@ body {
   border: 1px solid;
   letter-spacing: 0.01em;
 }
+
+/* ──────────────────────────────────────
+   LAYOUT — shared container
+   All sections must use .section-container
+────────────────────────────────────── */
+.section-container {
+  position: relative;
+  width: 100%;
+  max-width: 1380px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
+}
+@media (min-width: 640px) {
+  .section-container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+@media (min-width: 1024px) {
+  .section-container {
+    padding-left: 3rem;
+    padding-right: 3rem;
+  }
+}
