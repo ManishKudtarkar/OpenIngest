@@ -1,8 +1,42 @@
+from __future__ import annotations
+
+import os
+from pathlib import Path
+
+
+def _load_env() -> None:
+    """
+    Load .env into os.environ before any task runs.
+    Airflow workers don't inherit the host .env, so we do it explicitly.
+    The .env is mounted into the container at /opt/airflow/.env.
+    """
+    # Try container path first, then project root (local dev)
+    candidates = [
+        Path("/opt/airflow/.env"),
+        Path(__file__).resolve().parents[2] / ".env",
+    ]
+    for env_path in candidates:
+        if env_path.exists():
+            for line in env_path.read_text(encoding="utf-8", errors="ignore").splitlines():
+                line = line.strip()
+                if line and not line.startswith("#") and "=" in line:
+                    k, _, v = line.partition("=")
+                    k = k.strip()
+                    v = v.strip().strip('"').strip("'")
+                    if k and k not in os.environ:
+                        os.environ[k] = v
+            break
+
+
+# Load on module import so all tasks in this worker process get the env
+_load_env()
+
+
 from core.discovery import discover_datasets
 from core.quality import run_quality_checks
 from core.reporting import pipeline_report
 from core.validation import validate_dataset
-from core.ingestion import ingest_dataset
+from core.ingestion import ingest_dataset, _read_dataset
 from utils.metadata_logger import MetadataLogger
 
 
@@ -19,7 +53,7 @@ def _get_dataset(dataset_name: str):
 
 
 def run_discover(dataset_name: str) -> dict:
-    """Discover dataset from data/raw/ and confirm registration."""
+    """Discover dataset and confirm registration."""
     dataset = _get_dataset(dataset_name)
     return {
         "dataset": dataset.name,
@@ -50,9 +84,14 @@ def run_schema_validation(dataset_name: str) -> dict:
 
 
 def run_quality_check(dataset_name: str, run_id: str | None = None) -> dict:
-    """Run non-null, unique, and range quality checks. Fails task if quality FAIL."""
+    """Run quality checks. Reads data once and passes df to avoid double download."""
     dataset = _get_dataset(dataset_name)
-    result = run_quality_checks(dataset)
+
+    df = _read_dataset(dataset)
+    dataset.columns = list(df.columns)
+    dataset.rows = len(df)
+
+    result = run_quality_checks(dataset, df=df)
 
     if run_id:
         MetadataLogger().log_quality_result(run_id, dataset, result)
@@ -68,7 +107,7 @@ def run_quality_check(dataset_name: str, run_id: str | None = None) -> dict:
 
 
 def run_ingest(dataset_name: str, run_id: str | None = None) -> dict:
-    """Ingest dataset using configured load strategy (replace / append / incremental)."""
+    """Ingest dataset using configured load strategy."""
     dataset = _get_dataset(dataset_name)
     dataset = ingest_dataset(dataset)
 

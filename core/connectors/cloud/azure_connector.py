@@ -44,9 +44,23 @@ def _resolve_env(value: str) -> str:
         var = value[2:-1]
         resolved = os.environ.get(var)
         if resolved is None:
+            try:
+                from dotenv import load_dotenv
+                from pathlib import Path
+                env_path = Path(__file__).resolve()
+                for _ in range(6):
+                    env_path = env_path.parent
+                    candidate = env_path / ".env"
+                    if candidate.exists():
+                        load_dotenv(candidate, override=False)
+                        break
+                resolved = os.environ.get(var)
+            except Exception:
+                pass
+        if resolved is None:
             raise ConnectorError(
                 f"Environment variable '{var}' is not set. "
-                f"Export it: export {var}=..."
+                f"Add it to your .env file: {var}=..."
             )
         return resolved
     return value

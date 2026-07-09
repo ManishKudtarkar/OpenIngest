@@ -1,12 +1,23 @@
 import argparse
 import os
 import sys
+from pathlib import Path
 
-sys.path.append(
-    os.path.abspath(
-        os.path.join(os.path.dirname(__file__), "..")
-    )
-)
+# Load .env before anything else — manual parse so it works on all platforms
+# regardless of dotenv version or encoding quirks.
+_project_root = Path(__file__).resolve().parent.parent
+_env_file = _project_root / ".env"
+if _env_file.exists():
+    for _line in _env_file.read_text(encoding="utf-8", errors="ignore").splitlines():
+        _line = _line.strip()
+        if _line and not _line.startswith("#") and "=" in _line:
+            _k, _, _v = _line.partition("=")
+            _k = _k.strip()
+            _v = _v.strip().strip('"').strip("'")
+            if _k and _k not in os.environ:
+                os.environ[_k] = _v
+
+sys.path.append(str(_project_root))
 
 from core.discovery import discover_datasets
 from core.pipeline import run_pipeline

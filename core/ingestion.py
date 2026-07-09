@@ -19,6 +19,56 @@ class DatasetIngestionError(Exception):
     pass
 
 
+def _safe_to_sql(
+    df: pd.DataFrame,
+    table: str,
+    engine: object,
+    if_exists: str = "append",
+    chunksize: int = 1000,
+) -> None:
+    """
+    Load a DataFrame into PostgreSQL with automatic type coercion.
+
+    Strategy:
+    1. Try inserting the DataFrame as-is with chunksize to avoid parameter limits.
+    2. If a column type error occurs, cast all object/mixed columns to TEXT and retry.
+    3. If still failing, cast the entire DataFrame to TEXT and retry.
+    Never raises on type mismatch — always finds a way to load.
+    """
+    def _load(frame: pd.DataFrame) -> None:
+        frame.to_sql(
+            table,
+            engine,
+            if_exists=if_exists,
+            index=False,
+            method="multi",
+            chunksize=chunksize,
+        )
+
+    try:
+        _load(df)
+        return
+    except Exception as e1:
+        err = str(e1).lower()
+        # Type mismatch or encoding issue — coerce object columns to string
+        if any(kw in err for kw in ("invalid input", "type", "encoding", "unicode", "value")):
+            df2 = df.copy()
+            for col in df2.columns:
+                if df2[col].dtype == object or str(df2[col].dtype) == "string":
+                    df2[col] = df2[col].astype(str).replace("nan", None).replace("<NA>", None)
+            try:
+                _load(df2)
+                return
+            except Exception:
+                pass
+
+    # Last resort: cast everything to TEXT
+    df3 = df.copy()
+    for col in df3.columns:
+        df3[col] = df3[col].astype(str).replace("nan", None).replace("None", None).replace("<NA>", None)
+    _load(df3)
+
+
 def _read_dataset(dataset: Dataset) -> pd.DataFrame:
     """
     Read source data via the ConnectorRegistry (v2.0).
@@ -52,17 +102,16 @@ def _read_dataset(dataset: Dataset) -> pd.DataFrame:
 
         return pd.read_csv(file_path)
 
-def ingest_dataset(dataset: Dataset) -> Dataset:
+def ingest_dataset(dataset: Dataset, df: "pd.DataFrame | None" = None) -> Dataset:
     """
     Ingest a single dataset into PostgreSQL.
 
-    Workflow
-    --------
-    1. Check registration
-    2. Validate schema
-    3. Read CSV
-    4. Load into PostgreSQL
-    5. Update metadata
+    Parameters
+    ----------
+    dataset : Dataset
+    df : pd.DataFrame, optional
+        Pre-read DataFrame. If provided, skips the source read entirely.
+        Pass this from pipeline.py to avoid downloading cloud files twice.
     """
 
     # --------------------------------------------------
@@ -102,10 +151,11 @@ def ingest_dataset(dataset: Dataset) -> Dataset:
 
     # --------------------------------------------------
     # Read source data via ConnectorRegistry (v2.0)
-    # Supports: csv, excel, json, parquet, s3, azure, gcs, rest
+    # Skip if df was already provided by the caller (pipeline.py read-once pattern)
     # --------------------------------------------------
 
-    df = _read_dataset(dataset)
+    if df is None:
+        df = _read_dataset(dataset)
 
     # --------------------------------------------------
     # Database Connection
@@ -140,25 +190,13 @@ def ingest_dataset(dataset: Dataset) -> Dataset:
         with engine.begin() as conn:
             conn.execute(text(f"TRUNCATE TABLE {quote_table_name(dataset.table or dataset.name)};"))
 
-        df.to_sql(
-            dataset.table,
-            engine,
-            if_exists="append",
-            index=False,
-            method="multi",
-        )
+        _safe_to_sql(df, dataset.table, engine)
 
         dataset.load_mode = "FULL"
         dataset.rows_loaded = len(df)
         dataset.watermark_value = None
     else:
-        df.to_sql(
-            dataset.table,
-            engine,
-            if_exists="append",
-            index=False,
-            method="multi",
-        )
+        _safe_to_sql(df, dataset.table, engine, if_exists="append")
 
         dataset.load_mode = "APPEND"
         dataset.rows_loaded = len(df)

@@ -43,16 +43,35 @@ from core.connectors.base import BaseConnector, ConnectorError
 
 
 def _resolve_env(value: str) -> str:
-    """Expand ${VAR_NAME} environment variable references."""
+    """Expand ${VAR_NAME} environment variable references.
+    Falls back to loading .env if the variable is not already in os.environ.
+    """
     if value and value.startswith("${") and value.endswith("}"):
         var = value[2:-1]
         resolved = os.environ.get(var)
         if resolved is None:
+            # Try loading from .env file
+            try:
+                from dotenv import load_dotenv
+                from pathlib import Path
+                env_path = Path(__file__).resolve()
+                # Walk up to find the .env file
+                for _ in range(6):
+                    env_path = env_path.parent
+                    candidate = env_path / ".env"
+                    if candidate.exists():
+                        load_dotenv(candidate, override=False)
+                        break
+                resolved = os.environ.get(var)
+            except Exception:
+                pass
+        if resolved is None:
             raise ConnectorError(
                 f"Environment variable '{var}' is not set. "
-                f"Export it before running: export {var}=..."
+                f"Add it to your .env file: {var}=..."
             )
         return resolved
+    return value
     return value
 
 

@@ -1,193 +1,95 @@
 datasets:
+  # ── Arsenal Football Data ──────────────────────────────────────────────────
 
-  customers:
-    file: customers.csv
-    staging_table: stg_customers
+  goalkeepers:
+    file: goalkeepers.csv
+    staging_table: stg_goalkeepers
     load_strategy: replace
 
-    primary_key:
-      - customer_id
+    source:
+      type: s3
+      bucket: demos212
+      key: goalkeepers.csv
+      region: ap-south-1
+      aws_access_key_id: ${AWS_ACCESS_KEY_ID}
+      aws_secret_access_key: ${AWS_SECRET_ACCESS_KEY}
 
     required_columns:
-      - customer_id
-      - name
-      - email
-      - country
-      - age
-      - signup_date
-
-    unique_columns:
-      - customer_id
+      - LastName
+      - FirstName
+      - Date
+      - Pos
+      - Min
+      - SoTA
+      - GA
+      - Saves
 
     non_null_columns:
-      - customer_id
-      - email
+      - LastName
+      - FirstName
+      - Date
 
 
-  orders:
-    file: orders.csv
-    staging_table: stg_orders
-    load_strategy: incremental
-    incremental_column: order_time
-    hash_columns:
-      - customer_id
-      - order_time
-      - payment_method
-      - discount_pct
-      - subtotal_usd
-      - total_usd
-      - country
-      - device
-      - source
-
-    primary_key:
-      - order_id
-
-    required_columns:
-      - order_id
-      - customer_id
-      - order_time
-      - subtotal_usd
-      - total_usd
-
-
-  products:
-    file: products.csv
-    staging_table: stg_products
+  players:
+    file: players.csv
+    staging_table: stg_players
     load_strategy: replace
 
-    primary_key:
-      - product_id
+    source:
+      type: s3
+      bucket: demos212
+      key: players.csv
+      region: ap-south-1
+      aws_access_key_id: ${AWS_ACCESS_KEY_ID}
+      aws_secret_access_key: ${AWS_SECRET_ACCESS_KEY}
 
     required_columns:
-      - product_id
-      - category
-      - name
-      - price_usd
-      - cost_usd
-      - margin_usd
+      - LastName
+      - FirstName
+      - Date
+      - Pos
+      - Min
+      - G
+      - A
+      - S
+      - SoT
+      - Touches
+
+    non_null_columns:
+      - LastName
+      - FirstName
+      - Date
+      - Pos
 
 
-  sessions:
-    file: sessions.csv
-    staging_table: stg_sessions
+  matches:
+    file: matches.csv
+    staging_table: stg_matches
     load_strategy: replace
 
-    primary_key:
-      - session_id
+    source:
+      type: s3
+      bucket: demos212
+      key: matches.csv
+      region: ap-south-1
+      aws_access_key_id: ${AWS_ACCESS_KEY_ID}
+      aws_secret_access_key: ${AWS_SECRET_ACCESS_KEY}
 
     required_columns:
-      - session_id
-      - customer_id
-      - start_time
-      - device
-      - source
-      - country
-
-
-  events:
-    file: events.csv
-    staging_table: stg_events
-    load_strategy: incremental
-    incremental_column: timestamp
-    hash_columns:
-      - session_id
-      - event_type
-      - product_id
-      - amount_usd
-
-    primary_key:
-      - event_id
-
-    required_columns:
-      - event_id
-      - session_id
-      - timestamp
-      - event_type
-      - product_id
-      - qty
-      - cart_size
-      - payment
-      - discount_pct
-      - amount_usd
+      - Season
+      - Tour
+      - Date
+      - Opponent
+      - HoAw
+      - ArsenalScore
+      - OpponentScore
 
     non_null_columns:
-      - event_id
-      - session_id
-      - timestamp
-      - event_type
-
-
-  order_items:
-    file: order_items.csv
-    staging_table: stg_order_items
-    load_strategy: replace
-
-    required_columns:
-      - order_id
-      - product_id
-      - unit_price_usd
-      - quantity
-      - line_total_usd
-
-    non_null_columns:
-      - order_id
-      - product_id
-      - quantity
-      - line_total_usd
-
-
-  reviews:
-    file: reviews.csv
-    staging_table: stg_reviews
-    load_strategy: incremental
-    incremental_column: review_time
-    hash_columns:
-      - order_id
-      - product_id
-      - rating
-
-    primary_key:
-      - review_id
-
-    required_columns:
-      - review_id
-      - order_id
-      - product_id
-      - rating
-      - review_text
-      - review_time
-
-    non_null_columns:
-      - review_id
-      - order_id
-      - rating
-
-
-  employees:
-    file: employees.csv
-    staging_table: stg_employees
-    load_strategy: replace
-
-    primary_key:
-      - employee_id
-
-    required_columns:
-      - employee_id
-      - name
-      - email
-      - department
-      - role
-      - hire_date
-      - salary
-      - is_active
-
-    unique_columns:
-      - employee_id
-
-    non_null_columns:
-      - employee_id
-      - email
+      - Season
+      - Date
+      - Opponent
+      - ArsenalScore
+      - OpponentScore
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -199,11 +101,11 @@ datasets:
 # customers_s3:
 #   source:
 #     type: s3
-#     bucket: company-data
+#     bucket: demos212
 #     key: customers/customers.csv
 #     aws_access_key_id: ${AWS_ACCESS_KEY_ID}
 #     aws_secret_access_key: ${AWS_SECRET_ACCESS_KEY}
-#     region: us-east-1
+#     region: ap-south-1
 #   staging_table: stg_customers
 #   load_strategy: replace
 #   primary_key: [customer_id]

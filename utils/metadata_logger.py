@@ -127,11 +127,7 @@ class MetadataLogger:
                     "rows_loaded": dataset.rows_loaded,
                     "duration_seconds": dataset.duration_seconds,
                     "status": dataset.load_status,
-                    "auto_created_table": getattr(
-                        dataset,
-                        "auto_created_table",
-                        False,
-                    ),
+                    "auto_created_table": getattr(dataset, "auto_created_table", False),
                     "load_strategy": getattr(dataset, "load_strategy", None),
                     "load_mode": getattr(dataset, "load_mode", None),
                     "incremental_column": getattr(dataset, "incremental_column", None),
@@ -141,12 +137,8 @@ class MetadataLogger:
             ]
         )
 
-        df.to_sql(
-            "pipeline_dataset_runs",
-            self.engine,
-            if_exists="append",
-            index=False,
-        )
+        with self.engine.begin() as conn:
+            df.to_sql("pipeline_dataset_runs", conn, if_exists="append", index=False)
 
     def log_quality_result(self, run_id: str, dataset: Dataset, quality_result: dict):
 
@@ -168,23 +160,20 @@ class MetadataLogger:
             ]
         )
 
-        df.to_sql(
-            "pipeline_quality_runs",
-            self.engine,
-            if_exists="append",
-            index=False,
-        )
+        try:
+            with self.engine.begin() as conn:
+                df.to_sql("pipeline_quality_runs", conn, if_exists="append", index=False)
+        except Exception:
+            # Reconnect and retry once on stale connection
+            self.engine = get_engine()
+            with self.engine.begin() as conn:
+                df.to_sql("pipeline_quality_runs", conn, if_exists="append", index=False)
 
     def finish_pipeline(self, run: PipelineRun):
 
         run.finished_at = datetime.now()
-
         run.total_duration = round(
-            (
-                run.finished_at
-                - run.started_at
-            ).total_seconds(),
-            2,
+            (run.finished_at - run.started_at).total_seconds(), 2
         )
 
         df = pd.DataFrame(
@@ -201,9 +190,5 @@ class MetadataLogger:
             ]
         )
 
-        df.to_sql(
-            "pipeline_runs",
-            self.engine,
-            if_exists="append",
-            index=False,
-        )
+        with self.engine.begin() as conn:
+            df.to_sql("pipeline_runs", conn, if_exists="append", index=False)

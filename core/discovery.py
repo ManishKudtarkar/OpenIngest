@@ -7,6 +7,7 @@ v2.0 — also supports datasets with an explicit 'source' block (cloud/REST/mult
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -18,14 +19,93 @@ from utils.config_loader import load_dataset_config
 RAW_FOLDER = Path("data/raw")
 
 
+def _fetch_csv_header(source_type: str, source_cfg: Dict[str, Any]) -> Optional["pd.DataFrame"]:
+    """
+    Fetch just the first 8KB of a cloud CSV to get column names cheaply.
+    Uses HTTP Range requests for S3; falls back to full read for Azure/GCS.
+    """
+    try:
+        import io as _io
+
+        if source_type == "s3":
+            import boto3  # type: ignore[import]
+            bucket = source_cfg["bucket"]
+            key = source_cfg["key"]
+            region = source_cfg.get("region")
+
+            session_kwargs: Dict[str, Any] = {}
+            if source_cfg.get("aws_access_key_id"):
+                session_kwargs["aws_access_key_id"] = os.environ.get(
+                    source_cfg["aws_access_key_id"][2:-1]
+                    if source_cfg["aws_access_key_id"].startswith("${")
+                    else source_cfg["aws_access_key_id"]
+                ) or source_cfg["aws_access_key_id"]
+            if source_cfg.get("aws_secret_access_key"):
+                raw = source_cfg["aws_secret_access_key"]
+                session_kwargs["aws_secret_access_key"] = os.environ.get(
+                    raw[2:-1] if raw.startswith("${") else raw
+                ) or raw
+            if region:
+                session_kwargs["region_name"] = region
+
+            session = boto3.Session(**session_kwargs)
+            s3 = session.client("s3")
+            resp = s3.get_object(Bucket=bucket, Key=key, Range="bytes=0-8191")
+            chunk = resp["Body"].read()
+            # Find last complete line
+            last_nl = chunk.rfind(b"\n")
+            if last_nl > 0:
+                chunk = chunk[:last_nl]
+            return pd.read_csv(_io.BytesIO(chunk))
+
+        # Azure / GCS — no cheap range request, read full file
+        from core.connectors.registry import ConnectorRegistry
+        connector = ConnectorRegistry.get(source_type, source_cfg)
+        return connector.read()
+
+    except Exception:
+        return None
+
+
 def _read_sample(source_cfg: Dict[str, Any], file_hint: Optional[str]) -> Optional[pd.DataFrame]:
     """
     Try to read the first 5 rows from a dataset source for column discovery.
-    Returns None if the source is remote/unreachable (non-blocking).
+    For cloud sources, fetches just enough to get column names.
+    Returns None if the source is unreachable (non-blocking).
     """
-    # Cloud / REST sources — skip local sample read; columns resolved at ingest time
     source_type = (source_cfg or {}).get("type", "").lower()
-    if source_type in ("s3", "azure", "gcs", "rest", "api"):
+
+    # Cloud sources — fetch header only (first ~4KB) to get column names fast
+    if source_type in ("s3", "azure", "gcs"):
+        try:
+            from core.connectors.registry import ConnectorRegistry
+            connector = ConnectorRegistry.get(source_type, source_cfg)
+            # For S3/Azure/GCS CSV files, read only the header row
+            # by fetching just enough bytes — much faster than full download
+            fmt = source_cfg.get("format") or ""
+            if not fmt:
+                key = source_cfg.get("key") or source_cfg.get("object") or source_cfg.get("blob", "")
+                n = key.lower()
+                if n.endswith(".parquet") or n.endswith(".pq"):
+                    fmt = "parquet"
+                elif n.endswith(".json") or n.endswith(".ndjson"):
+                    fmt = "json"
+                elif n.endswith(".xlsx") or n.endswith(".xls"):
+                    fmt = "excel"
+                else:
+                    fmt = "csv"
+
+            if fmt == "csv":
+                # Use range request for S3 to get just the first 8KB (header + a few rows)
+                df = _fetch_csv_header(source_type, source_cfg)
+            else:
+                df = connector.read()
+            return df.head(5) if df is not None else None
+        except Exception:
+            return None
+
+    # REST / API — can't cheaply sample, defer to ingest time
+    if source_type in ("rest", "api"):
         return None
 
     # Local file source via connector

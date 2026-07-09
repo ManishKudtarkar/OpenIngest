@@ -5,9 +5,38 @@ from core.quality_rules import evaluate_quality_rules
 from typing import Optional, Dict, Any
 
 
+def _read_dataset_df(dataset) -> pd.DataFrame:
+    """
+    Read a dataset using the connector registry if a source: block is present,
+    otherwise fall back to reading the local file.
+    """
+    config = dataset.config or {}
+    source_cfg = config.get("source", {})
+
+    if source_cfg:
+        from core.connectors.registry import ConnectorRegistry
+        source_type = source_cfg.get("type", "csv").lower()
+        connector = ConnectorRegistry.get(source_type, source_cfg)
+        return connector.read()
+
+    # Legacy: read local file with format detection
+    from pathlib import Path
+    file_path = dataset.file
+    ext = Path(str(file_path)).suffix.lower()
+
+    if ext in (".xlsx", ".xls"):
+        return pd.read_excel(file_path, engine="openpyxl")
+    if ext == ".json":
+        return pd.read_json(file_path)
+    if ext in (".parquet", ".pq"):
+        return pd.read_parquet(file_path)
+
+    return pd.read_csv(file_path)
+
+
 def run_quality_checks(dataset, df: Optional[pd.DataFrame] = None) -> Dict[str, Any]:
     if df is None:
-        df = pd.read_csv(dataset.file)
+        df = _read_dataset_df(dataset)
 
     checks = evaluate_quality_rules(dataset, df)
 
