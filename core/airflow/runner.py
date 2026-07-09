@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
+from typing import Any, Dict, Optional
 
 
 def _load_env() -> None:
@@ -29,8 +30,6 @@ def _load_env() -> None:
 
 # Load on module import so all tasks in this worker process get the env
 _load_env()
-
-from typing import Any, Dict, Optional
 
 from core.discovery import discover_datasets  # noqa: E402
 from core.quality import run_quality_checks  # noqa: E402
