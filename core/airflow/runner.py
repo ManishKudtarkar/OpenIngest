@@ -10,7 +10,6 @@ def _load_env() -> None:
     Airflow workers don't inherit the host .env, so we do it explicitly.
     The .env is mounted into the container at /opt/airflow/.env.
     """
-    # Try container path first, then project root (local dev)
     candidates = [
         Path("/opt/airflow/.env"),
         Path(__file__).resolve().parents[2] / ".env",
@@ -31,13 +30,12 @@ def _load_env() -> None:
 # Load on module import so all tasks in this worker process get the env
 _load_env()
 
-
-from core.discovery import discover_datasets
-from core.quality import run_quality_checks
-from core.reporting import pipeline_report
-from core.validation import validate_dataset
-from core.ingestion import ingest_dataset, _read_dataset
-from utils.metadata_logger import MetadataLogger
+from core.discovery import discover_datasets  # noqa: E402
+from core.quality import run_quality_checks  # noqa: E402
+from core.reporting import pipeline_report  # noqa: E402
+from core.validation import validate_dataset  # noqa: E402
+from core.ingestion import ingest_dataset, _read_dataset  # noqa: E402
+from utils.metadata_logger import MetadataLogger  # noqa: E402
 
 
 def _get_dataset(dataset_name: str):

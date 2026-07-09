@@ -3,43 +3,47 @@ import os
 import sys
 from pathlib import Path
 
-# Load .env before anything else — manual parse so it works on all platforms
-# regardless of dotenv version or encoding quirks.
-_project_root = Path(__file__).resolve().parent.parent
-_env_file = _project_root / ".env"
-if _env_file.exists():
-    for _line in _env_file.read_text(encoding="utf-8", errors="ignore").splitlines():
-        _line = _line.strip()
-        if _line and not _line.startswith("#") and "=" in _line:
-            _k, _, _v = _line.partition("=")
-            _k = _k.strip()
-            _v = _v.strip().strip('"').strip("'")
-            if _k and _k not in os.environ:
-                os.environ[_k] = _v
 
-sys.path.append(str(_project_root))
+def _bootstrap() -> None:
+    """Load .env and ensure project root is on sys.path before any imports."""
+    project_root = Path(__file__).resolve().parent.parent
+    env_file = project_root / ".env"
+    if env_file.exists():
+        for line in env_file.read_text(encoding="utf-8", errors="ignore").splitlines():
+            line = line.strip()
+            if line and not line.startswith("#") and "=" in line:
+                k, _, v = line.partition("=")
+                k = k.strip()
+                v = v.strip().strip('"').strip("'")
+                if k and k not in os.environ:
+                    os.environ[k] = v
+    if str(project_root) not in sys.path:
+        sys.path.insert(0, str(project_root))
 
-from core.discovery import discover_datasets
-from core.pipeline import run_pipeline
-from core.reporting import pipeline_report
-from core.validation import validate_dataset
-from scripts.commands.init import run_init
-from scripts.commands.add_dataset import run_add_dataset
-from scripts.commands.doctor import run_doctor
-from scripts.commands.discover import run_discover
-from scripts.commands.profile import run_profile
-from scripts.commands.infer import run_infer
-from scripts.commands.version import run_version, run_upgrade
-from scripts.commands.graph import run_graph
-from scripts.commands.docker_cmd import run_docker_init
-from scripts.commands.airflow_cmd import run_airflow_build
-from scripts.commands.schedule import run_schedule
-from scripts.dashboard import show_dashboard
-from scripts.data_quality_checks import run_data_quality_checks
-import pandas as pd
-from utils.db import get_engine
-from utils.config_loader import load_pipeline_config
-from utils.project import chdir_project_root
+
+_bootstrap()
+
+from core.discovery import discover_datasets  # noqa: E402
+from core.pipeline import run_pipeline  # noqa: E402
+from core.reporting import pipeline_report  # noqa: E402
+from core.validation import validate_dataset  # noqa: E402
+from scripts.commands.init import run_init  # noqa: E402
+from scripts.commands.add_dataset import run_add_dataset  # noqa: E402
+from scripts.commands.doctor import run_doctor  # noqa: E402
+from scripts.commands.discover import run_discover  # noqa: E402
+from scripts.commands.profile import run_profile  # noqa: E402
+from scripts.commands.infer import run_infer  # noqa: E402
+from scripts.commands.version import run_version, run_upgrade  # noqa: E402
+from scripts.commands.graph import run_graph  # noqa: E402
+from scripts.commands.docker_cmd import run_docker_init  # noqa: E402
+from scripts.commands.airflow_cmd import run_airflow_build  # noqa: E402
+from scripts.commands.schedule import run_schedule  # noqa: E402
+from scripts.dashboard import show_dashboard  # noqa: E402
+from scripts.data_quality_checks import run_data_quality_checks  # noqa: E402
+import pandas as pd  # noqa: E402
+from utils.db import get_engine  # noqa: E402
+from utils.config_loader import load_pipeline_config  # noqa: E402
+from utils.project import chdir_project_root  # noqa: E402
 
 PROJECT_COMMANDS = {
     "run",
