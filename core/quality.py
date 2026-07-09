@@ -2,10 +2,11 @@ import pandas as pd
 
 from core.quality_report import build_quality_report
 from core.quality_rules import evaluate_quality_rules
+from models.dataset import Dataset
 from typing import Optional, Dict, Any
 
 
-def _read_dataset_df(dataset) -> pd.DataFrame:
+def _read_dataset_df(dataset: Dataset) -> pd.DataFrame:
     """
     Read a dataset using the connector registry if a source: block is present,
     otherwise fall back to reading the local file.
@@ -34,7 +35,7 @@ def _read_dataset_df(dataset) -> pd.DataFrame:
     return pd.read_csv(file_path)
 
 
-def run_quality_checks(dataset, df: Optional[pd.DataFrame] = None) -> Dict[str, Any]:
+def run_quality_checks(dataset: Dataset, df: Optional[pd.DataFrame] = None) -> Dict[str, Any]:
     if df is None:
         df = _read_dataset_df(dataset)
 

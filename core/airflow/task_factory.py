@@ -1,9 +1,11 @@
+from typing import Any
+
 from airflow.operators.python import PythonOperator
 
 from core.airflow.runner import run_ingest, run_quality_check
 
 
-def create_ingestion_task(dag, dataset):
+def create_ingestion_task(dag: Any, dataset: Any) -> PythonOperator:
     """
     Creates one Airflow task for one dataset.
     """
@@ -19,7 +21,7 @@ def create_ingestion_task(dag, dataset):
     )
 
 
-def create_quality_task(dag, dataset):
+def create_quality_task(dag: Any, dataset: Any) -> PythonOperator:
     """
     Creates one Airflow quality task for one dataset.
     """

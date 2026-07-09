@@ -1,8 +1,10 @@
+from typing import Any, Dict
+
 from core.discovery import discover_datasets
 from core.ingestion import ingest_dataset
 
 
-def run_dataset(dataset_name: str):
+def run_dataset(dataset_name: str) -> Dict[str, Any]:
     """
     Airflow entrypoint.
 

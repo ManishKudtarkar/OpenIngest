@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, TYPE_CHECKING
 
 import pandas as pd
 import yaml
+
+if TYPE_CHECKING:
+    from models.dataset import Dataset
 
 
 QUALITY_RULES_FILE = Path(__file__).resolve().parents[1] / "configs" / "validation_rules.yaml"
@@ -200,7 +203,7 @@ def _add_check(checks: List[Dict[str, Any]], name: str, passed: bool, failed_row
     )
 
 
-def evaluate_quality_rules(dataset, df: pd.DataFrame) -> List[Dict[str, Any]]:
+def evaluate_quality_rules(dataset: "Dataset", df: pd.DataFrame) -> List[Dict[str, Any]]:
     rules = get_dataset_rules(dataset.name)
     dataset_config = dataset.config or {}
 

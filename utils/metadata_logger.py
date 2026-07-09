@@ -1,17 +1,18 @@
 import json
 from datetime import datetime
 import uuid
+from typing import Any, Dict
 
 import pandas as pd
 from sqlalchemy import text
+from sqlalchemy.engine import Engine
 
 from models.dataset import Dataset
 from models.pipeline_run import PipelineRun
 from utils.db import get_engine
 
 
-def ensure_metadata_schema(engine):
-
+def ensure_metadata_schema(engine: Engine) -> None:
     with engine.begin() as conn:
 
         conn.execute(
@@ -102,12 +103,12 @@ def ensure_metadata_schema(engine):
 
 class MetadataLogger:
 
-    def __init__(self):
+    def __init__(self) -> None:
 
         self.engine = get_engine()
         ensure_metadata_schema(self.engine)
 
-    def create_pipeline_run(self):
+    def create_pipeline_run(self) -> PipelineRun:
 
         run = PipelineRun(
             run_id=f"OI-{datetime.now().strftime('%Y%m%d')}-{uuid.uuid4().hex[:6].upper()}",
@@ -116,7 +117,7 @@ class MetadataLogger:
 
         return run
 
-    def log_dataset(self, run: PipelineRun, dataset: Dataset):
+    def log_dataset(self, run: PipelineRun, dataset: Dataset) -> None:
 
         df = pd.DataFrame(
             [
@@ -140,7 +141,7 @@ class MetadataLogger:
         with self.engine.begin() as conn:
             df.to_sql("pipeline_dataset_runs", conn, if_exists="append", index=False)
 
-    def log_quality_result(self, run_id: str, dataset: Dataset, quality_result: dict):
+    def log_quality_result(self, run_id: str, dataset: Dataset, quality_result: Dict[str, Any]) -> None:
 
         df = pd.DataFrame(
             [
@@ -169,7 +170,7 @@ class MetadataLogger:
             with self.engine.begin() as conn:
                 df.to_sql("pipeline_quality_runs", conn, if_exists="append", index=False)
 
-    def finish_pipeline(self, run: PipelineRun):
+    def finish_pipeline(self, run: PipelineRun) -> None:
 
         run.finished_at = datetime.now()
         run.total_duration = round(

@@ -3,8 +3,10 @@ from __future__ import annotations
 import json
 from typing import Any, Dict, List
 
+from models.dataset import Dataset
 
-def build_quality_report(dataset, df_rows: int, checks: List[Dict[str, Any]]) -> Dict[str, Any]:
+
+def build_quality_report(dataset: Dataset, df_rows: int, checks: List[Dict[str, Any]]) -> Dict[str, Any]:
     passed_checks = sum(1 for check in checks if check["passed"])
     failed_checks = len(checks) - passed_checks
     score = round((passed_checks / len(checks)) * 100, 2) if checks else 100.0

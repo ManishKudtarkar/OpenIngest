@@ -9,6 +9,8 @@ from sqlalchemy import MetaData, Table, text
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.engine import Engine
 
+from models.dataset import Dataset
+
 
 class IncrementalResult(TypedDict):
     rows_loaded: int
@@ -256,7 +258,7 @@ def _upsert_dataframe(
             conn.execute(statement)
 
 
-def load_incremental_dataset(dataset, df: pd.DataFrame, engine: Engine) -> IncrementalResult:
+def load_incremental_dataset(dataset: Dataset, df: pd.DataFrame, engine: Engine) -> IncrementalResult:
     config = dataset.config or {}
     primary_key_columns = list(dict.fromkeys(config.get("primary_key", [])))
     incremental_column: Optional[str] = config.get("incremental_column") or config.get("watermark_column") or None
@@ -267,7 +269,9 @@ def load_incremental_dataset(dataset, df: pd.DataFrame, engine: Engine) -> Incre
             f"Dataset '{dataset.name}' must define primary_key for incremental loading."
         )
 
-    _ensure_unique_index(engine, dataset.table, primary_key_columns)
+    target_table: str = dataset.table or dataset.name
+
+    _ensure_unique_index(engine, target_table, primary_key_columns)
 
     state = _load_incremental_state(engine, dataset.name)
     last_watermark_value: Optional[str] = str(state["last_watermark_value"]) if state and state.get("last_watermark_value") is not None else None
@@ -278,13 +282,13 @@ def load_incremental_dataset(dataset, df: pd.DataFrame, engine: Engine) -> Incre
         candidates = _apply_hash_change_detection(
             engine=engine,
             df=candidates,
-            table_name=dataset.table,
+            table_name=target_table,
             primary_key_columns=primary_key_columns,
             hash_columns=hash_columns,
         )
 
     if not candidates.empty:
-        _upsert_dataframe(engine, dataset.table, candidates, primary_key_columns)
+        _upsert_dataframe(engine, target_table, candidates, primary_key_columns)
 
     new_watermark_value: Optional[str] = None
     if incremental_column and incremental_column in df.columns and not df.empty:
@@ -297,7 +301,7 @@ def load_incremental_dataset(dataset, df: pd.DataFrame, engine: Engine) -> Incre
     _save_incremental_state(
         engine=engine,
         dataset_name=dataset.name,
-        target_table=dataset.table,
+        target_table=target_table,
         load_strategy="incremental",
         primary_key_columns=primary_key_columns,
         incremental_column=incremental_column,

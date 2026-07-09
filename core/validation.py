@@ -1,4 +1,12 @@
-def compare_schema(discovered_columns, required_columns):
+from typing import Any, Dict, List
+
+from models.dataset import Dataset
+
+
+def compare_schema(
+    discovered_columns: List[str],
+    required_columns: List[str],
+) -> Dict[str, Any]:
 
     discovered = set(discovered_columns)
     required = set(required_columns)
@@ -13,13 +21,14 @@ def compare_schema(discovered_columns, required_columns):
     }
 
 
-def validate_dataset(dataset):
+def validate_dataset(dataset: Dataset) -> Dict[str, Any]:
 
-    required = dataset.config["required_columns"]
+    config = dataset.config or {}
+    required: List[str] = config.get("required_columns", [])
 
     result = compare_schema(
         dataset.columns,
-        required
+        required,
     )
 
     dataset.schema_valid = result["valid"]

@@ -3,9 +3,11 @@ from __future__ import annotations
 import time
 from datetime import datetime
 from pathlib import Path
+from typing import Optional
 
 import pandas as pd
 from sqlalchemy import text
+from sqlalchemy.engine import Engine
 
 from core.schema import ensure_table_exists, quote_table_name
 from core.incremental import load_incremental_dataset
@@ -22,7 +24,7 @@ class DatasetIngestionError(Exception):
 def _safe_to_sql(
     df: pd.DataFrame,
     table: str,
-    engine: object,
+    engine: Engine,
     if_exists: str = "append",
     chunksize: int = 1000,
 ) -> None:
@@ -44,7 +46,6 @@ def _safe_to_sql(
             method="multi",
             chunksize=chunksize,
         )
-
     try:
         _load(df)
         return
@@ -102,7 +103,7 @@ def _read_dataset(dataset: Dataset) -> pd.DataFrame:
 
         return pd.read_csv(file_path)
 
-def ingest_dataset(dataset: Dataset, df: "pd.DataFrame | None" = None) -> Dataset:
+def ingest_dataset(dataset: Dataset, df: Optional[pd.DataFrame] = None) -> Dataset:
     """
     Ingest a single dataset into PostgreSQL.
 
@@ -187,16 +188,18 @@ def ingest_dataset(dataset: Dataset, df: "pd.DataFrame | None" = None) -> Datase
         dataset.load_mode = load_result["load_mode"]
         dataset.watermark_value = load_result["watermark_value"]
     elif strategy.lower() == "replace":
+        target_table = dataset.table or dataset.name
         with engine.begin() as conn:
-            conn.execute(text(f"TRUNCATE TABLE {quote_table_name(dataset.table or dataset.name)};"))
+            conn.execute(text(f"TRUNCATE TABLE {quote_table_name(target_table)};"))
 
-        _safe_to_sql(df, dataset.table, engine)
+        _safe_to_sql(df, target_table, engine)
 
         dataset.load_mode = "FULL"
         dataset.rows_loaded = len(df)
         dataset.watermark_value = None
     else:
-        _safe_to_sql(df, dataset.table, engine, if_exists="append")
+        target_table = dataset.table or dataset.name
+        _safe_to_sql(df, target_table, engine, if_exists="append")
 
         dataset.load_mode = "APPEND"
         dataset.rows_loaded = len(df)

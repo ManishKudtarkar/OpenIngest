@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 
 
-def generate_run_id():
+def generate_run_id() -> str:
 
     return (
         "OI-"

@@ -4,7 +4,7 @@ from utils.metadata_logger import ensure_metadata_schema
 from utils.db import get_engine
 
 
-def pipeline_report():
+def pipeline_report() -> None:
 
     engine = get_engine()
     ensure_metadata_schema(engine)

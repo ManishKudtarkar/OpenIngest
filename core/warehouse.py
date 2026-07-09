@@ -1,4 +1,4 @@
-def load_warehouse():
+def load_warehouse() -> None:
 
     print("Warehouse loading started")
 
