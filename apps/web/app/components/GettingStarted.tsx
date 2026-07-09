@@ -5,34 +5,40 @@ import { Copy, Check } from "lucide-react";
 const STEPS = [
   {
     n: "01",
-    title: "Clone and install",
-    code: `git clone https://github.com/manishkudtarkar/OpenIngest.git
-cd OpenIngest
-pip install -e ".[dev]"`,
+    title: "Install OpenIngest",
+    code: `pip install openingest`,
     note: "Gives you the openingest CLI. Windows: add Python Scripts to PATH if needed.",
   },
   {
     n: "02",
-    title: "Configure database",
-    code: `cp .env.example .env
-# Edit .env:
-# DATABASE_URL=postgresql://user:password@localhost:5432/openingest`,
-    note: null,
+    title: "Create a project",
+    code: `openingest init my-pipeline
+cd my-pipeline`,
+    note: "Scaffolds configs/, data/raw/, .env, and docker-compose.yml for you.",
   },
   {
     n: "03",
-    title: "Start PostgreSQL + Airflow",
+    title: "Configure database",
+    code: `# Edit .env:
+DATABASE_URL=postgresql://user:password@localhost:5432/openingest`,
+    note: null,
+  },
+  {
+    n: "04",
+    title: "Start PostgreSQL",
     code: `docker compose up -d`,
     note: "PostgreSQL on 5432. Airflow UI at localhost:8080 — login: admin / admin",
   },
   {
-    n: "04",
-    title: "Run the pipeline",
-    code: `openingest run`,
-    note: "Discovers all 8 datasets, validates, checks quality, loads 174,777 rows.",
+    n: "05",
+    title: "Drop your data and run",
+    code: `# Drop CSV/Excel/Parquet files into data/raw/
+openingest infer data/raw/customers.csv   # auto-generate config
+openingest run                             # load everything`,
+    note: "Discovers datasets, validates schemas, checks quality, loads PostgreSQL.",
   },
   {
-    n: "05",
+    n: "06",
     title: "Explore the CLI",
     code: `openingest validate     # schema only
 openingest quality      # quality scores
@@ -73,7 +79,7 @@ export default function GettingStarted() {
       <div className="section-container">
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 tag text-emerald-400 border-emerald-500/25 bg-emerald-500/8 mb-5">
-            5 steps · &lt;10 minutes
+            6 steps · &lt;10 minutes
           </div>
           <h2 className="f-head text-[42px] md:text-[52px] font-bold text-white leading-[1.1] tracking-[-0.025em] mb-4">
             Up and running fast.

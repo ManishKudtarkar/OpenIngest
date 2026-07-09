@@ -5,7 +5,7 @@ import GithubIcon from "./GithubIcon";
 
 export default function CTA() {
   const [copied, setCopied] = useState(false);
-  const cmd = 'pip install -e ".[dev]"';
+  const cmd = 'pip install openingest';
 
   const copy = () => {
     navigator.clipboard.writeText(cmd);
@@ -35,8 +35,8 @@ export default function CTA() {
           <span className="g-text">in minutes.</span>
         </h2>
         <p className="text-[#94A3B8] text-[16px] mb-10 leading-relaxed max-w-lg mx-auto">
-          Clone the repo, run docker compose, and your first 174,777-row pipeline
-          completes in 4.21 seconds. No cloud account. No API key. No credit card.
+          Install from PyPI, run <code className="text-[#A5B4FC] f-mono text-[14px]">openingest init</code>, and your first pipeline
+          completes in seconds. No cloud account. No API key. No credit card.
         </p>
 
         {/* Install command */}
