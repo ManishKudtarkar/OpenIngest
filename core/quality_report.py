@@ -26,7 +26,7 @@ def build_quality_report(dataset: Dataset, df_rows: int, checks: List[Dict[str, 
 
     dataset.quality_checked = True
     dataset.quality_score = score
-    dataset.quality_status = result["status"]
+    dataset.quality_status = str(result["status"])
     dataset.quality_summary = json.dumps(result, default=str)
 
     return result
