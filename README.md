@@ -532,7 +532,7 @@ OpenIngest/
 - ✅ v1.0 — Discovery, schema validation, quality engine, incremental loading, Airflow DAG, CLI, CI
 - ✅ v2.0 — Excel, JSON, Parquet, S3, Azure Blob, GCS, REST API connectors, plugin registry
 - ✅ v2.5 — Built-in scheduler, Slack/email notifications, data lineage engine
-- ✅ v2.5.1 — Published to PyPI · `pip install openingest`
+- ✅ v2.5.2 — Published to PyPI · `pip install openingest`
 - 🔲 v3.0 — Web dashboard, RBAC, multi-environment support, Snowflake/BigQuery connectors
 
 ---
