@@ -4,6 +4,8 @@ import os
 from pathlib import Path
 from typing import Any, Dict, Optional
 
+# ruff: noqa: E402
+
 
 def _load_env() -> None:
     """

@@ -1,96 +1,32 @@
 datasets:
-  # ── Arsenal Football Data ──────────────────────────────────────────────────
 
-  goalkeepers:
-    file: goalkeepers.csv
-    staging_table: stg_goalkeepers
-    load_strategy: replace
+# ─────────────────────────────────────────────────────────────────────────────
+# Air Quality Datasets — S3 bucket: demos212
+# ─────────────────────────────────────────────────────────────────────────────
 
+  air_full_raw:
     source:
       type: s3
       bucket: demos212
-      key: goalkeepers.csv
-      region: ap-south-1
+      key: Air_full-Raw.csv
       aws_access_key_id: ${AWS_ACCESS_KEY_ID}
       aws_secret_access_key: ${AWS_SECRET_ACCESS_KEY}
-
-    required_columns:
-      - LastName
-      - FirstName
-      - Date
-      - Pos
-      - Min
-      - SoTA
-      - GA
-      - Saves
-
-    non_null_columns:
-      - LastName
-      - FirstName
-      - Date
-
-
-  players:
-    file: players.csv
-    staging_table: stg_players
+      region: ap-south-1
+    staging_table: stg_air_full_raw
     load_strategy: replace
+    required_columns: []
 
+  air_clean:
     source:
       type: s3
       bucket: demos212
-      key: players.csv
-      region: ap-south-1
+      key: Air-Clean.csv
       aws_access_key_id: ${AWS_ACCESS_KEY_ID}
       aws_secret_access_key: ${AWS_SECRET_ACCESS_KEY}
-
-    required_columns:
-      - LastName
-      - FirstName
-      - Date
-      - Pos
-      - Min
-      - G
-      - A
-      - S
-      - SoT
-      - Touches
-
-    non_null_columns:
-      - LastName
-      - FirstName
-      - Date
-      - Pos
-
-
-  matches:
-    file: matches.csv
-    staging_table: stg_matches
+      region: ap-south-1
+    staging_table: stg_air_clean
     load_strategy: replace
-
-    source:
-      type: s3
-      bucket: demos212
-      key: matches.csv
-      region: ap-south-1
-      aws_access_key_id: ${AWS_ACCESS_KEY_ID}
-      aws_secret_access_key: ${AWS_SECRET_ACCESS_KEY}
-
-    required_columns:
-      - Season
-      - Tour
-      - Date
-      - Opponent
-      - HoAw
-      - ArsenalScore
-      - OpponentScore
-
-    non_null_columns:
-      - Season
-      - Date
-      - Opponent
-      - ArsenalScore
-      - OpponentScore
-
+    required_columns: []
 
 # ─────────────────────────────────────────────────────────────────────────────
 # v2.0 Source Connector Examples
