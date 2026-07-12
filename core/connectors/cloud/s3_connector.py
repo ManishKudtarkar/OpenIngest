@@ -72,7 +72,6 @@ def _resolve_env(value: str) -> str:
             )
         return resolved
     return value
-    return value
 
 
 class S3Connector(BaseConnector):

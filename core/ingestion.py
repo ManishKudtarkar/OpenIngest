@@ -205,9 +205,6 @@ def ingest_dataset(dataset: Dataset, df: Optional[pd.DataFrame] = None) -> Datas
         dataset.rows_loaded = len(df)
         dataset.watermark_value = None
 
-    if strategy.lower() == "incremental":
-        pass
-
     # --------------------------------------------------
     # Metadata
     # --------------------------------------------------

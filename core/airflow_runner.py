@@ -1,55 +1,26 @@
-from typing import Any, Dict
+"""
+Backwards-compatibility shim for core/airflow_runner.py.
 
-from core.discovery import discover_datasets
-from core.ingestion import ingest_dataset
+The real implementation lives in core/airflow/runner.py.
+This module re-exports all public task functions so any legacy imports still work.
+"""
 
+from core.airflow.runner import (  # noqa: F401
+    run_discover,
+    run_schema_validation,
+    run_quality_check,
+    run_ingest,
+    run_pipeline_report,
+)
 
-def run_dataset(dataset_name: str) -> Dict[str, Any]:
-    """
-    Airflow entrypoint.
+# Legacy alias — old code may call run_dataset(name)
+run_dataset = run_ingest
 
-    Executes ingestion for one dataset.
-    """
-
-    datasets = discover_datasets()
-
-    dataset = next(
-        (
-            d
-            for d in datasets
-            if d.name == dataset_name
-        ),
-        None,
-    )
-
-    if dataset is None:
-        raise ValueError(
-            f"Dataset '{dataset_name}' not found."
-        )
-
-    if not dataset.registered:
-        print(
-            f"Skipping '{dataset_name}' "
-            f"(dataset not registered)"
-        )
-
-        return {
-            "dataset": dataset_name,
-            "status": "SKIPPED",
-            "rows_loaded": 0,
-        }
-
-    dataset = ingest_dataset(dataset)
-
-    print(
-        f"\nFinished {dataset.name}"
-        f"\nRows Loaded : {dataset.rows_loaded:,}"
-        f"\nStatus      : {dataset.load_status}"
-    )
-
-    # Airflow XCom supports JSON only
-    return {
-        "dataset": dataset.name,
-        "rows_loaded": dataset.rows_loaded,
-        "status": dataset.load_status,
-    }
+__all__ = [
+    "run_discover",
+    "run_schema_validation",
+    "run_quality_check",
+    "run_ingest",
+    "run_pipeline_report",
+    "run_dataset",
+]

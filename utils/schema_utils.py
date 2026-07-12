@@ -1,15 +1,10 @@
-from typing import Any, Dict, List
+"""
+Schema utility helpers — thin wrappers around core/validation.py.
 
+Kept for backwards compatibility. New code should import directly from
+core.validation.
+"""
 
-def compare_schema(discovered_columns: List[str], required_columns: List[str]) -> Dict[str, Any]:
-    discovered = set(discovered_columns)
-    required = set(required_columns)
+from core.validation import compare_schema  # noqa: F401
 
-    missing = sorted(required - discovered)
-    extra = sorted(discovered - required)
-
-    return {
-        "valid": len(missing) == 0,
-        "missing": missing,
-        "extra": extra,
-    }
+__all__ = ["compare_schema"]

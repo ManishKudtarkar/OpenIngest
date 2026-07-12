@@ -1,13 +1,13 @@
 import subprocess
 import sys
 
+from openingest import __version__
 
-VERSION = "2.0.0"
 PACKAGE = "openingest"
 
 
 def run_version() -> int:
-    print(f"\n  OpenIngest v{VERSION}")
+    print(f"\n  OpenIngest v{__version__}")
     print(f"  Python {sys.version.split()[0]}")
     print(f"  {sys.executable}\n")
     return 0
