@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "openingest"
-version = "2.5.2"
+version = "3.0.0"
 description = "Configuration-driven data ingestion framework with quality checks, metadata, and orchestration"
 readme = "docs/USABILITY_AND_OBSERVABILITY.md"
 requires-python = ">=3.10"
@@ -60,6 +60,50 @@ notifications = [
   "requests>=2.31.0"
 ]
 
+# v3.0 — Database connectors
+postgresql = [
+  "psycopg2-binary>=2.9.0"
+]
+mysql = [
+  "PyMySQL>=1.1.0"
+]
+mongodb = [
+  "pymongo>=4.6.0"
+]
+
+# v3.0 — File transfer connectors
+sftp = [
+  "paramiko>=3.4.0"
+]
+
+# v3.0 — SaaS connectors
+salesforce = [
+  "simple-salesforce>=1.12.0"
+]
+hubspot = [
+  "requests>=2.31.0"
+]
+stripe = [
+  "requests>=2.31.0"
+]
+google_sheets = [
+  "google-api-python-client>=2.120.0",
+  "google-auth>=2.28.0",
+  "google-auth-httplib2>=0.2.0",
+]
+
+# v3.0 — All new connectors in one group
+connectors = [
+  "PyMySQL>=1.1.0",
+  "pymongo>=4.6.0",
+  "paramiko>=3.4.0",
+  "simple-salesforce>=1.12.0",
+  "requests>=2.31.0",
+  "google-api-python-client>=2.120.0",
+  "google-auth>=2.28.0",
+  "google-auth-httplib2>=0.2.0",
+]
+
 # All v2.0 extras together
 v2 = [
   "openpyxl>=3.1.2",
@@ -83,6 +127,14 @@ all = [
   "pytest-cov>=5.0",
   "ruff>=0.4",
   "mypy>=1.10",
+  # v3.0 connectors
+  "PyMySQL>=1.1.0",
+  "pymongo>=4.6.0",
+  "paramiko>=3.4.0",
+  "simple-salesforce>=1.12.0",
+  "google-api-python-client>=2.120.0",
+  "google-auth>=2.28.0",
+  "google-auth-httplib2>=0.2.0",
 ]
 
 [project.scripts]

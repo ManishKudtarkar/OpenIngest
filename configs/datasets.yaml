@@ -115,3 +115,187 @@ datasets:
 #   incremental_column: timestamp
 #   primary_key: [event_id]
 #   required_columns: [event_id, session_id, timestamp, event_type]
+
+# ─────────────────────────────────────────────────────────────────────────────
+# v3.0 Connector Examples
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Example: PostgreSQL source
+# pg_orders:
+#   source:
+#     type: postgresql
+#     host: ${PG_HOST}
+#     port: 5432
+#     database: ${PG_DATABASE}
+#     username: ${PG_USER}
+#     password: ${PG_PASSWORD}
+#     query: "SELECT * FROM orders WHERE status = 'active'"
+#     # OR: table: orders
+#     chunk_size: 10000
+#   staging_table: stg_pg_orders
+#   load_strategy: incremental
+#   incremental_column: updated_at
+#   primary_key: [order_id]
+#   required_columns: [order_id, customer_id, total_usd]
+
+# Example: MySQL source
+# mysql_users:
+#   source:
+#     type: mysql
+#     host: ${MYSQL_HOST}
+#     port: 3306
+#     database: ${MYSQL_DATABASE}
+#     username: ${MYSQL_USER}
+#     password: ${MYSQL_PASSWORD}
+#     table: users
+#   staging_table: stg_mysql_users
+#   load_strategy: replace
+#   required_columns: [id, email, created_at]
+
+# Example: MongoDB source
+# mongo_events:
+#   source:
+#     type: mongodb
+#     uri: ${MONGODB_URI}
+#     database: analytics
+#     collection: events
+#     filter: {"status": "active"}
+#     limit: 50000
+#     include_id: false
+#   staging_table: stg_mongo_events
+#   load_strategy: incremental
+#   incremental_column: created_at
+#   primary_key: [event_id]
+
+# Example: SFTP source
+# sftp_exports:
+#   source:
+#     type: sftp
+#     host: ${SFTP_HOST}
+#     port: 22
+#     username: ${SFTP_USER}
+#     password: ${SFTP_PASSWORD}
+#     # OR: private_key_path: ~/.ssh/id_rsa
+#     remote_path: /exports/daily_orders.csv
+#   staging_table: stg_sftp_exports
+#   load_strategy: replace
+
+# Example: FTP source
+# ftp_reports:
+#   source:
+#     type: ftp
+#     host: ${FTP_HOST}
+#     port: 21
+#     username: ${FTP_USER}
+#     password: ${FTP_PASSWORD}
+#     remote_path: /reports/monthly_sales.csv
+#   staging_table: stg_ftp_reports
+#   load_strategy: replace
+
+# Example: Salesforce source
+# sf_opportunities:
+#   source:
+#     type: salesforce
+#     username: ${SF_USERNAME}
+#     password: ${SF_PASSWORD}
+#     security_token: ${SF_SECURITY_TOKEN}
+#     client_id: ${SF_CLIENT_ID}
+#     client_secret: ${SF_CLIENT_SECRET}
+#     object: Opportunity
+#     fields: [Id, Name, Amount, StageName, CloseDate, AccountId]
+#     where_clause: "StageName = 'Closed Won'"
+#   staging_table: stg_sf_opportunities
+#   load_strategy: replace
+#   required_columns: [Id, Name, Amount]
+
+# Example: HubSpot source
+# hs_contacts:
+#   source:
+#     type: hubspot
+#     access_token: ${HUBSPOT_ACCESS_TOKEN}
+#     object: contacts
+#     properties: [firstname, lastname, email, createdate, hs_lead_status]
+#   staging_table: stg_hs_contacts
+#   load_strategy: replace
+#   required_columns: [id, email]
+
+# Example: Stripe source
+# stripe_charges:
+#   source:
+#     type: stripe
+#     api_key: ${STRIPE_API_KEY}
+#     resource: charges
+#     created_after: "2024-01-01T00:00:00"
+#   staging_table: stg_stripe_charges
+#   load_strategy: replace
+#   required_columns: [id, amount, currency, created]
+
+# Example: Google Sheets source
+# gsheets_budget:
+#   source:
+#     type: google_sheets
+#     spreadsheet_id: 1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms
+#     sheet_name: Q1_Budget
+#     range: A1:F500
+#     service_account_file: ${GOOGLE_SERVICE_ACCOUNT_FILE}
+#   staging_table: stg_gsheets_budget
+#   load_strategy: replace
+#   required_columns: [department, amount, quarter]
+
+# ─────────────────────────────────────────────────────────────────────────────
+# v3.0 Transforms Example
+# Apply transform steps after ingestion, before writing to staging table.
+# ─────────────────────────────────────────────────────────────────────────────
+
+# transforms_demo:
+#   source:
+#     type: s3
+#     bucket: demos212
+#     key: Air_full-Raw.csv
+#     aws_access_key_id: ${AWS_ACCESS_KEY_ID}
+#     aws_secret_access_key: ${AWS_SECRET_ACCESS_KEY}
+#     region: ap-south-1
+#   staging_table: stg_transforms_demo
+#   load_strategy: replace
+#   required_columns: []
+#   transforms:
+#     # 1. Rename columns
+#     - type: rename
+#       columns:
+#         "PM2.5": pm25
+#         "PM10": pm10
+#         "NO2(GT)": no2
+#
+#     # 2. Cast column types
+#     - type: cast
+#       columns:
+#         pm25: float
+#         pm10: float
+#         no2: float
+#
+#     # 3. Filter out invalid rows
+#     - type: filter
+#       expression: "pm25 >= 0 and pm10 >= 0"
+#
+#     # 4. Add a derived column
+#     - type: derive
+#       columns:
+#         aqi_estimate: "pm25 * 0.5 + pm10 * 0.3"
+#
+#     # 5. Aggregate by a dimension
+#     - type: aggregate
+#       group_by: [City]
+#       aggregations:
+#         pm25: mean
+#         pm10: mean
+#         no2: mean
+#         aqi_estimate: mean
+#
+#     # 6. Custom Python transform (optional)
+#     # - type: python
+#     #   inline: |
+#     #     df["aqi_category"] = pd.cut(
+#     #       df["aqi_estimate"],
+#     #       bins=[0, 50, 100, 150, 200, 300],
+#     #       labels=["Good", "Moderate", "Unhealthy-SG", "Unhealthy", "Very Unhealthy"]
+#     #     ).astype(str)

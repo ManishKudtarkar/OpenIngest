@@ -1,6 +1,7 @@
 from core.discovery import discover_datasets
 from core.ingestion import ingest_dataset, _read_dataset
 from core.quality import run_quality_checks
+from core.transform import TransformEngine, TransformError
 from core.validation import validate_dataset
 
 from utils.metadata_logger import MetadataLogger
@@ -92,6 +93,26 @@ def run_pipeline(dry_run: bool = False, dataset_filter: str | None = None):
             print("Data Quality Failed")
             skipped += 1
             continue
+
+        # ── Transform stage ──────────────────────────────────────────────────
+        engine = TransformEngine(dataset.config)
+        if engine.has_transforms:
+            rows_before = len(df)
+            cols_before = len(df.columns)
+            try:
+                df = engine.run(df)
+            except TransformError as exc:
+                print(f"Transform Failed : {exc}")
+                skipped += 1
+                continue
+            print(
+                f"Transform      : {len(engine.steps)} step(s) applied  "
+                f"({rows_before} → {len(df)} rows, "
+                f"{cols_before} → {len(df.columns)} cols)"
+            )
+            # Update dataset metadata with post-transform state
+            dataset.columns = list(df.columns)
+            dataset.rows = len(df)
 
         if dry_run:
             print(f"  [DRY RUN] {dataset.name} — would ingest (skipping)")

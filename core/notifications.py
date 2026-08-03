@@ -112,22 +112,68 @@ class NotificationManager:
             return
 
         message = self._build_slack_message(run)
+        retry_count: int = int(self.config.get("retry_count", slack_cfg.get("retry_count", 3)))
+        retry_delay: float = float(self.config.get("retry_delay", slack_cfg.get("retry_delay", 2.0)))
 
-        try:
-            payload = json.dumps(message).encode("utf-8")
-            req = urllib.request.Request(
-                webhook,
-                data=payload,
-                headers={"Content-Type": "application/json"},
-                method="POST",
-            )
-            with urllib.request.urlopen(req, timeout=10) as resp:
-                if resp.status == 200:
-                    logger.info("Slack notification sent for run %s", getattr(run, "run_id", "?"))
-                else:
-                    logger.error("Slack webhook returned %s", resp.status)
-        except Exception as exc:
-            logger.error("Failed to send Slack notification: %s", exc)
+        self._post_with_retry(
+            url=webhook,
+            payload=message,
+            channel="Slack",
+            run_id=getattr(run, "run_id", "?"),
+            retry_count=retry_count,
+            retry_delay=retry_delay,
+        )
+
+    def _post_with_retry(
+        self,
+        url: str,
+        payload: Dict[str, Any],
+        channel: str,
+        run_id: str,
+        retry_count: int,
+        retry_delay: float,
+    ) -> None:
+        """POST a JSON payload with exponential-backoff retry."""
+        import time
+
+        encoded = json.dumps(payload).encode("utf-8")
+        last_exc: Exception | None = None
+
+        for attempt in range(retry_count + 1):
+            try:
+                req = urllib.request.Request(
+                    url,
+                    data=encoded,
+                    headers={"Content-Type": "application/json"},
+                    method="POST",
+                )
+                with urllib.request.urlopen(req, timeout=10) as resp:
+                    if resp.status == 200:
+                        logger.info(
+                            "%s notification sent for run %s (attempt %d)",
+                            channel, run_id, attempt + 1,
+                        )
+                        return
+                    logger.warning(
+                        "%s webhook returned HTTP %s (attempt %d/%d)",
+                        channel, resp.status, attempt + 1, retry_count + 1,
+                    )
+            except Exception as exc:
+                last_exc = exc
+                logger.warning(
+                    "%s notification attempt %d/%d failed: %s",
+                    channel, attempt + 1, retry_count + 1, exc,
+                )
+
+            if attempt < retry_count:
+                sleep_secs = retry_delay * (2 ** attempt)  # exponential backoff
+                logger.debug("Retrying %s notification in %.1fs…", channel, sleep_secs)
+                time.sleep(sleep_secs)
+
+        logger.error(
+            "All %d %s notification attempts failed for run %s. Last error: %s",
+            retry_count + 1, channel, run_id, last_exc,
+        )
 
     def _build_slack_message(self, run: Any) -> Dict[str, Any]:
         status = str(getattr(run, "status", "UNKNOWN")).upper()
@@ -178,6 +224,8 @@ class NotificationManager:
         password: str = _resolve_env(email_cfg.get("password", ""))
         from_addr: str = email_cfg.get("from", username)
         to_addrs: List[str] = email_cfg.get("to", [])
+        retry_count: int = int(self.config.get("retry_count", email_cfg.get("retry_count", 3)))
+        retry_delay: float = float(self.config.get("retry_delay", email_cfg.get("retry_delay", 2.0)))
 
         if not smtp_host or not to_addrs:
             logger.error(
@@ -192,17 +240,36 @@ class NotificationManager:
         msg["From"] = from_addr
         msg["To"] = ", ".join(to_addrs)
         msg.attach(MIMEText(body, "plain"))
+        raw_msg = msg.as_string()
 
-        try:
-            with smtplib.SMTP(smtp_host, smtp_port, timeout=15) as server:
-                server.ehlo()
-                server.starttls()
-                if username and password:
-                    server.login(username, password)
-                server.sendmail(from_addr, to_addrs, msg.as_string())
-            logger.info("Email notification sent to %s", to_addrs)
-        except Exception as exc:
-            logger.error("Failed to send email notification: %s", exc)
+        import time
+        last_exc: Exception | None = None
+
+        for attempt in range(retry_count + 1):
+            try:
+                with smtplib.SMTP(smtp_host, smtp_port, timeout=15) as server:
+                    server.ehlo()
+                    server.starttls()
+                    if username and password:
+                        server.login(username, password)
+                    server.sendmail(from_addr, to_addrs, raw_msg)
+                logger.info(
+                    "Email notification sent to %s (attempt %d)", to_addrs, attempt + 1
+                )
+                return
+            except Exception as exc:
+                last_exc = exc
+                logger.warning(
+                    "Email notification attempt %d/%d failed: %s",
+                    attempt + 1, retry_count + 1, exc,
+                )
+                if attempt < retry_count:
+                    time.sleep(retry_delay * (2 ** attempt))
+
+        logger.error(
+            "All %d email notification attempts failed. Last error: %s",
+            retry_count + 1, last_exc,
+        )
 
     def _build_email_content(self, run: Any) -> tuple[str, str]:
         status = str(getattr(run, "status", "UNKNOWN")).upper()

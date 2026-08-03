@@ -107,7 +107,7 @@ const VERSIONS = [
     version: "v3.0",
     label: "Enterprise Platform",
     headline: "Extensible. Observable. Enterprise-ready.",
-    status: "next",
+    status: "shipped",
     accent: "#6366F1",
     icon: Puzzle,
     groups: [
@@ -117,7 +117,28 @@ const VERSIONS = [
         items: [
           { label: "pip install openingest-*",      done: true },
           { label: "ConnectorRegistry.register()",  done: true },
-          { label: "Custom connector SDK",          done: false },
+          { label: "Custom connector SDK",          done: true },
+        ],
+      },
+      {
+        title: "New Connectors",
+        icon: Server,
+        items: [
+          { label: "PostgreSQL + MySQL",            done: true },
+          { label: "MongoDB",                       done: true },
+          { label: "SFTP + FTP",                    done: true },
+          { label: "Salesforce + HubSpot + Stripe", done: true },
+          { label: "Google Sheets",                 done: true },
+        ],
+      },
+      {
+        title: "Transformations",
+        icon: Layers,
+        items: [
+          { label: "rename / cast / filter",        done: true },
+          { label: "derive / aggregate",            done: true },
+          { label: "Python inline + dotted-path",   done: true },
+          { label: "YAML transforms: block",        done: true },
         ],
       },
       {
@@ -127,16 +148,6 @@ const VERSIONS = [
           { label: "Lineage graph engine",          done: true },
           { label: "ASCII + Mermaid + JSON export", done: true },
           { label: "Web lineage visualizer",        done: false },
-        ],
-      },
-      {
-        title: "Enterprise",
-        icon: Shield,
-        items: [
-          { label: "Web dashboard",                 done: false },
-          { label: "RBAC",                          done: false },
-          { label: "Multi-environment support",     done: false },
-          { label: "PyPI public release",           done: false },
         ],
       },
     ],

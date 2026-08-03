@@ -61,25 +61,67 @@ class ConnectorRegistry:
 
 def _auto_register_builtins() -> None:
     """Register all built-in connectors at import time."""
+    # ── v2.0 — Formats ──────────────────────────────────────────────────────
     from core.connectors.formats.csv_connector import CsvConnector
     from core.connectors.formats.excel_connector import ExcelConnector
     from core.connectors.formats.json_connector import JsonConnector
     from core.connectors.formats.parquet_connector import ParquetConnector
+
+    # ── v2.0 — Cloud storage ────────────────────────────────────────────────
     from core.connectors.cloud.s3_connector import S3Connector
     from core.connectors.cloud.azure_connector import AzureBlobConnector
     from core.connectors.cloud.gcs_connector import GCSConnector
+
+    # ── v2.0 — REST API ─────────────────────────────────────────────────────
     from core.connectors.api.rest_connector import RestApiConnector
 
-    ConnectorRegistry.register("csv",     CsvConnector)
-    ConnectorRegistry.register("excel",   ExcelConnector)
-    ConnectorRegistry.register("xlsx",    ExcelConnector)
-    ConnectorRegistry.register("json",    JsonConnector)
-    ConnectorRegistry.register("parquet", ParquetConnector)
-    ConnectorRegistry.register("s3",      S3Connector)
-    ConnectorRegistry.register("azure",   AzureBlobConnector)
-    ConnectorRegistry.register("gcs",     GCSConnector)
-    ConnectorRegistry.register("rest",    RestApiConnector)
-    ConnectorRegistry.register("api",     RestApiConnector)
+    # ── v3.0 — Database connectors ──────────────────────────────────────────
+    from core.connectors.database.postgresql_connector import PostgreSQLConnector
+    from core.connectors.database.mysql_connector import MySQLConnector
+    from core.connectors.database.mongodb_connector import MongoDBConnector
+
+    # ── v3.0 — File transfer ────────────────────────────────────────────────
+    from core.connectors.transfer.sftp_connector import SFTPConnector
+    from core.connectors.transfer.ftp_connector import FTPConnector
+
+    # ── v3.0 — SaaS connectors ──────────────────────────────────────────────
+    from core.connectors.saas.salesforce_connector import SalesforceConnector
+    from core.connectors.saas.hubspot_connector import HubSpotConnector
+    from core.connectors.saas.stripe_connector import StripeConnector
+    from core.connectors.saas.google_sheets_connector import GoogleSheetsConnector
+
+    # v2.0 formats
+    ConnectorRegistry.register("csv",          CsvConnector)
+    ConnectorRegistry.register("excel",        ExcelConnector)
+    ConnectorRegistry.register("xlsx",         ExcelConnector)
+    ConnectorRegistry.register("json",         JsonConnector)
+    ConnectorRegistry.register("parquet",      ParquetConnector)
+
+    # v2.0 cloud
+    ConnectorRegistry.register("s3",           S3Connector)
+    ConnectorRegistry.register("azure",        AzureBlobConnector)
+    ConnectorRegistry.register("gcs",          GCSConnector)
+
+    # v2.0 REST
+    ConnectorRegistry.register("rest",         RestApiConnector)
+    ConnectorRegistry.register("api",          RestApiConnector)
+
+    # v3.0 databases
+    ConnectorRegistry.register("postgresql",   PostgreSQLConnector)
+    ConnectorRegistry.register("postgres",     PostgreSQLConnector)
+    ConnectorRegistry.register("mysql",        MySQLConnector)
+    ConnectorRegistry.register("mongodb",      MongoDBConnector)
+    ConnectorRegistry.register("mongo",        MongoDBConnector)
+
+    # v3.0 file transfer
+    ConnectorRegistry.register("sftp",         SFTPConnector)
+    ConnectorRegistry.register("ftp",          FTPConnector)
+
+    # v3.0 SaaS
+    ConnectorRegistry.register("salesforce",   SalesforceConnector)
+    ConnectorRegistry.register("hubspot",      HubSpotConnector)
+    ConnectorRegistry.register("stripe",       StripeConnector)
+    ConnectorRegistry.register("google_sheets", GoogleSheetsConnector)
 
 
 _auto_register_builtins()
