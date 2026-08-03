@@ -3,14 +3,12 @@
 from __future__ import annotations
 
 import pandas as pd
-import pytest
 
 from core.incremental import (
     _filter_by_watermark,
     _normalize_datetime_series,
     _row_hash,
 )
-
 
 # ── _normalize_datetime_series ────────────────────────────────────────────────
 

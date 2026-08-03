@@ -8,7 +8,6 @@ import pytest
 
 from core.scheduler import CronExpression, resolve_cron
 
-
 # ── resolve_cron presets ──────────────────────────────────────────────────────
 
 def test_resolve_daily() -> None:

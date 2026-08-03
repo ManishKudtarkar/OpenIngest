@@ -6,7 +6,6 @@ from types import SimpleNamespace
 
 from core.validation import compare_schema, validate_dataset
 
-
 # ── compare_schema ────────────────────────────────────────────────────────────
 
 def test_compare_schema_all_present() -> None:

@@ -2,9 +2,7 @@
 
 from __future__ import annotations
 
-import io
 import json
-import tempfile
 from pathlib import Path
 
 import pandas as pd
@@ -14,7 +12,6 @@ from core.connectors.base import ConnectorError
 from core.connectors.formats.csv_connector import CsvConnector
 from core.connectors.formats.json_connector import JsonConnector
 from core.connectors.formats.parquet_connector import ParquetConnector
-
 
 # ── CSV ───────────────────────────────────────────────────────────────────────
 

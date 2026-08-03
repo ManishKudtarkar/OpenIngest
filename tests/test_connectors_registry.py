@@ -2,12 +2,11 @@
 
 from __future__ import annotations
 
-import pytest
 import pandas as pd
+import pytest
 
-from core.connectors.base import BaseConnector, ConnectorError
+from core.connectors.base import BaseConnector
 from core.connectors.registry import ConnectorRegistry
-
 
 # ── built-in registrations ────────────────────────────────────────────────────
 
