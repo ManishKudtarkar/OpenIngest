@@ -94,6 +94,14 @@ const FEATURES = [
   },
   {
     icon: Zap,
+    title: "Transformation Engine",
+    desc: "Six YAML transform types: rename, cast, filter, derive, aggregate, and Python inline/dotted-path. Runs after quality check, before DB write.",
+    src: "core/transform.py",
+    accent: "#F59E0B",
+    span: false,
+  },
+  {
+    icon: Zap,
     title: "Config-Driven Everything",
     desc: "One YAML file. No Python, no SQL, no DAG edits. Register a dataset and openingest run handles everything.",
     src: "configs/datasets.yaml",
@@ -113,7 +121,7 @@ export default function Features() {
         <div className="text-center mb-16 max-w-2xl mx-auto">
           <div className="inline-flex items-center gap-2 tag text-cyan-300 border-cyan-300/20 bg-cyan-300/6 mb-5">
             <Zap size={11} fill="currentColor" />
-            12 production-grade components
+            13 production-grade components
           </div>
           <h2 className="f-head text-[38px] md:text-[50px] font-bold text-white leading-[1.1] tracking-[-0.025em] mb-5">
             Everything you need.

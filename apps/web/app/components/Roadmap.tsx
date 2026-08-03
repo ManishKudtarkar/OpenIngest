@@ -84,7 +84,7 @@ const VERSIONS = [
         items: [
           { label: "Slack webhook on success/fail", done: true },
           { label: "Email (SMTP) alerts",           done: true },
-          { label: "Retry policies",                done: false },
+          { label: "Retry policies",                done: true },
         ],
       },
       {
@@ -220,9 +220,8 @@ export default function Roadmap() {
             Where we&apos;re going.
           </h2>
           <p className="text-[#94A3B8] text-[16px] max-w-2xl mx-auto">
-            v1.0 ships a complete production ingestion framework.
-            v2.0 adds every data source. v2.5 adds scheduling and alerts.
-            v3.0 makes it enterprise-grade.
+            v1.0 ships a complete ingestion framework. v2.0 adds every file and cloud source.
+            v2.5 adds scheduling and alerts. v3.0 ships 9 new connectors and a full transformation engine.
           </p>
         </div>
 

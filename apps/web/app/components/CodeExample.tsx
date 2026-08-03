@@ -82,6 +82,39 @@ const DATASETS: {
       [["k", "      - "], ["s", "event_type"]],
     ],
   },
+  {
+    name: "transforms",
+    strategy: "v3.0 · new",
+    accent: "#F59E0B",
+    segments: [
+      [["k", "  air_data:"]],
+      [["k", "    source:"]],
+      [["k", "      type: "], ["v", "s3"]],
+      [["k", "      bucket: "], ["s", "demos212"]],
+      [["k", "      key: "], ["s", "Air_full-Raw.csv"]],
+      [["k", "    staging_table: "], ["s", "stg_air_clean"]],
+      [["k", "    load_strategy: "], ["v", "replace"]],
+      [["k", "    transforms:"]],
+      [["k", "      - type: "], ["v", "rename"]],
+      [["k", "        columns:"]],
+      [["k", "          \"PM2.5\": "], ["s", "pm25"]],
+      [["k", "          \"NO2(GT)\": "], ["s", "no2"]],
+      [["k", "      - type: "], ["v", "cast"]],
+      [["k", "        columns:"]],
+      [["k", "          pm25: "], ["s", "float"]],
+      [["k", "          no2: "], ["s", "float"]],
+      [["k", "      - type: "], ["v", "filter"]],
+      [["k", "        expression: "], ["s", "\"pm25 >= 0\""]],
+      [["k", "      - type: "], ["v", "derive"]],
+      [["k", "        columns:"]],
+      [["k", "          aqi: "], ["s", "\"pm25 * 0.5 + no2 * 0.3\""]],
+      [["k", "      - type: "], ["v", "aggregate"]],
+      [["k", "        group_by: "], ["s", "[City]"]],
+      [["k", "        aggregations:"]],
+      [["k", "          pm25: "], ["v", "mean"]],
+      [["k", "          aqi: "], ["v", "mean"]],
+    ],
+  },
 ];
 
 const segColor: Record<string, string> = {
@@ -154,7 +187,7 @@ export default function CodeExample() {
                 "8 datasets configured — 5 replace, 3 incremental",
                 "Tables auto-created from inferred column types",
                 "Incremental: watermark + SHA-256 hash CDC + upsert",
-                "Quality rules per dataset: non_null, unique, range",
+                "v3.0: transforms block — rename, cast, filter, derive, aggregate",
               ].map(s => (
                 <li key={s} className="flex items-start gap-2.5 text-[13px] text-[#64748B]">
                   <Check size={13} className="text-emerald-400 mt-[3px] shrink-0" />{s}

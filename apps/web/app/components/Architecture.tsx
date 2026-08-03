@@ -8,6 +8,7 @@ const PIPELINE = [
   { label: "Config Registration", src: "configs/datasets.yaml", desc: "One YAML file defines everything: load strategy, required columns, primary keys, quality rules, watermarks.", accent: "#8B5CF6" },
   { label: "Schema Validation", src: "core/validation.py", desc: "Required columns must exist. Missing or extra columns are reported. Pipeline halts here if validation fails.", accent: "#22D3EE" },
   { label: "Data Quality Engine", src: "core/quality.py", desc: "Runs non_null, unique, and range checks. Produces a 0–100% quality score per dataset. PASS required to proceed.", accent: "#10B981" },
+  { label: "Transformation Engine", src: "core/transform.py", desc: "Six YAML steps: rename columns, cast types, filter rows, derive computed columns, aggregate, or call a Python function. Runs after quality, before DB write.", accent: "#F59E0B" },
   { label: "Ingestion Engine", src: "core/ingestion.py", desc: "Three strategies: replace (truncate+reload), append (insert only), incremental (watermark + SHA-256 hash CDC + upsert).", accent: "#A855F7" },
   { label: "PostgreSQL Staging", src: "utils/db.py", desc: "Tables auto-created from inferred types. Eight staging tables: stg_customers, stg_orders, stg_products, and more.", accent: "#3B82F6" },
   { label: "Metadata Logger", src: "utils/metadata_logger.py", desc: "Records run ID, status, duration, rows loaded, per-dataset breakdown. Stored in pipeline_runs and pipeline_dataset_runs.", accent: "#F59E0B" },

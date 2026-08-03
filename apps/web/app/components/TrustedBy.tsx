@@ -8,6 +8,9 @@ import {
   Sparkles,
   TerminalSquare,
   Workflow,
+  Cloud,
+  Zap,
+  Globe,
 } from "lucide-react";
 
 const STACK = [
@@ -18,8 +21,11 @@ const STACK = [
   { icon: Layers3, label: "Pandas" },
   { icon: Boxes, label: "SQLAlchemy" },
   { icon: GitBranch, label: "GitHub Actions" },
-  { icon: CheckCircle2, label: "Pytest" },
+  { icon: CheckCircle2, label: "Pytest (93)" },
   { icon: Sparkles, label: "Ruff + Mypy" },
+  { icon: Cloud, label: "S3 / Azure / GCS" },
+  { icon: Globe, label: "Salesforce / HubSpot" },
+  { icon: Zap, label: "Stripe / Sheets" },
 ];
 
 export default function TrustedBy() {
@@ -30,8 +36,17 @@ export default function TrustedBy() {
         <p className="text-center text-[11px] text-[#64748B] uppercase font-semibold mb-7">
           Built on the modern open-source data stack
         </p>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-9 gap-2">
-          {STACK.map(({ icon: Icon, label }) => (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 mb-2">
+          {STACK.slice(0, 6).map(({ icon: Icon, label }) => (
+            <div key={label}
+              className="flex min-h-12 items-center justify-center gap-2 rounded-xl border border-white/7 bg-white/[0.025] px-3 text-[#94A3B8] transition-colors hover:border-cyan-300/20 hover:text-white">
+              <Icon size={15} className="text-cyan-300/80" />
+              <span className="text-[12px] font-medium">{label}</span>
+            </div>
+          ))}
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
+          {STACK.slice(6).map(({ icon: Icon, label }) => (
             <div key={label}
               className="flex min-h-12 items-center justify-center gap-2 rounded-xl border border-white/7 bg-white/[0.025] px-3 text-[#94A3B8] transition-colors hover:border-cyan-300/20 hover:text-white">
               <Icon size={15} className="text-cyan-300/80" />

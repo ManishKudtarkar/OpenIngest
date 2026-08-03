@@ -67,7 +67,7 @@ export default function Hero() {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
                 </span>
-                <span className="text-[12px] font-semibold text-cyan-200 tracking-wide">v2.0 · Open Source</span>
+                <span className="text-[12px] font-semibold text-cyan-200 tracking-wide">v3.0.1 · Open Source</span>
               </div>
               <span className="tag text-[#64748B] border-white/8 bg-white/3">MIT License</span>
             </div>

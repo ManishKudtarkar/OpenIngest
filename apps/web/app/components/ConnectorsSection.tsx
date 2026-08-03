@@ -3,7 +3,7 @@ import { useState } from "react";
 import {
   Cloud, Globe, Package, CheckCircle2,
   FileText, FileCode, Layers, Zap,
-  Server, HardDrive, Wifi,
+  Server, HardDrive, Wifi, Database,
 } from "lucide-react";
 
 type Connector = {
@@ -172,6 +172,149 @@ const GROUPS: Group[] = [
       },
     ],
   },
+  {
+    category: "Databases",
+    HeadIcon: Server,
+    accent: "#10B981",
+    items: [
+      {
+        id: "postgresql",
+        label: "PostgreSQL",
+        Icon: Database,
+        iconColor: "#336791",
+        desc: "Read from any PostgreSQL database via SQL query or table name. Supports chunked reads, ${ENV} credentials, and incremental watermark loads.",
+        version: "v3.0",
+        installed: "pip install openingest[postgresql]",
+        snip: [
+          ["source:", "#CBD5E1"],
+          ["  type: postgresql", "#FBBF24"],
+          ["  host: ${PG_HOST}", "#94A3B8"],
+          ["  database: ${PG_DATABASE}", "#94A3B8"],
+          ["  query: \"SELECT * FROM orders\"", "#34D399"],
+        ],
+      },
+      {
+        id: "mysql",
+        label: "MySQL",
+        Icon: Database,
+        iconColor: "#F29111",
+        desc: "Read from MySQL via SQL query or table name. PyMySQL under the hood. Supports chunked reads and ${ENV} credentials.",
+        version: "v3.0",
+        installed: "pip install openingest[mysql]",
+        snip: [
+          ["source:", "#CBD5E1"],
+          ["  type: mysql", "#FBBF24"],
+          ["  host: ${MYSQL_HOST}", "#94A3B8"],
+          ["  database: ${MYSQL_DATABASE}", "#94A3B8"],
+          ["  table: users", "#34D399"],
+        ],
+      },
+      {
+        id: "mongodb",
+        label: "MongoDB",
+        Icon: Database,
+        iconColor: "#13AA52",
+        desc: "Read MongoDB collections as flat DataFrames. Supports filter documents, field projection, document limit, and _id suppression.",
+        version: "v3.0",
+        installed: "pip install openingest[mongodb]",
+        snip: [
+          ["source:", "#CBD5E1"],
+          ["  type: mongodb", "#FBBF24"],
+          ["  uri: ${MONGODB_URI}", "#94A3B8"],
+          ["  database: analytics", "#34D399"],
+          ["  collection: events", "#34D399"],
+          ["  filter: {\"status\": \"active\"}", "#94A3B8"],
+        ],
+      },
+    ],
+  },
+  {
+    category: "SaaS & File Transfer",
+    HeadIcon: Zap,
+    accent: "#F59E0B",
+    items: [
+      {
+        id: "salesforce",
+        label: "Salesforce",
+        Icon: Globe,
+        iconColor: "#00A1E0",
+        desc: "Read Salesforce objects via SOQL. Username-password OAuth2 flow. Supports object, field selection, WHERE clause, or raw SOQL.",
+        version: "v3.0",
+        installed: "pip install openingest[salesforce]",
+        snip: [
+          ["source:", "#CBD5E1"],
+          ["  type: salesforce", "#FBBF24"],
+          ["  username: ${SF_USERNAME}", "#94A3B8"],
+          ["  object: Opportunity", "#34D399"],
+          ["  fields: [Id, Name, Amount]", "#34D399"],
+        ],
+      },
+      {
+        id: "hubspot",
+        label: "HubSpot",
+        Icon: Globe,
+        iconColor: "#FF7A59",
+        desc: "Read HubSpot CRM objects (contacts, companies, deals, tickets). Cursor-based pagination. Private app access token auth.",
+        version: "v3.0",
+        installed: "pip install openingest[hubspot]",
+        snip: [
+          ["source:", "#CBD5E1"],
+          ["  type: hubspot", "#FBBF24"],
+          ["  access_token: ${HUBSPOT_TOKEN}", "#94A3B8"],
+          ["  object: contacts", "#34D399"],
+          ["  properties: [email, createdate]", "#34D399"],
+        ],
+      },
+      {
+        id: "stripe",
+        label: "Stripe",
+        Icon: Globe,
+        iconColor: "#635BFF",
+        desc: "Read Stripe resource lists (charges, customers, invoices, subscriptions). Cursor pagination, created_after filter.",
+        version: "v3.0",
+        installed: "pip install openingest[stripe]",
+        snip: [
+          ["source:", "#CBD5E1"],
+          ["  type: stripe", "#FBBF24"],
+          ["  api_key: ${STRIPE_API_KEY}", "#94A3B8"],
+          ["  resource: charges", "#34D399"],
+          ["  created_after: \"2024-01-01T00:00:00\"", "#94A3B8"],
+        ],
+      },
+      {
+        id: "google_sheets",
+        label: "Google Sheets",
+        Icon: FileText,
+        iconColor: "#0F9D58",
+        desc: "Read Google Sheets via Sheets API v4. Service account JSON auth. Supports sheet name, cell range, and auto-detects headers.",
+        version: "v3.0",
+        installed: "pip install openingest[google_sheets]",
+        snip: [
+          ["source:", "#CBD5E1"],
+          ["  type: google_sheets", "#FBBF24"],
+          ["  spreadsheet_id: 1BxiM...", "#34D399"],
+          ["  sheet_name: Q1_Budget", "#34D399"],
+          ["  service_account_file: ${SA_FILE}", "#94A3B8"],
+        ],
+      },
+      {
+        id: "sftp",
+        label: "SFTP",
+        Icon: HardDrive,
+        iconColor: "#64748B",
+        desc: "Download CSV, JSON, Parquet, or Excel files from SFTP servers. Password or private key auth. Format auto-detected from extension.",
+        version: "v3.0",
+        installed: "pip install openingest[sftp]",
+        snip: [
+          ["source:", "#CBD5E1"],
+          ["  type: sftp", "#FBBF24"],
+          ["  host: ${SFTP_HOST}", "#94A3B8"],
+          ["  username: ${SFTP_USER}", "#94A3B8"],
+          ["  remote_path: /exports/daily.csv", "#34D399"],
+        ],
+      },
+    ],
+  },
 ];
 
 const ALL = GROUPS.flatMap(g => g.items);
@@ -193,7 +336,7 @@ export default function ConnectorsSection() {
         {/* Header */}
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 tag text-indigo-400 border-indigo-500/20 bg-indigo-500/6 mb-5">
-            v2.0 · 9 connectors
+            v3.0 · 17 connectors
           </div>
           <h2 className="f-head text-[38px] md:text-[50px] font-bold text-white leading-[1.1] tracking-[-0.025em] mb-4">
             Any source. One config block.
