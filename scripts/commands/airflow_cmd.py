@@ -2,7 +2,6 @@ from pathlib import Path
 
 import yaml
 
-
 # The DAG template is the live dags/openingest_dynamic_dag.py itself.
 # airflow build copies it after patching the schedule from pipeline.yaml.
 _DAG_SOURCE = Path("dags/openingest_dynamic_dag.py")
@@ -14,7 +13,7 @@ def run_airflow_build() -> int:
         print("  configs/datasets.yaml not found.")
         return 1
 
-    with open(config_path, "r", encoding="utf-8") as f:
+    with open(config_path, encoding="utf-8") as f:
         config = yaml.safe_load(f) or {}
 
     datasets = list((config.get("datasets") or {}).keys())
@@ -30,7 +29,7 @@ def run_airflow_build() -> int:
     schedule = "@daily"
     pipeline_cfg = Path("configs/pipeline.yaml")
     if pipeline_cfg.exists():
-        with open(pipeline_cfg, "r", encoding="utf-8") as f:
+        with open(pipeline_cfg, encoding="utf-8") as f:
             pcfg = yaml.safe_load(f) or {}
         schedule = pcfg.get("schedule", "@daily")
 

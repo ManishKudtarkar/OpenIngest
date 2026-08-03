@@ -23,27 +23,28 @@ def _bootstrap() -> None:
 
 _bootstrap()
 
-from core.discovery import discover_datasets  # noqa: E402
-from core.pipeline import run_pipeline  # noqa: E402
-from core.reporting import pipeline_report  # noqa: E402
-from core.validation import validate_dataset  # noqa: E402
-from scripts.commands.init import run_init  # noqa: E402
-from scripts.commands.add_dataset import run_add_dataset  # noqa: E402
-from scripts.commands.doctor import run_doctor  # noqa: E402
-from scripts.commands.discover import run_discover  # noqa: E402
-from scripts.commands.profile import run_profile  # noqa: E402
-from scripts.commands.infer import run_infer  # noqa: E402
-from scripts.commands.version import run_version, run_upgrade  # noqa: E402
-from scripts.commands.graph import run_graph  # noqa: E402
-from scripts.commands.docker_cmd import run_docker_init  # noqa: E402
-from scripts.commands.airflow_cmd import run_airflow_build  # noqa: E402
-from scripts.commands.schedule import run_schedule  # noqa: E402
-from scripts.dashboard import show_dashboard  # noqa: E402
-from scripts.data_quality_checks import run_data_quality_checks  # noqa: E402
-import pandas as pd  # noqa: E402
-from utils.db import get_engine  # noqa: E402
-from utils.config_loader import load_pipeline_config  # noqa: E402
-from utils.project import chdir_project_root  # noqa: E402
+import pandas as pd
+
+from core.discovery import discover_datasets
+from core.pipeline import run_pipeline
+from core.reporting import pipeline_report
+from core.validation import validate_dataset
+from scripts.commands.add_dataset import run_add_dataset
+from scripts.commands.airflow_cmd import run_airflow_build
+from scripts.commands.discover import run_discover
+from scripts.commands.docker_cmd import run_docker_init
+from scripts.commands.doctor import run_doctor
+from scripts.commands.graph import run_graph
+from scripts.commands.infer import run_infer
+from scripts.commands.init import run_init
+from scripts.commands.profile import run_profile
+from scripts.commands.schedule import run_schedule
+from scripts.commands.version import run_upgrade, run_version
+from scripts.dashboard import show_dashboard
+from scripts.data_quality_checks import run_data_quality_checks
+from utils.config_loader import load_pipeline_config
+from utils.db import get_engine
+from utils.project import chdir_project_root
 
 PROJECT_COMMANDS = {
     "run",
@@ -266,25 +267,22 @@ def main() -> int:
     if args.command == "schedule":
         return run_schedule(args.schedule)
 
-    if args.command == "scheduler":
-        if args.scheduler_command == "start":
-            from core.scheduler import Scheduler
-            cron_arg = args.cron or None
-            if not cron_arg:
-                cfg = load_pipeline_config()
-                cron_arg = cfg.get("cron") or cfg.get("schedule") or "@daily"
-            dry = getattr(args, "dry_run", False)
-            s = Scheduler(cron_expression=cron_arg, dry_run=dry)
-            s.start()
-            return 0
+    if args.command == "scheduler" and args.scheduler_command == "start":
+        from core.scheduler import Scheduler
+        cron_arg = args.cron or None
+        if not cron_arg:
+            cfg = load_pipeline_config()
+            cron_arg = cfg.get("cron") or cfg.get("schedule") or "@daily"
+        dry = getattr(args, "dry_run", False)
+        s = Scheduler(cron_expression=cron_arg, dry_run=dry)
+        s.start()
+        return 0
 
-    if args.command == "docker":
-        if args.docker_command == "init":
-            return run_docker_init()
+    if args.command == "docker" and args.docker_command == "init":
+        return run_docker_init()
 
-    if args.command == "airflow":
-        if args.airflow_command == "build":
-            return run_airflow_build()
+    if args.command == "airflow" and args.airflow_command == "build":
+        return run_airflow_build()
 
     return 1
 

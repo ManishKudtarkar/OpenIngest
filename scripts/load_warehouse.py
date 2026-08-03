@@ -1,10 +1,12 @@
-from pathlib import Path
-from sqlalchemy import text
-import sys
 import os
+import sys
+from pathlib import Path
+
+from sqlalchemy import text
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from utils.db import get_engine
+
 
 def run_sql_file(file_path: str):
     engine = get_engine()

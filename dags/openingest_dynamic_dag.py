@@ -1,19 +1,18 @@
 from datetime import datetime, timedelta
 
 from airflow import DAG
-from airflow.operators.python import PythonOperator
 from airflow.operators.empty import EmptyOperator
+from airflow.operators.python import PythonOperator
 from airflow.utils.task_group import TaskGroup
 
-from utils.config_loader import load_dataset_config
 from core.airflow.runner import (
     run_discover,
-    run_schema_validation,
-    run_quality_check,
     run_ingest,
     run_pipeline_report,
+    run_quality_check,
+    run_schema_validation,
 )
-
+from utils.config_loader import load_dataset_config
 
 default_args = {
     "owner": "OpenIngest",
@@ -26,7 +25,7 @@ default_args = {
 with DAG(
     dag_id="openingest_dynamic_pipeline",
     description="Configuration-driven ingestion: discover -> validate -> quality -> ingest -> report",
-    start_date=datetime(2025, 1, 1),
+    start_date=datetime(2025, 1, 1, tzinfo=None),  # noqa: DTZ001
     schedule="@daily",
     catchup=False,
     default_args=default_args,

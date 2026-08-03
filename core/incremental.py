@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import hashlib
 from datetime import datetime
-from typing import Dict, List, Optional, TypedDict
+from typing import TypedDict
 
 import pandas as pd
 from sqlalchemy import MetaData, Table, text
@@ -16,8 +16,8 @@ class IncrementalResult(TypedDict):
     rows_loaded: int
     load_mode: str
     load_strategy: str
-    incremental_column: Optional[str]
-    watermark_value: Optional[str]
+    incremental_column: str | None
+    watermark_value: str | None
     hash_based_change_detection: bool
     upserted: bool
 
@@ -56,7 +56,7 @@ def _normalize_datetime_series(series: pd.Series) -> pd.Series:
     return pd.to_datetime(series, errors="coerce")
 
 
-def _row_hash(frame: pd.DataFrame, columns: List[str]) -> pd.Series:
+def _row_hash(frame: pd.DataFrame, columns: list[str]) -> pd.Series:
     if not columns:
         columns = list(frame.columns)
 
@@ -64,7 +64,7 @@ def _row_hash(frame: pd.DataFrame, columns: List[str]) -> pd.Series:
     return digest_source.apply(lambda value: hashlib.sha256(value.encode("utf-8")).hexdigest())
 
 
-def _load_incremental_state(engine: Engine, dataset_name: str) -> Optional[Dict[str, str]]:
+def _load_incremental_state(engine: Engine, dataset_name: str) -> dict[str, str] | None:
     query = text(
         """
         SELECT
@@ -91,10 +91,10 @@ def _save_incremental_state(
     dataset_name: str,
     target_table: str,
     load_strategy: str,
-    primary_key_columns: List[str],
-    incremental_column: Optional[str],
-    hash_columns: List[str],
-    last_watermark_value: Optional[str],
+    primary_key_columns: list[str],
+    incremental_column: str | None,
+    hash_columns: list[str],
+    last_watermark_value: str | None,
     last_rows_loaded: int,
     last_source_rows: int,
 ) -> None:
@@ -149,12 +149,12 @@ def _save_incremental_state(
                 "last_watermark_value": last_watermark_value,
                 "last_rows_loaded": last_rows_loaded,
                 "last_source_rows": last_source_rows,
-                "last_loaded_at": datetime.now(),
+                "last_loaded_at": datetime.now(),  # noqa: DTZ005
             },
         )
 
 
-def _ensure_unique_index(engine: Engine, table_name: str, column_names: List[str]) -> None:
+def _ensure_unique_index(engine: Engine, table_name: str, column_names: list[str]) -> None:
     if not column_names:
         return
 
@@ -169,7 +169,7 @@ def _ensure_unique_index(engine: Engine, table_name: str, column_names: List[str
         )
 
 
-def _filter_by_watermark(df: pd.DataFrame, watermark_column: str, last_watermark_value: Optional[str]) -> pd.DataFrame:
+def _filter_by_watermark(df: pd.DataFrame, watermark_column: str, last_watermark_value: str | None) -> pd.DataFrame:
     if watermark_column not in df.columns:
         return df.copy()
 
@@ -189,8 +189,8 @@ def _apply_hash_change_detection(
     engine: Engine,
     df: pd.DataFrame,
     table_name: str,
-    primary_key_columns: List[str],
-    hash_columns: List[str],
+    primary_key_columns: list[str],
+    hash_columns: list[str],
 ) -> pd.DataFrame:
     if not primary_key_columns or not hash_columns or df.empty:
         return df.copy()
@@ -219,7 +219,7 @@ def _apply_hash_change_detection(
     target["_target_hash"] = _row_hash(target, hash_columns)
 
     merged = source.merge(
-        target[list(dict.fromkeys(primary_key_columns + ["_target_hash"]))],
+        target[list(dict.fromkeys([*primary_key_columns, "_target_hash"]))],
         on=primary_key_columns,
         how="left",
     )
@@ -233,7 +233,7 @@ def _upsert_dataframe(
     engine: Engine,
     table_name: str,
     df: pd.DataFrame,
-    primary_key_columns: List[str],
+    primary_key_columns: list[str],
 ) -> None:
     if df.empty:
         return
@@ -261,7 +261,7 @@ def _upsert_dataframe(
 def load_incremental_dataset(dataset: Dataset, df: pd.DataFrame, engine: Engine) -> IncrementalResult:
     config = dataset.config or {}
     primary_key_columns = list(dict.fromkeys(config.get("primary_key", [])))
-    incremental_column: Optional[str] = config.get("incremental_column") or config.get("watermark_column") or None
+    incremental_column: str | None = config.get("incremental_column") or config.get("watermark_column") or None
     hash_columns = list(dict.fromkeys(config.get("hash_columns", [])))
 
     if not primary_key_columns:
@@ -274,7 +274,7 @@ def load_incremental_dataset(dataset: Dataset, df: pd.DataFrame, engine: Engine)
     _ensure_unique_index(engine, target_table, primary_key_columns)
 
     state = _load_incremental_state(engine, dataset.name)
-    last_watermark_value: Optional[str] = str(state["last_watermark_value"]) if state and state.get("last_watermark_value") is not None else None
+    last_watermark_value: str | None = str(state["last_watermark_value"]) if state and state.get("last_watermark_value") is not None else None
 
     candidates = _filter_by_watermark(df, incremental_column or "", last_watermark_value)
 
@@ -290,7 +290,7 @@ def load_incremental_dataset(dataset: Dataset, df: pd.DataFrame, engine: Engine)
     if not candidates.empty:
         _upsert_dataframe(engine, target_table, candidates, primary_key_columns)
 
-    new_watermark_value: Optional[str] = None
+    new_watermark_value: str | None = None
     if incremental_column and incremental_column in df.columns and not df.empty:
         source_values = _normalize_datetime_series(df[incremental_column])
         if source_values.notna().any():
@@ -307,12 +307,12 @@ def load_incremental_dataset(dataset: Dataset, df: pd.DataFrame, engine: Engine)
         incremental_column=incremental_column,
         hash_columns=hash_columns,
         last_watermark_value=new_watermark_value or last_watermark_value,
-        last_rows_loaded=int(len(candidates)),
-        last_source_rows=int(len(df)),
+        last_rows_loaded=len(candidates),
+        last_source_rows=len(df),
     )
 
     return {
-        "rows_loaded": int(len(candidates)),
+        "rows_loaded": len(candidates),
         "load_mode": "INCREMENTAL",
         "load_strategy": "incremental",
         "incremental_column": incremental_column,

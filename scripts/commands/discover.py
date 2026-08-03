@@ -19,7 +19,7 @@ def run_discover() -> int:
     # Load existing config to find already-registered files
     registered_files: set[str] = set()
     if config_path.exists():
-        with open(config_path, "r", encoding="utf-8") as f:
+        with open(config_path, encoding="utf-8") as f:
             existing = yaml.safe_load(f) or {}
         for ds in (existing.get("datasets") or {}).values():
             registered_files.add(ds.get("file", ""))
@@ -50,7 +50,7 @@ def run_discover() -> int:
 
     # Load or init config
     if config_path.exists():
-        with open(config_path, "r", encoding="utf-8") as f:
+        with open(config_path, encoding="utf-8") as f:
             config = yaml.safe_load(f) or {}
     else:
         config = {}

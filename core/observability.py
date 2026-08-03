@@ -243,7 +243,7 @@ def get_incremental_summary() -> dict:
     latest_watermark = watermark_candidates.max() if not watermark_candidates.empty else "-"
 
     return {
-        "incremental_datasets": int(len(latest_incremental)),
+        "incremental_datasets": len(latest_incremental),
         "new_records": new_records,
         "skipped_records": skipped_records,
         "latest_watermark": latest_watermark,

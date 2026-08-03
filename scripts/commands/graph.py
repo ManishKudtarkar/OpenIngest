@@ -9,7 +9,7 @@ def run_graph() -> int:
         print("  configs/datasets.yaml not found.")
         return 1
 
-    with open(config_path, "r", encoding="utf-8") as f:
+    with open(config_path, encoding="utf-8") as f:
         config = yaml.safe_load(f) or {}
 
     datasets = config.get("datasets") or {}
@@ -33,8 +33,7 @@ def run_graph() -> int:
 
     # Print each branch
     for i, (name, strategy, table) in enumerate(branches):
-        connector = "|" if i < len(branches) - 1 else "|"
-        print(f"     {connector}-- [{name}]")
+        print(f"     |-- [{name}]")
         print(f"     |     discover -> validate -> quality -> ingest ({strategy})")
         print(f"     |     -> {table}")
         if i < len(branches) - 1:

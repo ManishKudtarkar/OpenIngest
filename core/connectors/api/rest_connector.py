@@ -38,7 +38,7 @@ from __future__ import annotations
 
 import os
 import time
-from typing import Any, Dict, List, Optional
+from typing import Any, ClassVar
 
 import pandas as pd
 
@@ -61,7 +61,7 @@ def _resolve_env_in_str(value: str) -> str:
     return value
 
 
-def _resolve_env_in_dict(d: Dict[str, Any]) -> Dict[str, Any]:
+def _resolve_env_in_dict(d: dict[str, Any]) -> dict[str, Any]:
     """Recursively expand ${VAR} references in all string values of a dict."""
     return {k: _resolve_env_in_str(str(v)) if isinstance(v, str) else v for k, v in d.items()}
 
@@ -143,7 +143,7 @@ class RestApiConnector(BaseConnector):
         max_pages: 100
     """
 
-    RETRY_STATUS_CODES = {429, 500, 502, 503, 504}
+    RETRY_STATUS_CODES: ClassVar[set[int]] = {429, 500, 502, 503, 504}
 
     def read(self) -> pd.DataFrame:
         self.validate_config()
@@ -158,10 +158,10 @@ class RestApiConnector(BaseConnector):
 
         url: str = self.config["url"]
         method: str = self.config.get("method", "GET").upper()
-        headers: Dict[str, str] = _resolve_env_in_dict(self.config.get("headers", {}))
-        params: Dict[str, Any] = dict(self.config.get("params", {}))
-        body: Optional[Dict[str, Any]] = self.config.get("body")
-        record_path: Optional[str] = self.config.get("record_path")
+        headers: dict[str, str] = _resolve_env_in_dict(self.config.get("headers", {}))
+        params: dict[str, Any] = dict(self.config.get("params", {}))
+        body: dict[str, Any] | None = self.config.get("body")
+        record_path: str | None = self.config.get("record_path")
         timeout: int = int(self.config.get("timeout", 30))
         retry_count: int = int(self.config.get("retry_count", 3))
         retry_delay: float = float(self.config.get("retry_delay", 1.0))
@@ -205,15 +205,15 @@ class RestApiConnector(BaseConnector):
         requests: Any,
         url: str,
         method: str,
-        headers: Dict[str, str],
-        params: Dict[str, Any],
-        body: Optional[Dict[str, Any]],
+        headers: dict[str, str],
+        params: dict[str, Any],
+        body: dict[str, Any] | None,
         timeout: int,
         retry_count: int,
         retry_delay: float,
         verify_ssl: bool,
     ) -> Any:
-        last_exc: Optional[Exception] = None
+        last_exc: Exception | None = None
 
         for attempt in range(retry_count + 1):
             try:
@@ -254,17 +254,17 @@ class RestApiConnector(BaseConnector):
         requests: Any,
         url: str,
         method: str,
-        headers: Dict[str, str],
-        params: Dict[str, Any],
-        body: Optional[Dict[str, Any]],
-        record_path: Optional[str],
-        pagination: Dict[str, Any],
+        headers: dict[str, str],
+        params: dict[str, Any],
+        body: dict[str, Any] | None,
+        record_path: str | None,
+        pagination: dict[str, Any],
         timeout: int,
         verify_ssl: bool,
-    ) -> List[Any]:
+    ) -> list[Any]:
         page_type: str = pagination.get("type", "offset")
         max_pages: int = int(pagination.get("max_pages", 50))
-        all_records: List[Any] = []
+        all_records: list[Any] = []
 
         if page_type == "offset":
             limit: int = int(pagination.get("limit", 500))
@@ -290,7 +290,7 @@ class RestApiConnector(BaseConnector):
         elif page_type == "cursor":
             cursor_path: str = pagination.get("cursor_path", "next_cursor")
             cursor_param: str = pagination.get("param", "cursor")
-            cursor: Optional[str] = None
+            cursor: str | None = None
 
             for page in range(max_pages):
                 page_params = {**params}
@@ -312,7 +312,7 @@ class RestApiConnector(BaseConnector):
 
         return all_records
 
-    def _extract_records(self, raw: Any, record_path: Optional[str]) -> List[Any]:
+    def _extract_records(self, raw: Any, record_path: str | None) -> list[Any]:
         if record_path:
             data = _get_nested(raw, record_path)
             if data is None:
@@ -324,7 +324,7 @@ class RestApiConnector(BaseConnector):
             return raw
         return [raw]
 
-    def _to_dataframe(self, raw: Any, record_path: Optional[str]) -> pd.DataFrame:
+    def _to_dataframe(self, raw: Any, record_path: str | None) -> pd.DataFrame:
         records = self._extract_records(raw, record_path)
         if not records:
             return pd.DataFrame()

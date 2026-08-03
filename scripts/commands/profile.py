@@ -94,7 +94,7 @@ def _friendly_dtype(series: pd.Series) -> str:
         try:
             pd.to_datetime(sample, format="mixed")
             return "DATE/TIMESTAMP"
-        except Exception:
+        except Exception:  # noqa: BLE001, S110
             pass
         return "TEXT"
     return dtype.upper()

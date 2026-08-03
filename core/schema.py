@@ -15,12 +15,10 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
-from typing import List, Optional, Tuple
 
 import pandas as pd
 from sqlalchemy import inspect, text
 from sqlalchemy.engine import Engine
-
 
 # ─── Identifiers ──────────────────────────────────────────────────────────────
 
@@ -106,7 +104,7 @@ def _is_datetime_series(series: pd.Series) -> bool:
     return parsed.notna().all()
 
 
-def _is_numeric_series(series: pd.Series) -> Tuple[bool, bool]:
+def _is_numeric_series(series: pd.Series) -> tuple[bool, bool]:
     """
     Returns (is_numeric, is_integer).
     is_integer is True only when all non-null values have no fractional part.
@@ -147,7 +145,7 @@ def infer_postgres_type(series: pd.Series) -> str:
             try:
                 max_val = int(series.abs().max()) if not series.empty else 0
                 return "BIGINT" if max_val > 2_147_483_647 else "INTEGER"
-            except Exception:
+            except Exception:  # noqa: BLE001
                 return "BIGINT"
 
         # ── Native float ─────────────────────────────────────────────────────
@@ -173,24 +171,24 @@ def infer_postgres_type(series: pd.Series) -> str:
                     cleaned = _clean_series(series)
                     max_val = abs(pd.to_numeric(cleaned).max())
                     return "BIGINT" if max_val > 2_147_483_647 else "INTEGER"
-                except Exception:
+                except Exception:  # noqa: BLE001
                     return "INTEGER"
             return "DOUBLE PRECISION"
 
         return "TEXT"
 
-    except Exception:
+    except Exception:  # noqa: BLE001
         # Absolute safety net — TEXT accepts any value
         return "TEXT"
 
 
-def infer_column_definitions(df: pd.DataFrame) -> List[ColumnDefinition]:
+def infer_column_definitions(df: pd.DataFrame) -> list[ColumnDefinition]:
     """Infer PostgreSQL column types for every column in the DataFrame."""
-    definitions: List[ColumnDefinition] = []
+    definitions: list[ColumnDefinition] = []
     for col in df.columns:
         try:
             pg_type = infer_postgres_type(df[col])
-        except Exception:
+        except Exception:  # noqa: BLE001
             pg_type = "TEXT"
         definitions.append(ColumnDefinition(name=col, postgres_type=pg_type))
     return definitions
@@ -216,7 +214,7 @@ def _sync_table_columns(
     engine: Engine,
     table_name: str,
     df: pd.DataFrame,
-    schema_name: Optional[str],
+    schema_name: str | None,
     bare_table_name: str,
 ) -> None:
     """
@@ -252,7 +250,7 @@ def ensure_table_exists(dataset: object, df: pd.DataFrame, engine: Engine) -> bo
         raise ValueError(f"Dataset '{dataset.name}' is missing a target table.")  # type: ignore[attr-defined]
 
     inspector = inspect(engine)
-    schema_name: Optional[str] = None
+    schema_name: str | None = None
     bare_table_name = dataset.table  # type: ignore[attr-defined]
 
     if "." in dataset.table:  # type: ignore[attr-defined]
@@ -264,7 +262,7 @@ def ensure_table_exists(dataset: object, df: pd.DataFrame, engine: Engine) -> bo
         # Evolve the schema: add missing columns if the source grew
         try:
             _sync_table_columns(engine, dataset.table, df, schema_name, bare_table_name)  # type: ignore[attr-defined]
-        except Exception:
+        except Exception:  # noqa: BLE001, S110
             pass  # Non-fatal — load will still succeed for existing columns
         return False
 

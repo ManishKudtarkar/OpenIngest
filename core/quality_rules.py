@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Dict, List, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import pandas as pd
 import yaml
@@ -13,15 +13,15 @@ if TYPE_CHECKING:
 QUALITY_RULES_FILE = Path(__file__).resolve().parents[1] / "configs" / "validation_rules.yaml"
 
 
-def load_quality_rules() -> Dict[str, Any]:
+def load_quality_rules() -> dict[str, Any]:
     if not QUALITY_RULES_FILE.exists():
         return {}
 
-    with open(QUALITY_RULES_FILE, "r", encoding="utf-8") as handle:
+    with open(QUALITY_RULES_FILE, encoding="utf-8") as handle:
         return yaml.safe_load(handle) or {}
 
 
-def get_dataset_rules(dataset_name: str) -> Dict[str, Any]:
+def get_dataset_rules(dataset_name: str) -> dict[str, Any]:
     config = load_quality_rules()
     return (config.get("datasets") or {}).get(dataset_name, {})
 
@@ -69,15 +69,15 @@ def _is_type(series: pd.Series, expected_type: str) -> bool:
     return True
 
 
-def _count_duplicates(df: pd.DataFrame, columns: List[str]) -> int:
+def _count_duplicates(df: pd.DataFrame, columns: list[str]) -> int:
     if not columns:
         return 0
 
     return int(df.duplicated(subset=columns).sum())
 
 
-def _count_nulls(df: pd.DataFrame, columns: List[str]) -> Dict[str, int]:
-    counts: Dict[str, int] = {}
+def _count_nulls(df: pd.DataFrame, columns: list[str]) -> dict[str, int]:
+    counts: dict[str, int] = {}
 
     for column in columns:
         if column not in df.columns:
@@ -89,8 +89,8 @@ def _count_nulls(df: pd.DataFrame, columns: List[str]) -> Dict[str, int]:
     return counts
 
 
-def _count_type_mismatches(df: pd.DataFrame, type_rules: Dict[str, str]) -> Dict[str, int]:
-    counts: Dict[str, int] = {}
+def _count_type_mismatches(df: pd.DataFrame, type_rules: dict[str, str]) -> dict[str, int]:
+    counts: dict[str, int] = {}
 
     for column, expected_type in type_rules.items():
         if column not in df.columns:
@@ -102,8 +102,8 @@ def _count_type_mismatches(df: pd.DataFrame, type_rules: Dict[str, str]) -> Dict
     return counts
 
 
-def _count_range_violations(df: pd.DataFrame, range_rules: Dict[str, Dict[str, Any]]) -> Dict[str, int]:
-    counts: Dict[str, int] = {}
+def _count_range_violations(df: pd.DataFrame, range_rules: dict[str, dict[str, Any]]) -> dict[str, int]:
+    counts: dict[str, int] = {}
 
     for column, rule in range_rules.items():
         if column not in df.columns:
@@ -127,8 +127,8 @@ def _count_range_violations(df: pd.DataFrame, range_rules: Dict[str, Dict[str, A
     return counts
 
 
-def _count_regex_violations(df: pd.DataFrame, regex_rules: Dict[str, str]) -> Dict[str, int]:
-    counts: Dict[str, int] = {}
+def _count_regex_violations(df: pd.DataFrame, regex_rules: dict[str, str]) -> dict[str, int]:
+    counts: dict[str, int] = {}
 
     for column, pattern in regex_rules.items():
         if column not in df.columns:
@@ -145,8 +145,8 @@ def _count_regex_violations(df: pd.DataFrame, regex_rules: Dict[str, str]) -> Di
     return counts
 
 
-def _count_custom_rule_violations(df: pd.DataFrame, custom_rules: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    results: List[Dict[str, Any]] = []
+def _count_custom_rule_violations(df: pd.DataFrame, custom_rules: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    results: list[dict[str, Any]] = []
 
     for rule in custom_rules:
         name = rule.get("name", "custom_rule")
@@ -179,7 +179,7 @@ def _count_custom_rule_violations(df: pd.DataFrame, custom_rules: List[Dict[str,
                     "message": rule.get("message", condition),
                 }
             )
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001
             results.append(
                 {
                     "name": name,
@@ -192,7 +192,7 @@ def _count_custom_rule_violations(df: pd.DataFrame, custom_rules: List[Dict[str,
     return results
 
 
-def _add_check(checks: List[Dict[str, Any]], name: str, passed: bool, failed_rows: int = 0, details: Dict[str, Any] | None = None) -> None:
+def _add_check(checks: list[dict[str, Any]], name: str, passed: bool, failed_rows: int = 0, details: dict[str, Any] | None = None) -> None:
     checks.append(
         {
             "name": name,
@@ -203,11 +203,11 @@ def _add_check(checks: List[Dict[str, Any]], name: str, passed: bool, failed_row
     )
 
 
-def evaluate_quality_rules(dataset: "Dataset", df: pd.DataFrame) -> List[Dict[str, Any]]:
+def evaluate_quality_rules(dataset: Dataset, df: pd.DataFrame) -> list[dict[str, Any]]:
     rules = get_dataset_rules(dataset.name)
     dataset_config = dataset.config or {}
 
-    checks: List[Dict[str, Any]] = []
+    checks: list[dict[str, Any]] = []
 
     required_columns = list(dict.fromkeys(dataset_config.get("required_columns", [])))
     missing_required = [column for column in required_columns if column not in df.columns]

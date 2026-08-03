@@ -32,7 +32,6 @@ from __future__ import annotations
 
 import io
 import os
-from typing import List, Optional
 
 import pandas as pd
 
@@ -45,8 +44,9 @@ def _resolve_env(value: str) -> str:
         resolved = os.environ.get(var)
         if resolved is None:
             try:
-                from dotenv import load_dotenv
                 from pathlib import Path
+
+                from dotenv import load_dotenv
                 env_path = Path(__file__).resolve()
                 for _ in range(6):
                     env_path = env_path.parent
@@ -55,7 +55,7 @@ def _resolve_env(value: str) -> str:
                         load_dotenv(candidate, override=False)
                         break
                 resolved = os.environ.get(var)
-            except Exception:
+            except Exception:  # noqa: BLE001, S110
                 pass
         if resolved is None:
             raise ConnectorError(
@@ -155,7 +155,7 @@ class AzureBlobConnector(BaseConnector):
             return pd.read_csv(buf, sep=sep)
 
         if fmt == "parquet":
-            columns: Optional[List[str]] = self.config.get("columns")
+            columns: list[str] | None = self.config.get("columns")
             return pd.read_parquet(buf, columns=columns)
 
         if fmt == "json":
@@ -171,11 +171,11 @@ class AzureBlobConnector(BaseConnector):
     @staticmethod
     def _detect_format(name: str) -> str:
         n = name.lower()
-        if n.endswith(".parquet") or n.endswith(".pq"):
+        if n.endswith((".parquet", ".pq")):
             return "parquet"
-        if n.endswith(".json") or n.endswith(".ndjson"):
+        if n.endswith((".json", ".ndjson")):
             return "json"
-        if n.endswith(".xlsx") or n.endswith(".xls"):
+        if n.endswith((".xlsx", ".xls")):
             return "excel"
         return "csv"
 

@@ -1,7 +1,7 @@
 import pandas as pd
 
-from utils.metadata_logger import ensure_metadata_schema
 from utils.db import get_engine
+from utils.metadata_logger import ensure_metadata_schema
 
 
 def pipeline_report() -> None:

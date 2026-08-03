@@ -22,7 +22,7 @@ from __future__ import annotations
 import os
 import time
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import pandas as pd
 
@@ -82,13 +82,13 @@ class StripeConnector(BaseConnector):
 
         api_key = _resolve(self.config["api_key"])
         resource: str = self.config["resource"]
-        max_records: Optional[int] = self.config.get("limit")
-        created_after: Optional[str] = self.config.get("created_after")
+        max_records: int | None = self.config.get("limit")
+        created_after: str | None = self.config.get("created_after")
 
         url = f"{_STRIPE_BASE}/{resource}"
         headers = {"Authorization": f"Bearer {api_key}"}
 
-        params: Dict[str, Any] = {"limit": self._PAGE_SIZE}
+        params: dict[str, Any] = {"limit": self._PAGE_SIZE}
 
         if created_after:
             try:
@@ -100,8 +100,8 @@ class StripeConnector(BaseConnector):
                     f"Use ISO-8601, e.g. '2024-01-01T00:00:00'."
                 )
 
-        all_records: List[Dict[str, Any]] = []
-        starting_after: Optional[str] = None
+        all_records: list[dict[str, Any]] = []
+        starting_after: str | None = None
 
         while True:
             if starting_after:

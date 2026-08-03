@@ -59,7 +59,7 @@ def run_doctor() -> int:
             with engine.connect() as conn:
                 conn.execute(text("SELECT 1"))
             _check("Database reachable", True, db_url.split("@")[-1].split("/")[0])
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             _check("Database reachable", False, str(e)[:60])
             failures += 1
     else:
@@ -95,7 +95,7 @@ def run_doctor() -> int:
                 has_meta,
                 "pipeline_runs found" if has_meta else "run openingest run to create them",
             )
-        except Exception:
+        except Exception:  # noqa: BLE001
             _check("Metadata tables", False, "could not inspect database")
 
     print()

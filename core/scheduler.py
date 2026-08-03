@@ -31,7 +31,7 @@ from __future__ import annotations
 import logging
 import signal
 import time
-from typing import Callable, Optional
+from collections.abc import Callable
 
 logger = logging.getLogger("openingest.scheduler")
 
@@ -73,7 +73,7 @@ class CronExpression:
             )
         self.minute, self.hour, self.dom, self.month, self.dow = parts
 
-    def matches(self, t: "time.struct_time") -> bool:
+    def matches(self, t: time.struct_time) -> bool:
         return (
             self._field_matches(self.minute, t.tm_min,  0, 59)
             and self._field_matches(self.hour,   t.tm_hour, 0, 23)
@@ -124,7 +124,7 @@ class Scheduler:
     def __init__(
         self,
         cron_expression: str,
-        pipeline_fn: Optional[Callable[[], None]] = None,
+        pipeline_fn: Callable[[], None] | None = None,
         dry_run: bool = False,
     ) -> None:
         raw = resolve_cron(cron_expression)
@@ -150,7 +150,7 @@ class Scheduler:
         print(f"[scheduler] Running on schedule: {self.cron.raw}")
         print("[scheduler] Press Ctrl+C to stop.\n")
 
-        last_minute: Optional[int] = None
+        last_minute: int | None = None
 
         try:
             while self._running:
@@ -164,7 +164,7 @@ class Scheduler:
                     print(f"[scheduler] Tick at {time.strftime('%Y-%m-%d %H:%M', now)}")
                     try:
                         self._pipeline_fn()
-                    except Exception as exc:
+                    except Exception as exc:  # noqa: BLE001
                         logger.error("Pipeline failed during scheduled run: %s", exc)
                         print(f"[scheduler] Pipeline error: {exc}")
 
@@ -180,7 +180,7 @@ class Scheduler:
 
 
 def _register_signal_handlers(stop_fn: Callable[[], None]) -> None:
-    def _handler(signum: int, frame: object) -> None:  # noqa: ARG001
+    def _handler(signum: int, frame: object) -> None:
         print(f"\n[scheduler] Received signal {signum}. Shutting down...")
         stop_fn()
 

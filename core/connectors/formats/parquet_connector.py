@@ -16,7 +16,7 @@ source:
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import pandas as pd
 
@@ -51,11 +51,11 @@ class ParquetConnector(BaseConnector):
         self.validate_config()
         file_path = self._resolve_path()
 
-        columns: Optional[List[str]] = self.config.get("columns")
-        filters: Optional[Any] = self.config.get("filters")
+        columns: list[str] | None = self.config.get("columns")
+        filters: Any | None = self.config.get("filters")
         engine: str = self.config.get("engine", "pyarrow")
 
-        kwargs: Dict[str, Any] = {"engine": engine}
+        kwargs: dict[str, Any] = {"engine": engine}
         if columns:
             kwargs["columns"] = columns
         if filters:

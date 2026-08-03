@@ -22,7 +22,6 @@ from __future__ import annotations
 
 import json
 import os
-from typing import List, Optional
 
 import pandas as pd
 
@@ -101,8 +100,8 @@ class GoogleSheetsConnector(BaseConnector):
             ) from exc
 
         spreadsheet_id: str = self.config["spreadsheet_id"]
-        sheet_name: Optional[str] = self.config.get("sheet_name")
-        cell_range: Optional[str] = self.config.get("range")
+        sheet_name: str | None = self.config.get("sheet_name")
+        cell_range: str | None = self.config.get("range")
 
         try:
             service = build("sheets", "v4", credentials=credentials)
@@ -120,7 +119,7 @@ class GoogleSheetsConnector(BaseConnector):
                 range=range_notation,
             ).execute()
 
-            rows: List[List[str]] = result.get("values", [])
+            rows: list[list[str]] = result.get("values", [])
         except ConnectorError:
             raise
         except Exception as exc:

@@ -1,6 +1,5 @@
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import List
 
 from models.dataset import Dataset
 
@@ -16,7 +15,7 @@ class PipelineRun:
 
     status: str = "SUCCESS"
 
-    datasets: List[Dataset] = field(default_factory=list)
+    datasets: list[Dataset] = field(default_factory=list)
 
     total_rows: int = 0
 

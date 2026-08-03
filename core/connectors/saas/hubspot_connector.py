@@ -19,7 +19,7 @@ from __future__ import annotations
 
 import os
 import time
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import pandas as pd
 
@@ -40,7 +40,7 @@ def _resolve(value: str) -> str:
 
 
 # HubSpot v3 CRM API endpoints
-_OBJECT_ENDPOINTS: Dict[str, str] = {
+_OBJECT_ENDPOINTS: dict[str, str] = {
     "contacts": "https://api.hubapi.com/crm/v3/objects/contacts",
     "companies": "https://api.hubapi.com/crm/v3/objects/companies",
     "deals": "https://api.hubapi.com/crm/v3/objects/deals",
@@ -81,7 +81,7 @@ class HubSpotConnector(BaseConnector):
 
         token = _resolve(self.config.get("access_token") or self.config.get("api_key", ""))
         hs_object: str = self.config["object"].lower()
-        properties: Optional[List[str]] = self.config.get("properties")
+        properties: list[str] | None = self.config.get("properties")
 
         base_url = _OBJECT_ENDPOINTS.get(hs_object)
         if not base_url:
@@ -92,12 +92,12 @@ class HubSpotConnector(BaseConnector):
             "Content-Type": "application/json",
         }
 
-        params: Dict[str, Any] = {"limit": self._PAGE_SIZE}
+        params: dict[str, Any] = {"limit": self._PAGE_SIZE}
         if properties:
             params["properties"] = ",".join(properties)
 
-        all_records: List[Dict[str, Any]] = []
-        after: Optional[str] = None
+        all_records: list[dict[str, Any]] = []
+        after: str | None = None
 
         while True:
             if after:
@@ -119,7 +119,7 @@ class HubSpotConnector(BaseConnector):
             results = data.get("results", [])
 
             for record in results:
-                flat: Dict[str, Any] = {"id": record.get("id")}
+                flat: dict[str, Any] = {"id": record.get("id")}
                 flat.update(record.get("properties", {}))
                 all_records.append(flat)
 

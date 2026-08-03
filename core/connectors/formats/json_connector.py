@@ -27,7 +27,7 @@ source:
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 import pandas as pd
 
@@ -81,8 +81,8 @@ class JsonConnector(BaseConnector):
 
         encoding: str = self.config.get("encoding", "utf-8")
         lines: bool = bool(self.config.get("lines", False))
-        record_path: Optional[str] = self.config.get("record_path")
-        orient: Optional[str] = self.config.get("orient")
+        record_path: str | None = self.config.get("record_path")
+        orient: str | None = self.config.get("orient")
 
         try:
             if lines:
@@ -94,7 +94,7 @@ class JsonConnector(BaseConnector):
                 # Load full JSON, navigate to nested array
                 import json
 
-                with open(file_path, "r", encoding=encoding) as f:
+                with open(file_path, encoding=encoding) as f:
                     raw = json.load(f)
 
                 records = _get_nested(raw, record_path)
@@ -113,7 +113,7 @@ class JsonConnector(BaseConnector):
                 return df
 
             # Standard read
-            kwargs: Dict[str, Any] = {"encoding": encoding}
+            kwargs: dict[str, Any] = {"encoding": encoding}
             if orient:
                 kwargs["orient"] = orient
 

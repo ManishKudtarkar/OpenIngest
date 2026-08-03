@@ -24,7 +24,7 @@ Usage
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 
 @dataclass
@@ -35,11 +35,11 @@ class LineageNode:
     label: str                       # display name
     node_type: str                   # source | validation | quality | load | staging | warehouse
     dataset: str                     # parent dataset name
-    source_file: Optional[str] = None   # file path (for source nodes)
-    target_table: Optional[str] = None  # staging or warehouse table
-    status: Optional[str] = None        # PASS | FAIL | SKIP
-    rows: Optional[int] = None
-    score: Optional[float] = None       # quality score 0–100
+    source_file: str | None = None   # file path (for source nodes)
+    target_table: str | None = None  # staging or warehouse table
+    status: str | None = None        # PASS | FAIL | SKIP
+    rows: int | None = None
+    score: float | None = None       # quality score 0–100
 
 
 @dataclass
@@ -59,10 +59,10 @@ class LineageGraph:
     One graph instance is shared across the full pipeline run.
     """
 
-    nodes: List[LineageNode] = field(default_factory=list)
-    edges: List[LineageEdge] = field(default_factory=list)
+    nodes: list[LineageNode] = field(default_factory=list)
+    edges: list[LineageEdge] = field(default_factory=list)
 
-    _node_index: Dict[str, LineageNode] = field(default_factory=dict, repr=False)
+    _node_index: dict[str, LineageNode] = field(default_factory=dict, repr=False)
 
     def add_node(self, node: LineageNode) -> None:
         self._node_index[node.id] = node
@@ -153,11 +153,11 @@ class LineageGraph:
         ))
         self.add_edge(ingest_id, staging_id)
 
-    def get_dataset_chain(self, dataset_name: str) -> List[LineageNode]:
+    def get_dataset_chain(self, dataset_name: str) -> list[LineageNode]:
         """Return ordered list of nodes for a single dataset."""
         return [n for n in self.nodes if n.dataset == dataset_name]
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Return JSON-serialisable representation for web UI or API."""
         return {
             "nodes": [
@@ -182,7 +182,7 @@ class LineageGraph:
 
     def print_ascii(self) -> None:
         """Print a per-dataset ASCII lineage tree to stdout."""
-        datasets: Dict[str, List[LineageNode]] = {}
+        datasets: dict[str, list[LineageNode]] = {}
         for node in self.nodes:
             datasets.setdefault(node.dataset, []).append(node)
 
@@ -216,9 +216,7 @@ class LineageGraph:
             label = node.label.replace('"', "'")
             shape_open = "[["
             shape_close = "]]"
-            if node.node_type == "source":
-                shape_open, shape_close = "[(", ")]"
-            elif node.node_type in ("staging", "warehouse"):
+            if node.node_type == "source" or node.node_type in ("staging", "warehouse"):
                 shape_open, shape_close = "[(", ")]"
             elif node.node_type == "quality":
                 shape_open, shape_close = "{", "}"

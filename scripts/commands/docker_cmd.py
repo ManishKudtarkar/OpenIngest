@@ -1,6 +1,5 @@
 from pathlib import Path
 
-
 DOCKER_COMPOSE = """\
 version: "3.9"
 

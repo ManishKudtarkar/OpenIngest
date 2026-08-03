@@ -24,7 +24,6 @@ source:
 from __future__ import annotations
 
 import os
-from typing import List, Optional
 
 import pandas as pd
 
@@ -87,7 +86,7 @@ class PostgreSQLConnector(BaseConnector):
         password = _resolve(self.config["password"])
 
         query = self.config.get("query") or f'SELECT * FROM "{self.config["table"]}"'
-        chunk_size: Optional[int] = self.config.get("chunk_size")
+        chunk_size: int | None = self.config.get("chunk_size")
 
         try:
             conn = psycopg2.connect(
@@ -104,9 +103,10 @@ class PostgreSQLConnector(BaseConnector):
 
         try:
             if chunk_size:
-                chunks: List[pd.DataFrame] = []
-                for chunk in pd.read_sql(query, conn, chunksize=chunk_size):
-                    chunks.append(chunk)
+                chunks: list[pd.DataFrame] = [
+                    chunk
+                    for chunk in pd.read_sql(query, conn, chunksize=chunk_size)
+                ]
                 return pd.concat(chunks, ignore_index=True) if chunks else pd.DataFrame()
             else:
                 return pd.read_sql(query, conn)

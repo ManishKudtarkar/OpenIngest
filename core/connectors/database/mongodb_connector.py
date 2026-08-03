@@ -23,7 +23,7 @@ from __future__ import annotations
 
 import os
 import re
-from typing import Any, Dict, Optional
+from typing import Any
 
 import pandas as pd
 
@@ -84,8 +84,8 @@ class MongoDBConnector(BaseConnector):
         uri = _resolve(self.config.get("uri", ""))
         database: str = self.config["database"]
         collection: str = self.config["collection"]
-        query_filter: Dict[str, Any] = self.config.get("filter") or {}
-        projection: Optional[Dict[str, Any]] = self.config.get("projection")
+        query_filter: dict[str, Any] = self.config.get("filter") or {}
+        projection: dict[str, Any] | None = self.config.get("projection")
         limit: int = int(self.config.get("limit", 0))
         include_id: bool = bool(self.config.get("include_id", False))
 

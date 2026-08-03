@@ -25,7 +25,6 @@ source:
 from __future__ import annotations
 
 import os
-from typing import List, Optional
 
 import pandas as pd
 
@@ -107,8 +106,8 @@ class SalesforceConnector(BaseConnector):
         soql = self.config.get("soql")
         if not soql:
             sf_object: str = self.config["object"]
-            fields: Optional[List[str]] = self.config.get("fields")
-            where_clause: Optional[str] = self.config.get("where_clause")
+            fields: list[str] | None = self.config.get("fields")
+            where_clause: str | None = self.config.get("where_clause")
 
             if fields:
                 fields_str = ", ".join(fields)
@@ -117,7 +116,7 @@ class SalesforceConnector(BaseConnector):
                 try:
                     desc = getattr(sf, sf_object).describe()
                     fields_str = ", ".join(f["name"] for f in desc["fields"])
-                except Exception:
+                except Exception:  # noqa: BLE001
                     fields_str = "FIELDS(ALL)"
 
             soql = f"SELECT {fields_str} FROM {sf_object}"

@@ -17,7 +17,7 @@ source:
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Dict, Optional, Union
+from typing import Any
 
 import pandas as pd
 
@@ -55,11 +55,11 @@ class ExcelConnector(BaseConnector):
         self.validate_config()
         file_path = self._resolve_path()
 
-        sheet: Union[str, int] = self.config.get("sheet", 0)
+        sheet: str | int = self.config.get("sheet", 0)
         header: int = int(self.config.get("header", 0))
         skip_rows: int = int(self.config.get("skip_rows", 0))
-        use_cols: Optional[Any] = self.config.get("use_cols", self.config.get("usecols"))
-        dtype: Optional[Dict] = self.config.get("dtype")
+        use_cols: Any | None = self.config.get("use_cols", self.config.get("usecols"))
+        dtype: dict | None = self.config.get("dtype")
 
         try:
             df = pd.read_excel(

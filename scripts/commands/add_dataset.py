@@ -3,7 +3,6 @@ from typing import Any
 
 import yaml
 
-
 CONFIG_PATH = Path("configs/datasets.yaml")
 
 

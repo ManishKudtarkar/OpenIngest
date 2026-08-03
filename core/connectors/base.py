@@ -7,7 +7,7 @@ All connectors must implement `read() -> pd.DataFrame`.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -28,7 +28,7 @@ class BaseConnector(ABC):
           ...
     """
 
-    def __init__(self, source_config: Dict[str, Any]) -> None:
+    def __init__(self, source_config: dict[str, Any]) -> None:
         self.config = source_config
 
     @abstractmethod
@@ -44,9 +44,7 @@ class BaseConnector(ABC):
         Optional: validate required config keys before read().
         Override to add connector-specific checks.
         """
-        pass
 
 
 class ConnectorError(Exception):
     """Raised when a connector fails to read data."""
-    pass

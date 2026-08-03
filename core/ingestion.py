@@ -3,14 +3,13 @@ from __future__ import annotations
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
 import pandas as pd
 from sqlalchemy import text
 from sqlalchemy.engine import Engine
 
-from core.schema import ensure_table_exists, quote_table_name
 from core.incremental import load_incremental_dataset
+from core.schema import ensure_table_exists, quote_table_name
 from core.validation import validate_dataset
 from models.dataset import Dataset
 from utils.db import get_engine
@@ -18,7 +17,6 @@ from utils.db import get_engine
 
 class DatasetIngestionError(Exception):
     """Raised whenever a dataset cannot be ingested."""
-    pass
 
 
 def _safe_to_sql(
@@ -49,7 +47,7 @@ def _safe_to_sql(
     try:
         _load(df)
         return
-    except Exception as e1:
+    except Exception as e1:  # noqa: BLE001
         err = str(e1).lower()
         # Type mismatch or encoding issue — coerce object columns to string
         if any(kw in err for kw in ("invalid input", "type", "encoding", "unicode", "value")):
@@ -60,7 +58,7 @@ def _safe_to_sql(
             try:
                 _load(df2)
                 return
-            except Exception:
+            except Exception:  # noqa: BLE001, S110
                 pass
 
     # Last resort: cast everything to TEXT
@@ -103,7 +101,7 @@ def _read_dataset(dataset: Dataset) -> pd.DataFrame:
 
         return pd.read_csv(file_path)
 
-def ingest_dataset(dataset: Dataset, df: Optional[pd.DataFrame] = None) -> Dataset:
+def ingest_dataset(dataset: Dataset, df: pd.DataFrame | None = None) -> Dataset:
     """
     Ingest a single dataset into PostgreSQL.
 
@@ -146,7 +144,7 @@ def ingest_dataset(dataset: Dataset, df: Optional[pd.DataFrame] = None) -> Datas
     # Start Timer
     # --------------------------------------------------
 
-    dataset.started_at = datetime.now()
+    dataset.started_at = datetime.now()  # noqa: DTZ005
 
     start = time.time()
 
@@ -209,7 +207,7 @@ def ingest_dataset(dataset: Dataset, df: Optional[pd.DataFrame] = None) -> Datas
     # Metadata
     # --------------------------------------------------
 
-    dataset.finished_at = datetime.now()
+    dataset.finished_at = datetime.now()  # noqa: DTZ005
 
     if strategy.lower() != "incremental":
         dataset.rows_loaded = len(df)

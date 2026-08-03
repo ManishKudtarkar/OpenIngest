@@ -1,6 +1,5 @@
 from pathlib import Path
 
-
 PRESETS = {
     "hourly":  "0 * * * *",
     "daily":   "0 0 * * *",
@@ -34,7 +33,7 @@ def run_schedule(schedule_arg: str) -> int:
 
     import yaml
     if pipeline_path.exists():
-        with open(pipeline_path, "r", encoding="utf-8") as f:
+        with open(pipeline_path, encoding="utf-8") as f:
             existing = yaml.safe_load(f) or {}
     else:
         existing = {}

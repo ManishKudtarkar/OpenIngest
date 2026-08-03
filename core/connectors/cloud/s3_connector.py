@@ -35,7 +35,7 @@ from __future__ import annotations
 
 import io
 import os
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import pandas as pd
 
@@ -52,8 +52,9 @@ def _resolve_env(value: str) -> str:
         if resolved is None:
             # Try loading from .env file
             try:
-                from dotenv import load_dotenv
                 from pathlib import Path
+
+                from dotenv import load_dotenv
                 env_path = Path(__file__).resolve()
                 # Walk up to find the .env file
                 for _ in range(6):
@@ -63,7 +64,7 @@ def _resolve_env(value: str) -> str:
                         load_dotenv(candidate, override=False)
                         break
                 resolved = os.environ.get(var)
-            except Exception:
+            except Exception:  # noqa: BLE001, S110
                 pass
         if resolved is None:
             raise ConnectorError(
@@ -121,9 +122,9 @@ class S3Connector(BaseConnector):
 
         bucket: str = self.config["bucket"]
         key: str = self.config["key"]
-        region: Optional[str] = self.config.get("region")
+        region: str | None = self.config.get("region")
 
-        session_kwargs: Dict[str, Any] = {}
+        session_kwargs: dict[str, Any] = {}
 
         if self.config.get("aws_access_key_id"):
             session_kwargs["aws_access_key_id"] = _resolve_env(self.config["aws_access_key_id"])
@@ -155,7 +156,7 @@ class S3Connector(BaseConnector):
             return pd.read_csv(buf, sep=sep)
 
         if fmt in ("parquet",):
-            columns: Optional[List[str]] = self.config.get("columns")
+            columns: list[str] | None = self.config.get("columns")
             return pd.read_parquet(buf, columns=columns)
 
         if fmt == "json":
@@ -174,11 +175,11 @@ class S3Connector(BaseConnector):
     @staticmethod
     def _detect_format(key: str) -> str:
         k = key.lower()
-        if k.endswith(".parquet") or k.endswith(".pq"):
+        if k.endswith((".parquet", ".pq")):
             return "parquet"
-        if k.endswith(".json") or k.endswith(".ndjson"):
+        if k.endswith((".json", ".ndjson")):
             return "json"
-        if k.endswith(".xlsx") or k.endswith(".xls"):
+        if k.endswith((".xlsx", ".xls")):
             return "excel"
         return "csv"
 

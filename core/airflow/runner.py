@@ -2,9 +2,7 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
-from typing import Any, Dict, Optional
-
-# ruff: noqa: E402
+from typing import Any
 
 
 def _load_env() -> None:
@@ -33,13 +31,13 @@ def _load_env() -> None:
 # Load on module import so all tasks in this worker process get the env
 _load_env()
 
-from core.discovery import discover_datasets  # noqa: E402
-from core.quality import run_quality_checks  # noqa: E402
-from core.reporting import pipeline_report  # noqa: E402
-from core.validation import validate_dataset  # noqa: E402
-from core.ingestion import ingest_dataset, _read_dataset  # noqa: E402
-from models.dataset import Dataset  # noqa: E402
-from utils.metadata_logger import MetadataLogger  # noqa: E402
+from core.discovery import discover_datasets
+from core.ingestion import _read_dataset, ingest_dataset
+from core.quality import run_quality_checks
+from core.reporting import pipeline_report
+from core.validation import validate_dataset
+from models.dataset import Dataset
+from utils.metadata_logger import MetadataLogger
 
 
 def _get_dataset(dataset_name: str) -> Dataset:
@@ -54,7 +52,7 @@ def _get_dataset(dataset_name: str) -> Dataset:
     return dataset
 
 
-def run_discover(dataset_name: str) -> Dict[str, Any]:
+def run_discover(dataset_name: str) -> dict[str, Any]:
     """Discover dataset and confirm registration."""
     dataset = _get_dataset(dataset_name)
     return {
@@ -66,7 +64,7 @@ def run_discover(dataset_name: str) -> Dict[str, Any]:
     }
 
 
-def run_schema_validation(dataset_name: str) -> Dict[str, Any]:
+def run_schema_validation(dataset_name: str) -> dict[str, Any]:
     """Validate required columns against datasets.yaml config."""
     dataset = _get_dataset(dataset_name)
     result = validate_dataset(dataset)
@@ -85,7 +83,7 @@ def run_schema_validation(dataset_name: str) -> Dict[str, Any]:
     }
 
 
-def run_quality_check(dataset_name: str, run_id: Optional[str] = None) -> Dict[str, Any]:
+def run_quality_check(dataset_name: str, run_id: str | None = None) -> dict[str, Any]:
     """Run quality checks. Reads data once and passes df to avoid double download."""
     dataset = _get_dataset(dataset_name)
 
@@ -108,7 +106,7 @@ def run_quality_check(dataset_name: str, run_id: Optional[str] = None) -> Dict[s
     return result
 
 
-def run_ingest(dataset_name: str, run_id: Optional[str] = None) -> Dict[str, Any]:
+def run_ingest(dataset_name: str, run_id: str | None = None) -> dict[str, Any]:
     """Ingest dataset using configured load strategy."""
     dataset = _get_dataset(dataset_name)
     dataset = ingest_dataset(dataset)

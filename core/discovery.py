@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import pandas as pd
 
@@ -19,7 +19,7 @@ from utils.config_loader import load_dataset_config
 RAW_FOLDER = Path("data/raw")
 
 
-def _fetch_csv_header(source_type: str, source_cfg: Dict[str, Any]) -> Optional["pd.DataFrame"]:
+def _fetch_csv_header(source_type: str, source_cfg: dict[str, Any]) -> pd.DataFrame | None:
     """
     Fetch just the first 8KB of a cloud CSV to get column names cheaply.
     Uses HTTP Range requests for S3; falls back to full read for Azure/GCS.
@@ -33,7 +33,7 @@ def _fetch_csv_header(source_type: str, source_cfg: Dict[str, Any]) -> Optional[
             key = source_cfg["key"]
             region = source_cfg.get("region")
 
-            session_kwargs: Dict[str, Any] = {}
+            session_kwargs: dict[str, Any] = {}
             if source_cfg.get("aws_access_key_id"):
                 session_kwargs["aws_access_key_id"] = os.environ.get(
                     source_cfg["aws_access_key_id"][2:-1]
@@ -63,11 +63,11 @@ def _fetch_csv_header(source_type: str, source_cfg: Dict[str, Any]) -> Optional[
         connector = ConnectorRegistry.get(source_type, source_cfg)
         return connector.read()
 
-    except Exception:
+    except Exception:  # noqa: BLE001
         return None
 
 
-def _read_sample(source_cfg: Dict[str, Any], file_hint: Optional[str]) -> Optional[pd.DataFrame]:
+def _read_sample(source_cfg: dict[str, Any], file_hint: str | None) -> pd.DataFrame | None:
     """
     Try to read the first 5 rows from a dataset source for column discovery.
     For cloud sources, fetches just enough to get column names.
@@ -86,11 +86,11 @@ def _read_sample(source_cfg: Dict[str, Any], file_hint: Optional[str]) -> Option
             if not fmt:
                 key = source_cfg.get("key") or source_cfg.get("object") or source_cfg.get("blob", "")
                 n = key.lower()
-                if n.endswith(".parquet") or n.endswith(".pq"):
+                if n.endswith((".parquet", ".pq")):
                     fmt = "parquet"
-                elif n.endswith(".json") or n.endswith(".ndjson"):
+                elif n.endswith((".json", ".ndjson")):
                     fmt = "json"
-                elif n.endswith(".xlsx") or n.endswith(".xls"):
+                elif n.endswith((".xlsx", ".xls")):
                     fmt = "excel"
                 else:
                     fmt = "csv"
@@ -101,7 +101,7 @@ def _read_sample(source_cfg: Dict[str, Any], file_hint: Optional[str]) -> Option
             else:
                 df = connector.read()
             return df.head(5) if df is not None else None
-        except Exception:
+        except Exception:  # noqa: BLE001
             return None
 
     # REST / API — can't cheaply sample, defer to ingest time
@@ -115,7 +115,7 @@ def _read_sample(source_cfg: Dict[str, Any], file_hint: Optional[str]) -> Option
             connector = ConnectorRegistry.get(source_type, source_cfg)
             df = connector.read()
             return df.head(5)
-        except Exception:
+        except Exception:  # noqa: BLE001
             return None
 
     # Default CSV path
@@ -124,13 +124,13 @@ def _read_sample(source_cfg: Dict[str, Any], file_hint: Optional[str]) -> Option
         if csv_path.exists():
             try:
                 return pd.read_csv(csv_path, nrows=5)
-            except Exception:
+            except Exception:  # noqa: BLE001
                 return None
 
     return None
 
 
-def _count_rows(source_cfg: Dict[str, Any], file_hint: Optional[str]) -> int:
+def _count_rows(source_cfg: dict[str, Any], file_hint: str | None) -> int:
     """Estimate row count for local files. Returns 0 for remote sources."""
     source_type = (source_cfg or {}).get("type", "").lower()
     if source_type in ("s3", "azure", "gcs", "rest", "api"):
@@ -140,15 +140,15 @@ def _count_rows(source_cfg: Dict[str, Any], file_hint: Optional[str]) -> int:
         csv_path = RAW_FOLDER / file_hint
         if csv_path.exists():
             try:
-                with open(csv_path, "r", encoding="utf-8") as f:
+                with open(csv_path, encoding="utf-8") as f:
                     return sum(1 for _ in f) - 1
-            except Exception:
+            except Exception:  # noqa: BLE001
                 return 0
 
     return 0
 
 
-def discover_datasets() -> List[Dataset]:
+def discover_datasets() -> list[Dataset]:
     """
     Discover and register all datasets from configuration.
 
@@ -158,17 +158,17 @@ def discover_datasets() -> List[Dataset]:
     3. For local CSV datasets, also scan data/raw/ for unregistered files
     """
     config = load_dataset_config()
-    configured: Dict[str, Any] = config.get("datasets", {})
+    configured: dict[str, Any] = config.get("datasets", {})
 
     # ── Registered datasets (YAML-driven) ──────────────────────────────────
-    registered_datasets: List[Dataset] = []
+    registered_datasets: list[Dataset] = []
 
     for dataset_name, ds_cfg in configured.items():
-        source_cfg: Dict[str, Any] = ds_cfg.get("source", {})
-        file_hint: Optional[str] = ds_cfg.get("file") or source_cfg.get("file")
+        source_cfg: dict[str, Any] = ds_cfg.get("source", {})
+        file_hint: str | None = ds_cfg.get("file") or source_cfg.get("file")
 
         # Determine the physical file path for local sources
-        file_path: Optional[Path] = None
+        file_path: Path | None = None
         source_type = source_cfg.get("type", "csv").lower() if source_cfg else "csv"
 
         if source_type in ("csv", "") or (not source_cfg and file_hint):
@@ -192,7 +192,7 @@ def discover_datasets() -> List[Dataset]:
             file_hint,
         )
 
-        columns: List[str] = list(sample_df.columns) if sample_df is not None else []
+        columns: list[str] = list(sample_df.columns) if sample_df is not None else []
 
         dataset = Dataset(
             name=dataset_name,
@@ -220,9 +220,9 @@ def discover_datasets() -> List[Dataset]:
 
         try:
             df = pd.read_csv(csv_path, nrows=5)
-            with open(csv_path, "r", encoding="utf-8") as f:
+            with open(csv_path, encoding="utf-8") as f:
                 row_count = sum(1 for _ in f) - 1
-        except Exception:
+        except Exception:  # noqa: BLE001, S112
             continue
 
         dataset = Dataset(

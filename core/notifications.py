@@ -40,7 +40,7 @@ import smtplib
 import urllib.request
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from typing import Any, Dict, List
+from typing import Any
 
 logger = logging.getLogger("openingest.notifications")
 
@@ -74,7 +74,7 @@ class NotificationManager:
     nm.notify(run)
     """
 
-    def __init__(self, config: Dict[str, Any]) -> None:
+    def __init__(self, config: dict[str, Any]) -> None:
         self.config = config or {}
 
     def notify(self, run: Any) -> None:
@@ -91,7 +91,7 @@ class NotificationManager:
 
         slack_cfg = self.config.get("slack")
         if slack_cfg:
-            on_events: List[str] = [e.lower() for e in slack_cfg.get("on", ["success", "failure"])]
+            on_events: list[str] = [e.lower() for e in slack_cfg.get("on", ["success", "failure"])]
             if event in on_events:
                 self._send_slack(slack_cfg, run)
 
@@ -105,7 +105,7 @@ class NotificationManager:
     # Slack
     # ──────────────────────────────────────
 
-    def _send_slack(self, slack_cfg: Dict[str, Any], run: Any) -> None:
+    def _send_slack(self, slack_cfg: dict[str, Any], run: Any) -> None:
         webhook = _resolve_env(slack_cfg.get("webhook", ""))
         if not webhook:
             logger.error("Slack notification skipped: 'webhook' is not configured.")
@@ -127,7 +127,7 @@ class NotificationManager:
     def _post_with_retry(
         self,
         url: str,
-        payload: Dict[str, Any],
+        payload: dict[str, Any],
         channel: str,
         run_id: str,
         retry_count: int,
@@ -158,7 +158,7 @@ class NotificationManager:
                         "%s webhook returned HTTP %s (attempt %d/%d)",
                         channel, resp.status, attempt + 1, retry_count + 1,
                     )
-            except Exception as exc:
+            except Exception as exc:  # noqa: BLE001
                 last_exc = exc
                 logger.warning(
                     "%s notification attempt %d/%d failed: %s",
@@ -175,7 +175,7 @@ class NotificationManager:
             retry_count + 1, channel, run_id, last_exc,
         )
 
-    def _build_slack_message(self, run: Any) -> Dict[str, Any]:
+    def _build_slack_message(self, run: Any) -> dict[str, Any]:
         status = str(getattr(run, "status", "UNKNOWN")).upper()
         run_id = getattr(run, "run_id", "N/A")
         total_rows = getattr(run, "total_rows", 0)
@@ -217,13 +217,13 @@ class NotificationManager:
     # Email
     # ──────────────────────────────────────
 
-    def _send_email(self, email_cfg: Dict[str, Any], run: Any) -> None:
+    def _send_email(self, email_cfg: dict[str, Any], run: Any) -> None:
         smtp_host: str = email_cfg.get("smtp_host", "")
         smtp_port: int = int(email_cfg.get("smtp_port", 587))
         username: str = _resolve_env(email_cfg.get("username", ""))
         password: str = _resolve_env(email_cfg.get("password", ""))
         from_addr: str = email_cfg.get("from", username)
-        to_addrs: List[str] = email_cfg.get("to", [])
+        to_addrs: list[str] = email_cfg.get("to", [])
         retry_count: int = int(self.config.get("retry_count", email_cfg.get("retry_count", 3)))
         retry_delay: float = float(self.config.get("retry_delay", email_cfg.get("retry_delay", 2.0)))
 
@@ -257,7 +257,7 @@ class NotificationManager:
                     "Email notification sent to %s (attempt %d)", to_addrs, attempt + 1
                 )
                 return
-            except Exception as exc:
+            except Exception as exc:  # noqa: BLE001
                 last_exc = exc
                 logger.warning(
                     "Email notification attempt %d/%d failed: %s",

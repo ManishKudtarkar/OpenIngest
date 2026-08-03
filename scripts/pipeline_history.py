@@ -2,7 +2,6 @@ import pandas as pd
 
 from utils.db import get_engine
 
-
 engine = get_engine()
 
 print("\n")

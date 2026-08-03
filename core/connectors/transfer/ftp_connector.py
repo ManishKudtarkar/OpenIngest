@@ -42,11 +42,11 @@ def _resolve(value: str) -> str:
 
 def _detect_format(path: str) -> str:
     p = path.lower()
-    if p.endswith(".parquet") or p.endswith(".pq"):
+    if p.endswith((".parquet", ".pq")):
         return "parquet"
-    if p.endswith(".json") or p.endswith(".ndjson"):
+    if p.endswith((".json", ".ndjson")):
         return "json"
-    if p.endswith(".xlsx") or p.endswith(".xls"):
+    if p.endswith((".xlsx", ".xls")):
         return "excel"
     return "csv"
 

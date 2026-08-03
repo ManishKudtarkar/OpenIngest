@@ -43,19 +43,18 @@ Supported step types: rename, cast, filter, derive, aggregate, python
 from __future__ import annotations
 
 import importlib
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import pandas as pd
 
 
 class TransformError(Exception):
     """Raised when a transform step fails."""
-    pass
 
 
 _SUPPORTED_TYPES = ("rename", "cast", "filter", "derive", "aggregate", "python")
 
-_CAST_MAP: Dict[str, Any] = {
+_CAST_MAP: dict[str, Any] = {
     "int":      "Int64",       # nullable integer
     "float":    float,
     "str":      str,
@@ -71,8 +70,8 @@ _SUPPORTED_AGGS = ("sum", "mean", "min", "max", "count", "first", "last")
 # Individual step handlers
 # ─────────────────────────────────────────────────────────────────────────────
 
-def _apply_rename(df: pd.DataFrame, step: Dict[str, Any]) -> pd.DataFrame:
-    columns: Dict[str, str] = step.get("columns") or {}
+def _apply_rename(df: pd.DataFrame, step: dict[str, Any]) -> pd.DataFrame:
+    columns: dict[str, str] = step.get("columns") or {}
     for src in columns:
         if src not in df.columns:
             raise TransformError(
@@ -82,8 +81,8 @@ def _apply_rename(df: pd.DataFrame, step: Dict[str, Any]) -> pd.DataFrame:
     return df.rename(columns=columns)
 
 
-def _apply_cast(df: pd.DataFrame, step: Dict[str, Any]) -> pd.DataFrame:
-    columns: Dict[str, Any] = step.get("columns") or {}
+def _apply_cast(df: pd.DataFrame, step: dict[str, Any]) -> pd.DataFrame:
+    columns: dict[str, Any] = step.get("columns") or {}
     result = df.copy()
     for col, target_type in columns.items():
         if col not in result.columns:
@@ -123,7 +122,7 @@ def _apply_cast(df: pd.DataFrame, step: Dict[str, Any]) -> pd.DataFrame:
     return result
 
 
-def _apply_filter(df: pd.DataFrame, step: Dict[str, Any]) -> pd.DataFrame:
+def _apply_filter(df: pd.DataFrame, step: dict[str, Any]) -> pd.DataFrame:
     expression: str = step.get("expression", "")
     if not expression:
         raise TransformError("filter: 'expression' is required.")
@@ -135,8 +134,8 @@ def _apply_filter(df: pd.DataFrame, step: Dict[str, Any]) -> pd.DataFrame:
         ) from exc
 
 
-def _apply_derive(df: pd.DataFrame, step: Dict[str, Any]) -> pd.DataFrame:
-    columns: Dict[str, str] = step.get("columns") or {}
+def _apply_derive(df: pd.DataFrame, step: dict[str, Any]) -> pd.DataFrame:
+    columns: dict[str, str] = step.get("columns") or {}
     result = df.copy()
     for new_col, expression in columns.items():
         try:
@@ -149,9 +148,9 @@ def _apply_derive(df: pd.DataFrame, step: Dict[str, Any]) -> pd.DataFrame:
     return result
 
 
-def _apply_aggregate(df: pd.DataFrame, step: Dict[str, Any]) -> pd.DataFrame:
-    group_by: List[str] = step.get("group_by") or []
-    aggregations: Dict[str, str] = step.get("aggregations") or {}
+def _apply_aggregate(df: pd.DataFrame, step: dict[str, Any]) -> pd.DataFrame:
+    group_by: list[str] = step.get("group_by") or []
+    aggregations: dict[str, str] = step.get("aggregations") or {}
 
     if not aggregations:
         raise TransformError("aggregate: 'aggregations' mapping is required.")
@@ -184,9 +183,9 @@ def _apply_aggregate(df: pd.DataFrame, step: Dict[str, Any]) -> pd.DataFrame:
         raise TransformError(f"aggregate: aggregation failed: {exc}") from exc
 
 
-def _apply_python(df: pd.DataFrame, step: Dict[str, Any]) -> pd.DataFrame:
-    function_path: Optional[str] = step.get("function")
-    inline_code: Optional[str] = step.get("inline")
+def _apply_python(df: pd.DataFrame, step: dict[str, Any]) -> pd.DataFrame:
+    function_path: str | None = step.get("function")
+    inline_code: str | None = step.get("inline")
 
     if function_path:
         # Dotted import path: my_package.transforms.normalize
@@ -225,7 +224,7 @@ def _apply_python(df: pd.DataFrame, step: Dict[str, Any]) -> pd.DataFrame:
         return result
 
     elif inline_code:
-        local_ns: Dict[str, Any] = {"df": df.copy(), "pd": pd}
+        local_ns: dict[str, Any] = {"df": df.copy(), "pd": pd}
         try:
             exec(inline_code, local_ns)  # noqa: S102
         except Exception as exc:
@@ -268,8 +267,8 @@ class TransformEngine:
         transformed_df = engine.run(df)
     """
 
-    def __init__(self, dataset_config: Dict[str, Any]) -> None:
-        self.steps: List[Dict[str, Any]] = (dataset_config or {}).get("transforms") or []
+    def __init__(self, dataset_config: dict[str, Any]) -> None:
+        self.steps: list[dict[str, Any]] = (dataset_config or {}).get("transforms") or []
 
     @property
     def has_transforms(self) -> bool:

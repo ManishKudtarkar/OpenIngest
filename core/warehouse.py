@@ -8,7 +8,7 @@ Falls back to promoting all stg_* tables discovered in the database.
 from __future__ import annotations
 
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from sqlalchemy import inspect, text
 
@@ -17,21 +17,22 @@ from utils.db import get_engine
 logger = logging.getLogger("openingest.warehouse")
 
 
-def _load_warehouse_config() -> Dict[str, Any]:
+def _load_warehouse_config() -> dict[str, Any]:
     """Load configs/warehouse.yaml if it exists, else return empty dict."""
     try:
-        from utils.config_loader import get_config_dir
         import yaml
+
+        from utils.config_loader import get_config_dir
         path = get_config_dir() / "warehouse.yaml"
         if path.exists():
-            with open(path, "r", encoding="utf-8") as f:
+            with open(path, encoding="utf-8") as f:
                 return yaml.safe_load(f) or {}
-    except Exception:
+    except Exception:  # noqa: BLE001, S110
         pass
     return {}
 
 
-def _discover_staging_tables(engine: Any) -> List[str]:
+def _discover_staging_tables(engine: Any) -> list[str]:
     """Return all tables whose names start with 'stg_'."""
     inspector = inspect(engine)
     return [t for t in inspector.get_table_names() if t.startswith("stg_")]
@@ -55,7 +56,7 @@ def _promote_table(engine: Any, source: str, target: str) -> int:
         return int(row[0]) if row else 0
 
 
-def load_warehouse(table_map: Optional[Dict[str, str]] = None) -> None:
+def load_warehouse(table_map: dict[str, str] | None = None) -> None:
     """
     Promote staging tables into warehouse/analytics tables.
 
@@ -96,7 +97,7 @@ def load_warehouse(table_map: Optional[Dict[str, str]] = None) -> None:
             total_rows += rows
             print(f"  ✓  {source}  →  {target}  ({rows:,} rows)")
             logger.info("Promoted %s → %s (%d rows)", source, target, rows)
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001
             print(f"  ✗  {source}  →  {target}  FAILED: {exc}")
             logger.error("Failed to promote %s → %s: %s", source, target, exc)
 

@@ -6,7 +6,7 @@ def generate_run_id() -> str:
 
     return (
         "OI-"
-        + datetime.now().strftime("%Y%m%d")
+        + datetime.now().strftime("%Y%m%d")  # noqa: DTZ005
         + "-"
         + uuid.uuid4().hex[:6].upper()
     )

@@ -1,9 +1,8 @@
 from core.discovery import discover_datasets
-from core.ingestion import ingest_dataset, _read_dataset
+from core.ingestion import _read_dataset, ingest_dataset
 from core.quality import run_quality_checks
 from core.transform import TransformEngine, TransformError
 from core.validation import validate_dataset
-
 from utils.metadata_logger import MetadataLogger
 
 
@@ -63,7 +62,7 @@ def run_pipeline(dry_run: bool = False, dataset_filter: str | None = None):
         # ── Read data ONCE — reuse for quality check and ingest ──────────────
         try:
             df = _read_dataset(dataset)
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001
             print(f"Failed to read dataset '{dataset.name}': {exc}")
             skipped += 1
             continue

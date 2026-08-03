@@ -1,7 +1,7 @@
 import json
-from datetime import datetime
 import uuid
-from typing import Any, Dict
+from datetime import datetime
+from typing import Any
 
 import pandas as pd
 from sqlalchemy import text
@@ -111,8 +111,8 @@ class MetadataLogger:
     def create_pipeline_run(self) -> PipelineRun:
 
         run = PipelineRun(
-            run_id=f"OI-{datetime.now().strftime('%Y%m%d')}-{uuid.uuid4().hex[:6].upper()}",
-            started_at=datetime.now(),
+            run_id=f"OI-{datetime.now().strftime('%Y%m%d')}-{uuid.uuid4().hex[:6].upper()}",  # noqa: DTZ005
+            started_at=datetime.now(),  # noqa: DTZ005
         )
 
         return run
@@ -133,7 +133,7 @@ class MetadataLogger:
                     "load_mode": getattr(dataset, "load_mode", None),
                     "incremental_column": getattr(dataset, "incremental_column", None),
                     "watermark_value": getattr(dataset, "watermark_value", None),
-                    "loaded_at": datetime.now(),
+                    "loaded_at": datetime.now(),  # noqa: DTZ005
                 }
             ]
         )
@@ -141,7 +141,7 @@ class MetadataLogger:
         with self.engine.begin() as conn:
             df.to_sql("pipeline_dataset_runs", conn, if_exists="append", index=False)
 
-    def log_quality_result(self, run_id: str, dataset: Dataset, quality_result: Dict[str, Any]) -> None:
+    def log_quality_result(self, run_id: str, dataset: Dataset, quality_result: dict[str, Any]) -> None:
 
         df = pd.DataFrame(
             [
@@ -156,7 +156,7 @@ class MetadataLogger:
                     "score": quality_result.get("score", 0.0),
                     "status": quality_result.get("status", "UNKNOWN"),
                     "details": json.dumps(quality_result, default=str),
-                    "evaluated_at": datetime.now(),
+                    "evaluated_at": datetime.now(),  # noqa: DTZ005
                 }
             ]
         )
@@ -164,7 +164,7 @@ class MetadataLogger:
         try:
             with self.engine.begin() as conn:
                 df.to_sql("pipeline_quality_runs", conn, if_exists="append", index=False)
-        except Exception:
+        except Exception:  # noqa: BLE001
             # Reconnect and retry once on stale connection
             self.engine = get_engine()
             with self.engine.begin() as conn:
@@ -172,7 +172,7 @@ class MetadataLogger:
 
     def finish_pipeline(self, run: PipelineRun) -> None:
 
-        run.finished_at = datetime.now()
+        run.finished_at = datetime.now()  # noqa: DTZ005
         run.total_duration = round(
             (run.finished_at - run.started_at).total_seconds(), 2
         )

@@ -19,22 +19,22 @@ Usage
 
 from __future__ import annotations
 
-from typing import Any, Dict, Type, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, ClassVar
 
 if TYPE_CHECKING:
     from core.connectors.base import BaseConnector
 
 
 class ConnectorRegistry:
-    _registry: Dict[str, Type["BaseConnector"]] = {}
+    _registry: ClassVar[dict[str, type[BaseConnector]]] = {}
 
     @classmethod
-    def register(cls, name: str, connector_class: Type["BaseConnector"]) -> None:
+    def register(cls, name: str, connector_class: type[BaseConnector]) -> None:
         """Register a connector class under a type name."""
         cls._registry[name.lower()] = connector_class
 
     @classmethod
-    def get(cls, name: str, source_config: Dict[str, Any]) -> "BaseConnector":
+    def get(cls, name: str, source_config: dict[str, Any]) -> BaseConnector:
         """
         Instantiate and return a connector for the given source type.
         Raises ValueError if no connector is registered for the type.
@@ -62,33 +62,32 @@ class ConnectorRegistry:
 def _auto_register_builtins() -> None:
     """Register all built-in connectors at import time."""
     # ── v2.0 — Formats ──────────────────────────────────────────────────────
+    # ── v2.0 — REST API ─────────────────────────────────────────────────────
+    from core.connectors.api.rest_connector import RestApiConnector
+    from core.connectors.cloud.azure_connector import AzureBlobConnector
+    from core.connectors.cloud.gcs_connector import GCSConnector
+
+    # ── v2.0 — Cloud storage ────────────────────────────────────────────────
+    from core.connectors.cloud.s3_connector import S3Connector
+    from core.connectors.database.mongodb_connector import MongoDBConnector
+    from core.connectors.database.mysql_connector import MySQLConnector
+
+    # ── v3.0 — Database connectors ──────────────────────────────────────────
+    from core.connectors.database.postgresql_connector import PostgreSQLConnector
     from core.connectors.formats.csv_connector import CsvConnector
     from core.connectors.formats.excel_connector import ExcelConnector
     from core.connectors.formats.json_connector import JsonConnector
     from core.connectors.formats.parquet_connector import ParquetConnector
-
-    # ── v2.0 — Cloud storage ────────────────────────────────────────────────
-    from core.connectors.cloud.s3_connector import S3Connector
-    from core.connectors.cloud.azure_connector import AzureBlobConnector
-    from core.connectors.cloud.gcs_connector import GCSConnector
-
-    # ── v2.0 — REST API ─────────────────────────────────────────────────────
-    from core.connectors.api.rest_connector import RestApiConnector
-
-    # ── v3.0 — Database connectors ──────────────────────────────────────────
-    from core.connectors.database.postgresql_connector import PostgreSQLConnector
-    from core.connectors.database.mysql_connector import MySQLConnector
-    from core.connectors.database.mongodb_connector import MongoDBConnector
-
-    # ── v3.0 — File transfer ────────────────────────────────────────────────
-    from core.connectors.transfer.sftp_connector import SFTPConnector
-    from core.connectors.transfer.ftp_connector import FTPConnector
+    from core.connectors.saas.google_sheets_connector import GoogleSheetsConnector
+    from core.connectors.saas.hubspot_connector import HubSpotConnector
 
     # ── v3.0 — SaaS connectors ──────────────────────────────────────────────
     from core.connectors.saas.salesforce_connector import SalesforceConnector
-    from core.connectors.saas.hubspot_connector import HubSpotConnector
     from core.connectors.saas.stripe_connector import StripeConnector
-    from core.connectors.saas.google_sheets_connector import GoogleSheetsConnector
+    from core.connectors.transfer.ftp_connector import FTPConnector
+
+    # ── v3.0 — File transfer ────────────────────────────────────────────────
+    from core.connectors.transfer.sftp_connector import SFTPConnector
 
     # v2.0 formats
     ConnectorRegistry.register("csv",          CsvConnector)

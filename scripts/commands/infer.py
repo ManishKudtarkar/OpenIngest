@@ -28,7 +28,7 @@ def run_infer(file_arg: str) -> int:
                 pd.to_datetime(sample, format="mixed")
                 incremental_col = col
                 break
-            except Exception:
+            except Exception:  # noqa: BLE001, S110
                 pass
 
     # Non-null columns: columns with zero nulls in sample
@@ -77,7 +77,7 @@ def run_infer(file_arg: str) -> int:
 
     config_path = Path("configs/datasets.yaml")
     if config_path.exists():
-        with open(config_path, "r", encoding="utf-8") as f:
+        with open(config_path, encoding="utf-8") as f:
             existing = yaml.safe_load(f) or {}
     else:
         existing = {}
