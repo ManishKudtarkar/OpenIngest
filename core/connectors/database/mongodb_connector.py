@@ -96,7 +96,7 @@ class MongoDBConnector(BaseConnector):
             projection["_id"] = 0
 
         try:
-            client = MongoClient(uri, serverSelectionTimeoutMS=10_000)
+            client: Any = MongoClient(uri, serverSelectionTimeoutMS=10_000)
             client.server_info()  # force connection check
         except Exception as exc:
             raise ConnectorError(

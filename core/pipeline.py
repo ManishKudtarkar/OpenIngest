@@ -94,7 +94,7 @@ def run_pipeline(dry_run: bool = False, dataset_filter: str | None = None):
             continue
 
         # ── Transform stage ──────────────────────────────────────────────────
-        engine = TransformEngine(dataset.config)
+        engine = TransformEngine(dataset.config or {})
         if engine.has_transforms:
             rows_before = len(df)
             cols_before = len(df.columns)
