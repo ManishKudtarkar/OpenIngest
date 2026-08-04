@@ -550,7 +550,7 @@ OpenIngest/
 - ✅ v2.0 — Excel, JSON, Parquet, S3, Azure Blob, GCS, REST API connectors, plugin registry
 - ✅ v2.5 — Built-in scheduler, Slack/email notifications with retry, data lineage engine
 - ✅ v3.0 — PostgreSQL, MySQL, MongoDB, SFTP, FTP, Salesforce, HubSpot, Stripe, Google Sheets connectors + transformation engine (rename/cast/filter/derive/aggregate/python) + 93 tests + ruff + mypy clean
-- ✅ v3.0.1 — Published to PyPI · `pip install openingest`
+- ✅ v3.0.2 — Published to PyPI · `pip install openingest`
 - 🔲 v4.0 — Web dashboard, RBAC, multi-environment support, Snowflake/BigQuery connectors
 
 ---
