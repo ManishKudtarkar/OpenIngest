@@ -4,9 +4,9 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "openingest"
-version = "3.0.3"
+version = "3.0.4"
 description = "Configuration-driven data ingestion framework with quality checks, metadata, and orchestration"
-readme = "docs/USABILITY_AND_OBSERVABILITY.md"
+readme = "README.md"
 requires-python = ">=3.10"
 authors = [
   { name = "Manish Kudtarkar", email = "manishkudtarkar467@gmail.com" }
