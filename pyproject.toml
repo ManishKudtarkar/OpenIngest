@@ -27,12 +27,6 @@ classifiers = [
   "Topic :: Software Development :: Libraries :: Python Modules",
   "Topic :: Database",
 ]
-
-[project.urls]
-Homepage = "https://openingest.vercel.app"
-Repository = "https://github.com/ManishKudtarkar/OpenIngest"
-"Bug Tracker" = "https://github.com/ManishKudtarkar/OpenIngest/issues"
-Changelog = "https://github.com/ManishKudtarkar/OpenIngest/releases"
 dependencies = [
   "pandas",
   "sqlalchemy",
@@ -40,6 +34,12 @@ dependencies = [
   "python-dotenv",
   "PyYAML==6.0.2"
 ]
+
+[project.urls]
+Homepage = "https://openingest.vercel.app"
+Repository = "https://github.com/ManishKudtarkar/OpenIngest"
+"Bug Tracker" = "https://github.com/ManishKudtarkar/OpenIngest/issues"
+Changelog = "https://github.com/ManishKudtarkar/OpenIngest/releases"
 
 [project.optional-dependencies]
 dev = [
@@ -51,16 +51,12 @@ dev = [
 web = [
   "streamlit>=1.36"
 ]
-
-# v2.0 — Multi-format support
 excel = [
   "openpyxl>=3.1.2"
 ]
 parquet = [
   "pyarrow>=15.0"
 ]
-
-# v2.0 — Cloud connectors
 s3 = [
   "boto3>=1.34.0"
 ]
@@ -70,18 +66,12 @@ azure = [
 gcs = [
   "google-cloud-storage>=2.14.0"
 ]
-
-# v2.0 — REST API connector
 api = [
   "requests>=2.31.0"
 ]
-
-# v2.5 — Notifications
 notifications = [
   "requests>=2.31.0"
 ]
-
-# v3.0 — Database connectors
 postgresql = [
   "psycopg2-binary>=2.9.0"
 ]
@@ -91,13 +81,9 @@ mysql = [
 mongodb = [
   "pymongo>=4.6.0"
 ]
-
-# v3.0 — File transfer connectors
 sftp = [
   "paramiko>=3.4.0"
 ]
-
-# v3.0 — SaaS connectors
 salesforce = [
   "simple-salesforce>=1.12.0"
 ]
@@ -112,8 +98,6 @@ google_sheets = [
   "google-auth>=2.28.0",
   "google-auth-httplib2>=0.2.0",
 ]
-
-# v3.0 — All new connectors in one group
 connectors = [
   "PyMySQL>=1.1.0",
   "pymongo>=4.6.0",
@@ -124,8 +108,6 @@ connectors = [
   "google-auth>=2.28.0",
   "google-auth-httplib2>=0.2.0",
 ]
-
-# All v2.0 extras together
 v2 = [
   "openpyxl>=3.1.2",
   "pyarrow>=15.0",
@@ -134,8 +116,6 @@ v2 = [
   "google-cloud-storage>=2.14.0",
   "requests>=2.31.0",
 ]
-
-# Full install
 all = [
   "openpyxl>=3.1.2",
   "pyarrow>=15.0",
@@ -148,7 +128,6 @@ all = [
   "pytest-cov>=5.0",
   "ruff>=0.4",
   "mypy>=1.10",
-  # v3.0 connectors
   "PyMySQL>=1.1.0",
   "pymongo>=4.6.0",
   "paramiko>=3.4.0",
