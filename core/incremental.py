@@ -9,6 +9,7 @@ from sqlalchemy import MetaData, Table, text
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.engine import Engine
 
+from core.schema import quote_identifier, quote_table_name
 from models.dataset import Dataset
 
 
@@ -42,14 +43,6 @@ def ensure_incremental_schema(engine: Engine) -> None:
                 """
             )
         )
-
-
-def _quote_table_name(table_name: str) -> str:
-    if "." in table_name:
-        schema_name, bare_table_name = table_name.split(".", 1)
-        return f'"{schema_name}"."{bare_table_name}"'
-
-    return f'"{table_name}"'
 
 
 def _normalize_datetime_series(series: pd.Series) -> pd.Series:
@@ -158,13 +151,14 @@ def _ensure_unique_index(engine: Engine, table_name: str, column_names: list[str
     if not column_names:
         return
 
-    index_name = f"ux_{table_name.replace('.', '_')}_{'_'.join(column_names)}"
-    quoted_columns = ", ".join(f'"{column}"' for column in column_names)
+    raw_index_name = f"ux_{table_name.replace('.', '_')}_{'_'.join(column_names)}"
+    safe_index_name = quote_identifier(raw_index_name)
+    quoted_columns = ", ".join(quote_identifier(column) for column in column_names)
 
     with engine.begin() as conn:
         conn.execute(
             text(
-                f"CREATE UNIQUE INDEX IF NOT EXISTS {index_name} ON {_quote_table_name(table_name)} ({quoted_columns});"
+                f"CREATE UNIQUE INDEX IF NOT EXISTS {safe_index_name} ON {quote_table_name(table_name)} ({quoted_columns});"
             )
         )
 
@@ -203,9 +197,9 @@ def _apply_hash_change_detection(
         return df.copy()
 
     selected_columns = list(dict.fromkeys(primary_key_columns + hash_columns))
-    quoted_cols = ", ".join(f'"{c}"' for c in selected_columns)
+    quoted_cols = ", ".join(quote_identifier(c) for c in selected_columns)
     target_df = pd.read_sql(
-        text(f"SELECT {quoted_cols} FROM {_quote_table_name(table_name)}"),
+        text(f"SELECT {quoted_cols} FROM {quote_table_name(table_name)}"),
         engine,
     )
 
