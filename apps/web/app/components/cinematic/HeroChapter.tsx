@@ -4,48 +4,47 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight, ArrowDown } from "lucide-react";
 import GithubIcon from "../GithubIcon";
 
-function AnimChar({ ch, delay }: { ch: string; delay: number }) {
+/* ── Per-character animation ── */
+function Word({
+  text, delay = 0, className = "",
+}: { text: string; delay?: number; className?: string }) {
   return (
-    <motion.span
-      initial={{ y: 80, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.75, delay, ease: [0.16, 1, 0.3, 1] }}
-      style={{ display: "inline-block" }}
-    >
-      {ch}
-    </motion.span>
-  );
-}
-
-function AnimWord({ word, delay = 0, className = "" }: { word: string; delay?: number; className?: string }) {
-  return (
-    <span className={`inline-flex overflow-hidden ${className}`} aria-label={word}>
-      {word.split("").map((ch, i) => (
-        <AnimChar key={i} ch={ch === " " ? "\u00A0" : ch} delay={delay + i * 0.038} />
+    <span className={`inline-flex overflow-hidden ${className}`} aria-label={text}>
+      {text.split("").map((ch, i) => (
+        <motion.span
+          key={i}
+          initial={{ y: "100%", opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.65, delay: delay + i * 0.032, ease: [0.16, 1, 0.3, 1] }}
+          style={{ display: "inline-block" }}
+        >
+          {ch}
+        </motion.span>
       ))}
     </span>
   );
 }
 
+/* ── Terminal lines ── */
 const LINES = [
-  { t: "$ openingest run",                                              c: "#A5B4FC", d: 300  },
-  { t: "",                                                              c: "",        d: 650  },
-  { t: "  Discovering 8 datasets...",                                   c: "#334155", d: 900  },
-  { t: "  ✓  customers    →  stg_customers    replace       100.00%",  c: "#10B981", d: 1100 },
-  { t: "  ✓  orders       →  stg_orders       incremental    98.50%",  c: "#10B981", d: 1300 },
-  { t: "  ✓  products     →  stg_products     replace       100.00%",  c: "#10B981", d: 1470 },
-  { t: "  ✓  sessions     →  stg_sessions     replace       100.00%",  c: "#10B981", d: 1630 },
-  { t: "  ✓  employees    →  stg_employees    replace       100.00%",  c: "#10B981", d: 1780 },
-  { t: "  ✓  events       →  stg_events       incremental    99.20%",  c: "#10B981", d: 1920 },
-  { t: "  ✓  order_items  →  stg_order_items  replace       100.00%",  c: "#10B981", d: 2050 },
-  { t: "  ✓  reviews      →  stg_reviews      incremental    97.80%",  c: "#10B981", d: 2180 },
-  { t: "",                                                              c: "",        d: 2360 },
-  { t: "  Schema   ── all 8 valid",                                    c: "#22D3EE", d: 2520 },
-  { t: "  Quality  ── avg 99.4%",                                      c: "#22D3EE", d: 2700 },
-  { t: "",                                                              c: "",        d: 2850 },
-  { t: "  Rows    :  174,777",                                         c: "#A5B4FC", d: 2990 },
-  { t: "  Time    :  4.21 sec",                                        c: "#A5B4FC", d: 3130 },
-  { t: "  Status  :  SUCCESS ✓",                                       c: "#10B981", d: 3280 },
+  { t: "$ openingest run",                                             c: "#818CF8", d: 300  },
+  { t: "",                                                             c: "",        d: 700  },
+  { t: "  Discovering 8 datasets...",                                  c: "#334155", d: 950  },
+  { t: "  ✓  customers    →  stg_customers    replace       100.00%", c: "#10B981", d: 1150 },
+  { t: "  ✓  orders       →  stg_orders       incremental    98.50%", c: "#10B981", d: 1340 },
+  { t: "  ✓  products     →  stg_products     replace       100.00%", c: "#10B981", d: 1510 },
+  { t: "  ✓  sessions     →  stg_sessions     replace       100.00%", c: "#10B981", d: 1670 },
+  { t: "  ✓  employees    →  stg_employees    replace       100.00%", c: "#10B981", d: 1820 },
+  { t: "  ✓  events       →  stg_events       incremental    99.20%", c: "#10B981", d: 1960 },
+  { t: "  ✓  order_items  →  stg_order_items  replace       100.00%", c: "#10B981", d: 2090 },
+  { t: "  ✓  reviews      →  stg_reviews      incremental    97.80%", c: "#10B981", d: 2220 },
+  { t: "",                                                             c: "",        d: 2400 },
+  { t: "  Schema   ──  all 8 valid",                                  c: "#22D3EE", d: 2560 },
+  { t: "  Quality  ──  avg 99.4%",                                    c: "#22D3EE", d: 2740 },
+  { t: "",                                                             c: "",        d: 2900 },
+  { t: "  Rows    :  174,777",                                        c: "#818CF8", d: 3050 },
+  { t: "  Time    :  4.21 sec",                                       c: "#818CF8", d: 3210 },
+  { t: "  Status  :  SUCCESS ✓",                                      c: "#10B981", d: 3380 },
 ];
 
 export default function HeroChapter() {
@@ -54,8 +53,8 @@ export default function HeroChapter() {
   const sectionRef = useRef<HTMLElement>(null);
 
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start start", "end start"] });
-  const contentY = useTransform(scrollYProgress, [0, 1], ["0%", "18%"]);
-  const contentOpacity = useTransform(scrollYProgress, [0, 0.55], [1, 0]);
+  const y    = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
+  const fade = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
 
   useEffect(() => {
     LINES.forEach((l, i) => {
@@ -69,217 +68,257 @@ export default function HeroChapter() {
     <section
       ref={sectionRef}
       id="hero"
-      className="relative flex flex-col justify-center overflow-hidden"
-      style={{ minHeight: "100svh" }}
+      className="relative overflow-hidden"
+      style={{ minHeight: "100svh", display: "flex", flexDirection: "column", justifyContent: "center" }}
     >
-      {/* Background layers */}
-      <div className="absolute inset-0 bg-[#030507]" />
-      <div className="absolute inset-0 grid-fine opacity-[0.35]" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_90%_60%_at_50%_-10%,rgba(34,211,238,0.07),transparent)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_50%_at_80%_60%,rgba(99,102,241,0.06),transparent)]" />
-      <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent_60%,#030507_100%)]" />
-      <div className="absolute inset-0 noise pointer-events-none" />
-      {/* orbs */}
-      <div className="orb orb-indigo absolute top-[15%] left-[5%] w-[600px] h-[600px] opacity-25 orb-drift pointer-events-none" />
-      <div className="orb orb-cyan absolute top-[10%] right-[5%] w-[500px] h-[500px] opacity-15 pointer-events-none" style={{ animationDelay: "-5s" }} />
+      {/* ── BACKGROUND ── */}
+      <motion.div className="absolute inset-0 pointer-events-none" style={{ y }}>
+        <div className="absolute inset-0" style={{ background: "#02030a" }} />
+        <div className="absolute inset-0 grid-bg" style={{ opacity: 0.4 }} />
+        {/* top glow */}
+        <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse 90% 55% at 50% -8%, rgba(34,211,238,0.09), transparent)" }} />
+        {/* bottom fade */}
+        <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, transparent 50%, #02030a 100%)" }} />
+        {/* orbs */}
+        <div
+          className="absolute orb-drift"
+          style={{
+            top: "15%", left: "4%",
+            width: 700, height: 700,
+            borderRadius: "50%",
+            background: "radial-gradient(circle, rgba(99,102,241,0.28), transparent 70%)",
+            filter: "blur(90px)",
+            opacity: 0.25,
+          }}
+        />
+        <div
+          className="absolute"
+          style={{
+            top: "8%", right: "2%",
+            width: 500, height: 500,
+            borderRadius: "50%",
+            background: "radial-gradient(circle, rgba(34,211,238,0.20), transparent 70%)",
+            filter: "blur(80px)",
+            opacity: 0.18,
+            animationDelay: "-6s",
+          }}
+        />
+      </motion.div>
 
+      {/* ── CONTENT ── */}
       <motion.div
-        className="wrap relative z-10"
-        style={{ y: contentY, opacity: contentOpacity }}
+        className="site-pad relative z-10"
+        style={{ opacity: fade }}
       >
-        {/* Top spacer for navbar */}
-        <div className="pt-28 pb-16 lg:pb-20">
-          <div className="grid lg:grid-cols-[1fr_1fr] gap-12 xl:gap-20 items-center min-h-[calc(100svh-8rem)]">
+        <div
+          className="grid items-center gap-12 xl:gap-20"
+          style={{
+            gridTemplateColumns: "1fr 1fr",
+            paddingTop: "clamp(5.5rem, 10vw, 8rem)",
+            paddingBottom: "clamp(4rem, 8vw, 6rem)",
+          }}
+        >
+          {/* ─── LEFT ─── */}
+          <div className="flex flex-col gap-8 lg:gap-10">
 
-            {/* ─── LEFT COLUMN ─── */}
-            <div className="flex flex-col justify-center gap-8 lg:gap-10">
-
-              {/* Eyebrow badge */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.05 }}
-                className="flex items-center gap-3 flex-wrap"
-              >
-                <span className="flex items-center gap-2.5 rounded-full border border-cyan-400/25 bg-cyan-400/8 px-4 py-2">
-                  <span className="relative flex h-2 w-2 shrink-0">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
-                  </span>
-                  <span className="text-[11.5px] font-semibold text-cyan-200 tracking-[0.12em] uppercase">
-                    v3.0.5 · Open Source · PyPI
-                  </span>
+            {/* Badge */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.55, delay: 0.08 }}
+              className="flex items-center gap-3 flex-wrap"
+            >
+              <span style={{
+                display: "flex", alignItems: "center", gap: "0.6rem",
+                borderRadius: "99px",
+                border: "1px solid rgba(34,211,238,0.22)",
+                background: "rgba(34,211,238,0.07)",
+                padding: "6px 16px",
+              }}>
+                <span className="relative flex h-2 w-2 shrink-0">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
                 </span>
-                <span className="tag text-[#475569] border-white/8 bg-white/3 text-[10.5px]">MIT License</span>
-              </motion.div>
+                <span style={{ fontSize: 11, fontWeight: 700, color: "#A5F3FC", letterSpacing: "0.12em", textTransform: "uppercase" }}>
+                  v3.0.5 · Open Source · PyPI
+                </span>
+              </span>
+              <span className="tag" style={{ color: "#475569", borderColor: "rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.03)", fontSize: 10.5 }}>
+                MIT License
+              </span>
+            </motion.div>
 
-              {/* Headline — large cinematic type */}
-              <div>
-                <h1 className="f-head font-bold leading-[1.0] tracking-[-0.04em] select-none">
-                  {/* Line 1: white */}
-                  <div className="overflow-hidden">
-                    <div className="text-[clamp(54px,8.5vw,96px)] text-white">
-                      <AnimWord word="Data" delay={0.2} />
-                      <span style={{ display: "inline-block", width: "0.25em" }} />
-                      <AnimWord word="Ingestion." delay={0.38} />
-                    </div>
-                  </div>
-                  {/* Line 2: gradient */}
-                  <div className="overflow-hidden mt-1">
-                    <div className="text-[clamp(54px,8.5vw,96px)]">
-                      <AnimWord word="Zero" delay={0.75} className="text-[#A5B4FC]" />
-                      <span style={{ display: "inline-block", width: "0.25em" }} />
-                      <AnimWord word="Boilerplate." delay={0.92} className="text-[#22D3EE]" />
-                    </div>
-                  </div>
-                </h1>
+            {/* Headline */}
+            <div className="f-head" style={{ fontWeight: 800, lineHeight: 1.02, letterSpacing: "-0.045em" }}>
+              <div style={{ fontSize: "clamp(3.2rem, 8vw, 6rem)", color: "#F1F5F9", overflow: "hidden" }}>
+                <Word text="Data" delay={0.18} />
+                <span style={{ display: "inline-block", width: "0.22em" }} />
+                <Word text="Ingestion." delay={0.32} />
               </div>
-
-              {/* Subtext */}
-              <motion.p
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 1.65, ease: [0.16, 1, 0.3, 1] }}
-                className="text-[#64748B] text-[15px] sm:text-[17px] leading-[1.75] max-w-[500px]"
-              >
-                Register a dataset in YAML. OpenIngest handles{" "}
-                <span className="text-[#94A3B8]">
-                  discovery → validation → quality → transforms → PostgreSQL → Airflow
-                </span>{" "}
-                automatically.
-              </motion.p>
-
-              {/* CTA buttons */}
-              <motion.div
-                initial={{ opacity: 0, y: 14 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 1.95 }}
-                className="flex flex-wrap gap-3"
-              >
-                <a
-                  href="#install"
-                  className="flex items-center gap-2.5 font-semibold text-[#020c10] text-[14px] px-8 py-4 rounded-xl bg-cyan-300 hover:bg-white transition-all shadow-[0_0_60px_rgba(34,211,238,0.20)] hover:shadow-[0_0_60px_rgba(255,255,255,0.15)]"
-                >
-                  Get started free
-                  <ArrowRight size={15} />
-                </a>
-                <a
-                  href="https://github.com/manishkudtarkar/OpenIngest"
-                  target="_blank" rel="noopener noreferrer"
-                  className="flex items-center gap-2.5 font-semibold text-[#94A3B8] hover:text-white text-[14px] px-8 py-4 rounded-xl border border-white/8 hover:border-white/18 bg-white/3 hover:bg-white/6 transition-all"
-                >
-                  <GithubIcon size={16} />
-                  Star on GitHub
-                </a>
-              </motion.div>
-
-              {/* Stats strip */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 1.1, delay: 2.25 }}
-                className="grid grid-cols-4 gap-6 pt-6 border-t border-white/6"
-              >
-                {[
-                  ["174k",  "rows / run"],
-                  ["17",    "connectors"],
-                  ["4.21s", "runtime"],
-                  ["99.4%", "quality"],
-                ].map(([v, l]) => (
-                  <div key={l}>
-                    <div className="f-head text-[clamp(22px,3vw,32px)] font-bold text-white leading-none tabular-nums">{v}</div>
-                    <div className="text-[11px] text-[#334155] mt-2 tracking-wide uppercase">{l}</div>
-                  </div>
-                ))}
-              </motion.div>
+              <div style={{ fontSize: "clamp(3.2rem, 8vw, 6rem)", overflow: "hidden", marginTop: "0.04em" }}>
+                <Word text="Zero" delay={0.70} className="g-indigo-cyan" />
+                <span style={{ display: "inline-block", width: "0.22em" }} />
+                <Word text="Boilerplate." delay={0.86} className="g-cyan" />
+              </div>
             </div>
 
-            {/* ─── RIGHT COLUMN: Terminal ─── */}
-            <motion.div
-              initial={{ opacity: 0, y: 30, scale: 0.97 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ duration: 1.0, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
-              className="relative w-full"
+            {/* Sub */}
+            <motion.p
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 1.6, ease: [0.16, 1, 0.3, 1] }}
+              style={{ color: "#64748B", fontSize: "clamp(15px,1.5vw,17px)", lineHeight: 1.8, maxWidth: 500 }}
             >
-              {/* glow halo */}
-              <div className="absolute -inset-10 rounded-3xl bg-gradient-to-br from-cyan-500/10 via-indigo-500/8 to-transparent blur-3xl pointer-events-none" />
+              Register a dataset in YAML. OpenIngest handles{" "}
+              <span style={{ color: "#94A3B8" }}>
+                discovery → validation → quality → transforms → PostgreSQL → Airflow
+              </span>{" "}
+              automatically. No Python. No SQL.
+            </motion.p>
 
-              <div className="terminal relative w-full">
-                {/* chrome bar */}
-                <div className="terminal-bar flex items-center justify-between px-5 py-3.5">
-                  <div className="flex gap-2">
-                    <div className="t-dot" style={{ background: "#FF5F57" }} />
-                    <div className="t-dot" style={{ background: "#FFBD2E" }} />
-                    <div className="t-dot" style={{ background: "#27C93F" }} />
-                  </div>
-                  <div className="flex items-center gap-2 bg-white/5 rounded-lg px-3 py-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    <span className="text-[11px] text-[#475569] f-mono">openingest · bash</span>
-                  </div>
-                  <div className="w-20" />
-                </div>
+            {/* CTAs */}
+            <motion.div
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.65, delay: 1.9 }}
+              style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem" }}
+            >
+              <a
+                href="#install"
+                style={{
+                  display: "flex", alignItems: "center", gap: "0.6rem",
+                  padding: "14px 32px",
+                  borderRadius: "14px",
+                  background: "#22D3EE",
+                  color: "#020c10",
+                  fontWeight: 700,
+                  fontSize: 14,
+                  textDecoration: "none",
+                  boxShadow: "0 0 60px rgba(34,211,238,0.22)",
+                  transition: "background .2s, box-shadow .2s",
+                }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "#fff"; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "#22D3EE"; }}
+              >
+                Get started free <ArrowRight size={15} />
+              </a>
+              <a
+                href="https://github.com/manishkudtarkar/OpenIngest"
+                target="_blank" rel="noopener noreferrer"
+                style={{
+                  display: "flex", alignItems: "center", gap: "0.6rem",
+                  padding: "14px 32px",
+                  borderRadius: "14px",
+                  border: "1px solid rgba(255,255,255,0.09)",
+                  background: "rgba(255,255,255,0.04)",
+                  color: "#94A3B8",
+                  fontWeight: 700,
+                  fontSize: 14,
+                  textDecoration: "none",
+                  transition: "background .2s, color .2s, border-color .2s",
+                }}
+                onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.color = "#fff"; el.style.background = "rgba(255,255,255,0.08)"; el.style.borderColor = "rgba(255,255,255,0.16)"; }}
+                onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.color = "#94A3B8"; el.style.background = "rgba(255,255,255,0.04)"; el.style.borderColor = "rgba(255,255,255,0.09)"; }}
+              >
+                <GithubIcon size={16} /> Star on GitHub
+              </a>
+            </motion.div>
 
-                {/* output body */}
-                <div
-                  className="px-6 py-6 f-mono text-[12px] sm:text-[12.5px] leading-[1.95] overflow-x-auto"
-                  style={{ minHeight: "420px" }}
-                >
-                  {LINES.map((line, i) => (
-                    <motion.div
-                      key={i}
-                      initial={{ opacity: 0, x: -8 }}
-                      animate={vis.includes(i) ? { opacity: 1, x: 0 } : {}}
-                      transition={{ duration: 0.2 }}
-                      style={{
-                        color: line.c || "transparent",
-                        whiteSpace: "pre",
-                        minWidth: "max-content",
-                      }}
-                    >
-                      {line.t || "\u00A0"}
-                    </motion.div>
-                  ))}
-                  {vis.length < LINES.length && (
-                    <span
-                      className="inline-block blink"
-                      style={{
-                        width: 7, height: 14,
-                        background: "rgba(34,211,238,0.8)",
-                        marginLeft: 2,
-                        verticalAlign: "middle",
-                        display: "inline-block",
-                      }}
-                    />
-                  )}
+            {/* Stats */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 1.1, delay: 2.2 }}
+              style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "1.5rem", paddingTop: "1.5rem", borderTop: "1px solid rgba(255,255,255,0.06)" }}
+            >
+              {[["174k","rows / run"],["17","connectors"],["4.21s","runtime"],["99.4%","quality"]].map(([v, l]) => (
+                <div key={l}>
+                  <div className="f-head" style={{ fontSize: "clamp(24px,3vw,36px)", fontWeight: 800, color: "#F1F5F9", lineHeight: 1, letterSpacing: "-0.03em" }}>{v}</div>
+                  <div style={{ fontSize: 11, color: "#334155", marginTop: "0.5rem", textTransform: "uppercase", letterSpacing: "0.1em" }}>{l}</div>
                 </div>
-
-                {/* status footer */}
-                <div className="px-6 py-3 border-t border-white/5 bg-white/[0.018] flex items-center justify-between">
-                  <span className="text-[10.5px] text-[#1E293B] f-mono">python 3.12 · postgresql 15 · airflow 2.9</span>
-                  <span className="text-[10.5px] text-emerald-400 f-mono flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    connected
-                  </span>
-                </div>
-              </div>
+              ))}
             </motion.div>
           </div>
+
+          {/* ─── RIGHT: Terminal ─── */}
+          <motion.div
+            initial={{ opacity: 0, y: 32, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.95, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            style={{ position: "relative" }}
+          >
+            {/* halo */}
+            <div style={{
+              position: "absolute", inset: "-2.5rem",
+              borderRadius: "2rem",
+              background: "radial-gradient(ellipse at 50% 40%, rgba(99,102,241,0.14) 0%, transparent 70%)",
+              filter: "blur(30px)",
+              pointerEvents: "none",
+            }} />
+            <div className="terminal">
+              {/* chrome */}
+              <div className="term-bar" style={{ justifyContent: "space-between" }}>
+                <div style={{ display: "flex", gap: 7 }}>
+                  <div className="t-dot" style={{ background: "#FF5F57" }} />
+                  <div className="t-dot" style={{ background: "#FFBD2E" }} />
+                  <div className="t-dot" style={{ background: "#27C93F" }} />
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,0.05)", borderRadius: 8, padding: "4px 12px" }}>
+                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#10B981", display: "inline-block", animation: "pulse-ring 2.2s ease-out infinite" }} />
+                  <span className="f-mono" style={{ fontSize: 10.5, color: "#475569" }}>openingest · bash</span>
+                </div>
+                <div style={{ width: 80 }} />
+              </div>
+
+              {/* output */}
+              <div
+                className="f-mono"
+                style={{ padding: "1.5rem 1.5rem 1.5rem", minHeight: 430, fontSize: 12.5, lineHeight: 1.95, overflowX: "auto" }}
+              >
+                {LINES.map((line, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, x: -8 }}
+                    animate={vis.includes(i) ? { opacity: 1, x: 0 } : {}}
+                    transition={{ duration: 0.2 }}
+                    style={{ color: line.c || "transparent", whiteSpace: "pre", minWidth: "max-content" }}
+                  >
+                    {line.t || "\u00A0"}
+                  </motion.div>
+                ))}
+                {vis.length < LINES.length && (
+                  <span className="blink" style={{ display: "inline-block", width: 7, height: 14, background: "rgba(34,211,238,0.75)", verticalAlign: "middle", marginLeft: 2 }} />
+                )}
+              </div>
+
+              {/* footer */}
+              <div style={{
+                padding: "10px 20px",
+                borderTop: "1px solid rgba(255,255,255,0.05)",
+                background: "rgba(255,255,255,0.015)",
+                display: "flex", justifyContent: "space-between", alignItems: "center",
+              }}>
+                <span className="f-mono" style={{ fontSize: 10.5, color: "#1E293B" }}>python 3.12 · postgresql 15 · airflow 2.9</span>
+                <span className="f-mono" style={{ fontSize: 10.5, color: "#10B981", display: "flex", alignItems: "center", gap: 6 }}>
+                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#10B981", display: "inline-block" }} className="pulse-ring" />
+                  connected
+                </span>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </motion.div>
 
-      {/* Scroll cue */}
+      {/* scroll cue */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 3.5, duration: 1 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2.5 z-10"
+        transition={{ delay: 3.6, duration: 1.2 }}
+        style={{ position: "absolute", bottom: 36, left: "50%", transform: "translateX(-50%)", display: "flex", flexDirection: "column", alignItems: "center", gap: 8, zIndex: 10 }}
       >
-        <span className="chapter-label tracking-[0.2em]">Scroll</span>
-        <motion.div
-          animate={{ y: [0, 7, 0] }}
-          transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
-        >
-          <ArrowDown size={13} className="text-[#334155]" />
+        <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.18em", textTransform: "uppercase", color: "#334155" }}>Scroll</span>
+        <motion.div animate={{ y: [0, 7, 0] }} transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}>
+          <ArrowDown size={13} color="#334155" />
         </motion.div>
       </motion.div>
     </section>

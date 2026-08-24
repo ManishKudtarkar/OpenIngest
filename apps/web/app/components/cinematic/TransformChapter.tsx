@@ -80,32 +80,26 @@ export default function TransformChapter() {
   const cur = TRANSFORMS[active];
 
   return (
-    <section id="transforms" ref={ref} className="relative py-32 overflow-hidden">
+    <section id="transforms" ref={ref} className="relative overflow-hidden" style={{ paddingTop: "clamp(5rem,9vw,8rem)", paddingBottom: "clamp(5rem,9vw,8rem)", background: "#060810" }}>
       <motion.div className="absolute inset-0" style={{ y: bgY }}>
-        <div className="absolute inset-0 bg-[#080c18]" />
-        <div className="absolute inset-0 grid-fine opacity-15" />
-        <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-amber-500/10 to-transparent" />
-        <div className="chapter-num absolute left-1/2 -translate-x-1/2 top-8 opacity-[0.025]">04</div>
+        <div className="absolute inset-0 grid-bg" style={{ opacity: 0.22 }} />
+        <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg,transparent,rgba(245,158,11,0.12),transparent)" }} />
       </motion.div>
 
-      <div className="wrap relative z-10">
+      <div className="site-pad relative z-10">
         <FadeUp>
-          <div className="chapter-label mb-8 flex items-center gap-3">
-            <span className="w-8 h-px bg-amber-500/40" />
-            <span>Chapter 04</span>
-            <span className="text-[#1E293B]">/</span>
-            <span className="text-[#334155]">Transformation Engine</span>
-          </div>
+          <span className="eyebrow" style={{ marginBottom: "2rem", display: "inline-flex" }}>Chapter 04 / Transformation Engine</span>
         </FadeUp>
 
         <FadeUp delay={0.05}>
-          <h2 className="f-head font-bold leading-[1.06] tracking-[-0.03em] text-[clamp(28px,4vw,48px)] text-white mb-4">
-            Six YAML steps.<br/>
-            <span className="g-text">No Python required.</span>
+          <h2 className="f-head" style={{ fontWeight: 800, lineHeight: 1.02, letterSpacing: "-0.04em", fontSize: "clamp(2.4rem,5.5vw,4.2rem)", marginBottom: "1rem" }}>
+            <span style={{ color: "#F1F5F9" }}>Six YAML steps.</span>
+            <br />
+            <span className="g-amber">No Python required.</span>
           </h2>
-          <p className="text-[#475569] text-[14px] leading-relaxed mb-12 max-w-xl">
+          <p style={{ color: "#475569", fontSize: 16, lineHeight: 1.75, maxWidth: 560, marginBottom: "clamp(2.5rem,4vw,3.5rem)" }}>
             Transformations run after quality checks, before the database write.
-            Declare them in <code className="text-amber-400 f-mono text-[13px]">transforms:</code> blocks inside datasets.yaml.
+            Declare them in the <code className="f-mono" style={{ color: "#FDE68A", fontSize: 14 }}>transforms:</code> block inside datasets.yaml.
           </p>
         </FadeUp>
 

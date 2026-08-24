@@ -1,124 +1,131 @@
 "use client";
 import { useRef, useState } from "react";
-import { motion, useInView, useScroll, useTransform } from "framer-motion";
-import { ChevronRight } from "lucide-react";
+import { motion, useInView } from "framer-motion";
 
 function FadeUp({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-60px" });
   return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 28 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.75, delay, ease: [0.16, 1, 0.3, 1] }}
-      className={className}
-    >
+    <motion.div ref={ref} initial={{ opacity: 0, y: 28 }} animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.75, delay, ease: [0.16, 1, 0.3, 1] }} className={className}>
       {children}
     </motion.div>
   );
 }
 
 const STEPS = [
-  { n: "01", label: "Source",              src: "data/raw/ or source: block",         desc: "CSV, Parquet, S3, MongoDB, Salesforce — or any of the 17 connectors.",          accent: "#64748B" },
-  { n: "02", label: "Dataset Discovery",   src: "core/discovery.py",                  desc: "Reads datasets.yaml and builds Dataset objects automatically. Zero changes needed when adding new sources.", accent: "#6366F1" },
-  { n: "03", label: "Schema Validation",   src: "core/validation.py",                 desc: "Required columns verified. Missing or extra fields caught. Pipeline halts early on failure.", accent: "#22D3EE" },
-  { n: "04", label: "Data Quality Engine", src: "core/quality.py",                    desc: "Non-null, unique, range, regex, and custom df.eval() rules. 0–100% quality score every run.", accent: "#10B981" },
-  { n: "05", label: "Transform Engine",    src: "core/transform.py",                  desc: "rename → cast → filter → derive → aggregate → python. Six declarative YAML steps.", accent: "#F59E0B" },
-  { n: "06", label: "Ingestion Engine",    src: "core/ingestion.py",                  desc: "replace / append / incremental. Incremental = watermark + SHA-256 hash CDC + upsert.", accent: "#8B5CF6" },
-  { n: "07", label: "PostgreSQL Staging",  src: "utils/db.py",                        desc: "Tables auto-created from inferred types. No SQL. No migrations.", accent: "#3B82F6" },
-  { n: "08", label: "Metadata Logger",     src: "utils/metadata_logger.py",           desc: "Writes run ID, status, duration, rows, quality scores to pipeline_runs.", accent: "#F59E0B" },
-  { n: "09", label: "Airflow DAG",         src: "dags/openingest_dynamic_pipeline",   desc: "Every dataset → discover → validate_schema → quality_check → ingest. Auto-generated.", accent: "#EF4444" },
+  { n: "01", label: "Source",              src: "data/raw/ or source: block",       desc: "CSV, Parquet, S3, MongoDB, Salesforce — or any of the 17 connectors.",                   accent: "#64748B" },
+  { n: "02", label: "Dataset Discovery",   src: "core/discovery.py",                desc: "Reads datasets.yaml and builds Dataset objects automatically. Zero code changes needed.", accent: "#6366F1" },
+  { n: "03", label: "Schema Validation",   src: "core/validation.py",               desc: "Required columns verified. Missing/extra fields caught. Pipeline halts early on fail.",   accent: "#22D3EE" },
+  { n: "04", label: "Data Quality Engine", src: "core/quality.py",                  desc: "Non-null, unique, range, regex, and df.eval() rules. 0–100% score every run.",          accent: "#10B981" },
+  { n: "05", label: "Transform Engine",    src: "core/transform.py",                desc: "rename → cast → filter → derive → aggregate → python. Six YAML-declared steps.",        accent: "#F59E0B" },
+  { n: "06", label: "Ingestion Engine",    src: "core/ingestion.py",                desc: "replace / append / incremental (watermark + SHA-256 hash CDC + upsert).",               accent: "#8B5CF6" },
+  { n: "07", label: "PostgreSQL Staging",  src: "utils/db.py",                      desc: "Tables auto-created from inferred types. No SQL DDL. No migrations ever.",               accent: "#3B82F6" },
+  { n: "08", label: "Metadata Logger",     src: "utils/metadata_logger.py",         desc: "Writes run ID, status, duration, rows, quality scores to pipeline_runs.",                accent: "#F59E0B" },
+  { n: "09", label: "Airflow DAG",         src: "dags/openingest_dynamic_pipeline", desc: "Every dataset → discover → validate → quality → ingest. Auto-generated from YAML.",     accent: "#EF4444" },
 ];
 
 export default function PipelineChapter() {
   const [active, setActive] = useState<number | null>(null);
-  const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
-  const bgY = useTransform(scrollYProgress, [0, 1], ["-8%", "8%"]);
 
   return (
-    <section id="pipeline" ref={ref} className="relative py-32 overflow-hidden">
-      <motion.div className="absolute inset-0" style={{ y: bgY }}>
-        <div className="absolute inset-0 bg-[#080c18]" />
-        <div className="absolute inset-0 dot-grid opacity-15" />
-        <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/5 to-transparent" />
-        <div className="chapter-num absolute -left-6 top-1/2 -translate-y-1/2 opacity-[0.03]">02</div>
-      </motion.div>
+    <section
+      id="pipeline"
+      style={{ background: "#02030a", position: "relative", overflow: "hidden", paddingTop: "clamp(5rem,9vw,8rem)", paddingBottom: "clamp(5rem,9vw,8rem)" }}
+    >
+      <div className="absolute inset-0 grid-bg" style={{ opacity: 0.3 }} />
+      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg,transparent,rgba(34,211,238,0.15),transparent)" }} />
+      {/* bg number */}
+      <div className="f-head absolute select-none pointer-events-none" style={{ left: "-1rem", top: "50%", transform: "translateY(-50%)", fontSize: "clamp(140px,22vw,260px)", fontWeight: 900, letterSpacing: "-0.06em", lineHeight: 1, color: "transparent", WebkitTextStroke: "1px rgba(99,102,241,0.05)" }}>02</div>
 
-      <div className="wrap relative z-10">
-        {/* header */}
+      <div className="site-pad relative z-10">
         <FadeUp>
-          <div className="chapter-label mb-8 flex items-center gap-3">
-            <span className="w-8 h-px bg-cyan-500/40" />
-            <span>Chapter 02</span>
-            <span className="text-[#1E293B]">/</span>
-            <span className="text-[#334155]">How It Works</span>
-          </div>
+          <span className="eyebrow" style={{ marginBottom: "2rem", display: "inline-flex" }}>Chapter 02 / How It Works</span>
         </FadeUp>
 
-        <div className="grid lg:grid-cols-2 gap-16 items-start">
-          {/* left: steps */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "clamp(2.5rem,5vw,5rem)", alignItems: "start" }}>
+          {/* Left */}
           <div>
-            <FadeUp delay={0.05}>
-              <h2 className="f-head font-bold leading-[1.06] tracking-[-0.03em] text-[clamp(28px,4vw,48px)] text-white mb-4">
-                Nine stages.<br/>
-                <span className="g-text">Every run.</span>
+            <FadeUp delay={0.06}>
+              <h2 className="f-head" style={{ fontWeight: 800, lineHeight: 1.02, letterSpacing: "-0.04em", fontSize: "clamp(2.4rem,5.5vw,4.2rem)", marginBottom: "1rem" }}>
+                <span style={{ color: "#F1F5F9" }}>Nine stages.</span>
+                <br />
+                <span className="g-cyan">Every run.</span>
               </h2>
-              <p className="text-[#475569] text-[14px] leading-relaxed mb-10">
-                Click any stage to see what it does and which file handles it.
+              <p style={{ color: "#475569", fontSize: 15, lineHeight: 1.75, marginBottom: "2.5rem" }}>
+                Click any stage to see what it does and which file owns it.
               </p>
             </FadeUp>
 
-            <div className="flex flex-col">
+            <div style={{ display: "flex", flexDirection: "column" }}>
               {STEPS.map((step, i) => {
                 const on = active === i;
                 return (
-                  <FadeUp key={step.n} delay={0.05 + i * 0.04}>
+                  <FadeUp key={step.n} delay={0.06 + i * 0.04}>
                     <div>
                       <button
                         onClick={() => setActive(on ? null : i)}
-                        className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-xl border text-left transition-all duration-200
-                          ${on ? "border-white/10 bg-white/3" : "border-transparent hover:border-white/5 hover:bg-white/2"}`}
+                        style={{
+                          width: "100%",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "1rem",
+                          padding: "0.875rem 1rem",
+                          borderRadius: "0.875rem",
+                          border: `1px solid ${on ? "rgba(255,255,255,0.11)" : "transparent"}`,
+                          background: on ? "rgba(255,255,255,0.035)" : "transparent",
+                          cursor: "pointer",
+                          textAlign: "left",
+                          transition: "all .2s",
+                        }}
+                        onMouseEnter={e => { if (!on) { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.025)"; (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.06)"; }}}
+                        onMouseLeave={e => { if (!on) { (e.currentTarget as HTMLElement).style.background = "transparent"; (e.currentTarget as HTMLElement).style.borderColor = "transparent"; }}}
                       >
-                        <div
-                          className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 text-[11px] f-head font-bold transition-all"
-                          style={{
-                            background: on ? `${step.accent}18` : "rgba(255,255,255,0.03)",
-                            border: `1px solid ${on ? step.accent + "30" : "rgba(255,255,255,0.07)"}`,
-                            color: on ? step.accent : "#334155",
-                          }}
-                        >
-                          {step.n}
+                        {/* number badge */}
+                        <div className="f-head" style={{
+                          width: 36, height: 36, borderRadius: "0.6rem", flexShrink: 0,
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          fontSize: 11.5, fontWeight: 700,
+                          background: on ? `${step.accent}20` : "rgba(255,255,255,0.04)",
+                          border: `1px solid ${on ? step.accent + "35" : "rgba(255,255,255,0.08)"}`,
+                          color: on ? step.accent : "#334155",
+                          transition: "all .2s",
+                        }}>{step.n}</div>
+
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div className="f-head" style={{ fontSize: 13.5, fontWeight: 600, color: on ? "#F1F5F9" : "#64748B", transition: "color .2s" }}>{step.label}</div>
+                          <div className="f-mono" style={{ fontSize: 10.5, color: "#1E293B", marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{step.src}</div>
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <div className={`text-[13px] font-semibold f-head transition-colors ${on ? "text-white" : "text-[#64748B]"}`}>
-                            {step.label}
-                          </div>
-                          <div className="text-[10.5px] text-[#1E293B] f-mono mt-0.5 truncate">{step.src}</div>
-                        </div>
-                        <ChevronRight size={12} className={`text-[#1E293B] transition-transform shrink-0 ${on ? "rotate-90 text-[#475569]" : ""}`} />
+
+                        <span style={{ color: on ? "#64748B" : "#1E293B", transition: "transform .2s, color .2s", transform: on ? "rotate(90deg)" : "none", fontSize: 12 }}>›</span>
                       </button>
 
                       {on && (
                         <motion.div
                           initial={{ height: 0, opacity: 0 }}
                           animate={{ height: "auto", opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.25 }}
-                          className="overflow-hidden"
+                          transition={{ duration: 0.22 }}
+                          style={{ overflow: "hidden" }}
                         >
-                          <div
-                            className="mx-2 px-5 py-3 rounded-b-xl border-x border-b border-white/5 text-[12.5px] text-[#94A3B8] leading-relaxed -mt-1"
-                            style={{ background: `${step.accent}06` }}
-                          >
+                          <div style={{
+                            margin: "0 0.5rem",
+                            padding: "0.875rem 1.25rem",
+                            borderRadius: "0 0 0.875rem 0.875rem",
+                            border: `1px solid rgba(255,255,255,0.06)`,
+                            borderTop: "none",
+                            background: `${step.accent}08`,
+                            fontSize: 13,
+                            color: "#94A3B8",
+                            lineHeight: 1.7,
+                            marginTop: -2,
+                          }}>
                             {step.desc}
                           </div>
                         </motion.div>
                       )}
 
                       {i < STEPS.length - 1 && (
-                        <div className="ml-6 w-px h-4 connector" />
+                        <div className="connector-line" style={{ width: 1, height: 16, marginLeft: "1.875rem" }} />
                       )}
                     </div>
                   </FadeUp>
@@ -127,63 +134,71 @@ export default function PipelineChapter() {
             </div>
           </div>
 
-          {/* right: sticky diagram */}
-          <div className="lg:sticky lg:top-28">
+          {/* Right sticky */}
+          <div style={{ position: "sticky", top: "6rem" }}>
             <FadeUp delay={0.15}>
-              <div className="glass-glow rounded-2xl overflow-hidden">
-                <div className="px-5 py-4 border-b border-white/5">
-                  <div className="text-[10.5px] text-[#334155] f-mono uppercase tracking-widest">
-                    openingest_dynamic_pipeline
-                  </div>
+              {/* pipeline diagram */}
+              <div style={{
+                background: "rgba(6,8,16,0.8)",
+                border: "1px solid rgba(99,102,241,0.20)",
+                borderRadius: "1.25rem",
+                overflow: "hidden",
+                boxShadow: "0 0 80px rgba(99,102,241,0.07)",
+              }}>
+                <div style={{ padding: "1rem 1.25rem", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                  <span className="f-mono" style={{ fontSize: 10.5, color: "#334155", textTransform: "uppercase", letterSpacing: "0.12em" }}>openingest_dynamic_pipeline</span>
                 </div>
-                <div className="px-4 py-4 space-y-1">
+                <div style={{ padding: "0.75rem" }}>
                   {STEPS.map((step, i) => (
                     <motion.button
                       key={step.n}
                       onClick={() => setActive(active === i ? null : i)}
-                      whileHover={{ x: 3 }}
+                      whileHover={{ x: 4 }}
                       transition={{ duration: 0.15 }}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-colors
-                        ${active === i ? "bg-white/5" : "hover:bg-white/2"}`}
+                      style={{
+                        width: "100%",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "0.75rem",
+                        padding: "0.625rem 0.75rem",
+                        borderRadius: "0.625rem",
+                        background: active === i ? "rgba(255,255,255,0.05)" : "transparent",
+                        cursor: "pointer",
+                        textAlign: "left",
+                        border: "none",
+                      }}
                     >
-                      <div
-                        className="w-5 h-5 rounded flex items-center justify-center shrink-0"
-                        style={{ background: `${step.accent}18` }}
-                      >
-                        <div className="w-1.5 h-1.5 rounded-full" style={{ background: step.accent }} />
+                      <div style={{ width: 20, height: 20, borderRadius: "0.35rem", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", background: `${step.accent}20` }}>
+                        <div style={{ width: 6, height: 6, borderRadius: "50%", background: step.accent }} />
                       </div>
-                      <span className={`text-[12px] f-head flex-1 ${active === i ? "text-white" : "text-[#475569]"}`}>
-                        {step.label}
-                      </span>
-                      {i < STEPS.length - 1 && (
-                        <span className="text-[10px] text-[#1E293B]">↓</span>
-                      )}
+                      <span className="f-head" style={{ fontSize: 12.5, color: active === i ? "#F1F5F9" : "#475569", flex: 1 }}>{step.label}</span>
+                      {i < STEPS.length - 1 && <span style={{ color: "#1E293B", fontSize: 10 }}>↓</span>}
                     </motion.button>
                   ))}
                 </div>
-                <div className="px-5 py-3 border-t border-white/5 bg-white/[0.01]">
-                  <span className="text-[10px] text-[#1E293B] f-mono">
-                    {active !== null ? STEPS[active].src : "click any stage"}
+                <div style={{ padding: "0.75rem 1.25rem", borderTop: "1px solid rgba(255,255,255,0.05)", background: "rgba(255,255,255,0.01)" }}>
+                  <span className="f-mono" style={{ fontSize: 10, color: "#1E293B" }}>
+                    {active !== null ? STEPS[active].src : "click any stage to inspect"}
                   </span>
                 </div>
               </div>
             </FadeUp>
 
-            {/* YAML snippet */}
-            <FadeUp delay={0.25} className="mt-4">
-              <div className="glass rounded-2xl overflow-hidden">
-                <div className="px-5 py-3 border-b border-white/5 flex justify-between items-center">
-                  <span className="text-[10.5px] text-[#334155] f-mono">configs/datasets.yaml</span>
-                  <span className="tag text-[9px] text-indigo-400 border-indigo-500/20 bg-indigo-500/6">zero Python</span>
+            {/* YAML card */}
+            <FadeUp delay={0.25}>
+              <div style={{ marginTop: "1rem", background: "rgba(6,8,16,0.75)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "1.25rem", overflow: "hidden" }}>
+                <div style={{ padding: "0.75rem 1.25rem", borderBottom: "1px solid rgba(255,255,255,0.05)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span className="f-mono" style={{ fontSize: 10.5, color: "#334155" }}>configs/datasets.yaml</span>
+                  <span className="tag" style={{ color: "#818CF8", borderColor: "rgba(99,102,241,0.20)", background: "rgba(99,102,241,0.08)", fontSize: 9.5 }}>zero Python</span>
                 </div>
-                <div className="px-5 py-4 f-mono text-[11.5px] leading-[1.9]">
-                  <div className="text-[#6366F1] font-bold">customers:</div>
-                  <div><span className="text-[#94A3B8]">  file: </span><span className="text-[#34D399]">customers.csv</span></div>
-                  <div><span className="text-[#94A3B8]">  staging_table: </span><span className="text-[#34D399]">stg_customers</span></div>
-                  <div><span className="text-[#94A3B8]">  load_strategy: </span><span className="text-[#FBBF24]">replace</span></div>
-                  <div><span className="text-[#94A3B8]">  primary_key:</span></div>
-                  <div><span className="text-[#94A3B8]">    - </span><span className="text-[#34D399]">customer_id</span></div>
-                  <div className="text-[#1E293B] mt-2"># That&apos;s it. OpenIngest does the rest.</div>
+                <div className="f-mono" style={{ padding: "1rem 1.25rem", fontSize: 12, lineHeight: 1.9 }}>
+                  <div style={{ color: "#6366F1", fontWeight: 700 }}>customers:</div>
+                  <div><span style={{ color: "#94A3B8" }}>  file: </span><span style={{ color: "#34D399" }}>customers.csv</span></div>
+                  <div><span style={{ color: "#94A3B8" }}>  staging_table: </span><span style={{ color: "#34D399" }}>stg_customers</span></div>
+                  <div><span style={{ color: "#94A3B8" }}>  load_strategy: </span><span style={{ color: "#FBBF24" }}>replace</span></div>
+                  <div><span style={{ color: "#94A3B8" }}>  primary_key:</span></div>
+                  <div><span style={{ color: "#94A3B8" }}>    - </span><span style={{ color: "#34D399" }}>customer_id</span></div>
+                  <div style={{ color: "#1E293B", marginTop: "0.5rem" }}># That&apos;s it. OpenIngest handles the rest.</div>
                 </div>
               </div>
             </FadeUp>

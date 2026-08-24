@@ -125,29 +125,25 @@ export default function CLIChapter() {
   const bgY = useTransform(scrollYProgress, [0, 1], ["-8%", "8%"]);
 
   return (
-    <section id="cli" ref={ref} className="relative py-32 overflow-hidden">
+    <section id="cli" ref={ref} className="relative overflow-hidden" style={{ paddingTop: "clamp(5rem,9vw,8rem)", paddingBottom: "clamp(5rem,9vw,8rem)", background: "#02030a" }}>
       <motion.div className="absolute inset-0" style={{ y: bgY }}>
-        <div className="absolute inset-0 bg-[#030507]" />
-        <div className="absolute inset-0 grid-fine opacity-25" />
-        <div className="absolute left-0 top-1/2 w-[500px] h-[500px] bg-violet-600/5 rounded-full blur-[100px] -translate-y-1/2 pointer-events-none" />
-        <div className="chapter-num absolute -left-4 top-1/2 -translate-y-1/2 opacity-[0.025]">05</div>
+        <div className="absolute inset-0 grid-bg" style={{ opacity: 0.28 }} />
+        <div style={{ position: "absolute", left: 0, top: "50%", width: 600, height: 600, borderRadius: "50%", background: "radial-gradient(circle,rgba(139,92,246,0.07),transparent 70%)", filter: "blur(80px)", transform: "translateY(-50%)", pointerEvents: "none" }} />
+        <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg,transparent,rgba(16,185,129,0.15),transparent)" }} />
       </motion.div>
 
-      <div className="wrap relative z-10">
+      <div className="site-pad relative z-10">
         <FadeUp>
-          <div className="chapter-label mb-8 flex items-center gap-3">
-            <span className="w-8 h-px bg-emerald-500/40" />
-            <span>Chapter 05</span>
-            <span className="text-[#1E293B]">/</span>
-            <span className="text-[#334155]">CLI</span>
-          </div>
+          <span className="eyebrow" style={{ marginBottom: "2rem", display: "inline-flex" }}>Chapter 05 / CLI</span>
         </FadeUp>
 
         <FadeUp delay={0.05}>
-          <h2 className="f-head font-bold leading-[1.06] tracking-[-0.03em] text-[clamp(28px,4vw,48px)] text-white mb-4">
-            Everything<br/><span className="g-text-green">from the terminal.</span>
+          <h2 className="f-head" style={{ fontWeight: 800, lineHeight: 1.02, letterSpacing: "-0.04em", fontSize: "clamp(2.4rem,5.5vw,4.2rem)", marginBottom: "1rem" }}>
+            <span style={{ color: "#F1F5F9" }}>Everything</span>
+            <br />
+            <span className="g-green">from the terminal.</span>
           </h2>
-          <p className="text-[#475569] text-[14px] leading-relaxed mb-12">
+          <p style={{ color: "#475569", fontSize: 16, lineHeight: 1.75, marginBottom: "clamp(2.5rem,4vw,3.5rem)" }}>
             Real output. Real runs. Every number is accurate.
           </p>
         </FadeUp>

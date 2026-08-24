@@ -41,36 +41,28 @@ export default function ConnectorsChapter() {
   const cur = CONNECTORS[active];
 
   return (
-    <section id="connectors" ref={ref} className="relative py-32 overflow-hidden">
+    <section id="connectors" ref={ref} className="relative overflow-hidden" style={{ paddingTop: "clamp(5rem,9vw,8rem)", paddingBottom: "clamp(5rem,9vw,8rem)", background: "#02030a" }}>
       <motion.div className="absolute inset-0" style={{ y: bgY }}>
-        <div className="absolute inset-0 bg-[#030507]" />
-        <div className="absolute inset-0 grid-fine opacity-20" />
-        <div className="absolute top-1/2 right-0 w-[600px] h-[600px] bg-indigo-600/4 rounded-full blur-[140px] -translate-y-1/2 pointer-events-none" />
-        <div className="chapter-num absolute -right-4 top-1/2 -translate-y-1/2 opacity-[0.025]">03</div>
+        <div className="absolute inset-0 grid-bg" style={{ opacity: 0.28 }} />
+        <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg,transparent,rgba(139,92,246,0.18),transparent)" }} />
+        <div style={{ position: "absolute", top: "50%", right: 0, width: 700, height: 700, borderRadius: "50%", background: "radial-gradient(circle,rgba(99,102,241,0.08),transparent 70%)", filter: "blur(100px)", transform: "translateY(-50%)", pointerEvents: "none" }} />
       </motion.div>
 
-      <div className="wrap relative z-10">
+      <div className="site-pad relative z-10">
         <FadeUp>
-          <div className="chapter-label mb-8 flex items-center gap-3">
-            <span className="w-8 h-px bg-violet-500/40" />
-            <span>Chapter 03</span>
-            <span className="text-[#1E293B]">/</span>
-            <span className="text-[#334155]">Connectors</span>
-          </div>
+          <span className="eyebrow" style={{ marginBottom: "2rem", display: "inline-flex" }}>Chapter 03 / Connectors</span>
         </FadeUp>
 
         <FadeUp delay={0.05}>
-          <div className="flex items-end justify-between mb-12 flex-wrap gap-4">
-            <div>
-              <h2 className="f-head font-bold leading-[1.06] tracking-[-0.03em] text-[clamp(28px,4vw,48px)] text-white">
-                Any source.<br/><span className="g-text-warm">One config block.</span>
-              </h2>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="tag text-indigo-400 border-indigo-500/20 bg-indigo-500/6 text-[11px]">
-                17 connectors · v3.0
-              </span>
-            </div>
+          <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: "clamp(2.5rem,4vw,4rem)", flexWrap: "wrap", gap: "1rem" }}>
+            <h2 className="f-head" style={{ fontWeight: 800, lineHeight: 1.02, letterSpacing: "-0.04em", fontSize: "clamp(2.4rem,5.5vw,4.2rem)" }}>
+              <span style={{ color: "#F1F5F9" }}>Any source.</span>
+              <br />
+              <span className="g-violet">One config block.</span>
+            </h2>
+            <span className="tag" style={{ color: "#818CF8", borderColor: "rgba(99,102,241,0.22)", background: "rgba(99,102,241,0.08)", fontSize: 11, flexShrink: 0 }}>
+              17 connectors · v3.0
+            </span>
           </div>
         </FadeUp>
 
