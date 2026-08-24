@@ -1,43 +1,33 @@
-import Navbar from "./components/Navbar";
-import Hero from "./components/Hero";
-import ProblemSolution from "./components/ProblemSolution";
-import TrustedBy from "./components/TrustedBy";
-import Features from "./components/Features";
-import Architecture from "./components/Architecture";
-import CodeExample from "./components/CodeExample";
-import CLISection from "./components/CLISection";
-import AirflowSection from "./components/AirflowSection";
-import LoadStrategies from "./components/LoadStrategies";
-import ConnectorsSection from "./components/ConnectorsSection";
-import Stats from "./components/Stats";
-import GettingStarted from "./components/GettingStarted";
-import Roadmap from "./components/Roadmap";
-import Docs from "./components/Docs";
-import CTA from "./components/CTA";
-import Footer from "./components/Footer";
+import CinematicNavbar   from "./components/cinematic/CinematicNavbar";
+import HeroChapter       from "./components/cinematic/HeroChapter";
+import ManifestoChapter  from "./components/cinematic/ManifestoChapter";
+import PipelineChapter   from "./components/cinematic/PipelineChapter";
+import ConnectorsChapter from "./components/cinematic/ConnectorsChapter";
+import TransformChapter  from "./components/cinematic/TransformChapter";
+import CLIChapter        from "./components/cinematic/CLIChapter";
+import StatsChapter      from "./components/cinematic/StatsChapter";
+import InstallChapter    from "./components/cinematic/InstallChapter";
+import CinematicFooter   from "./components/cinematic/CinematicFooter";
+import ScrollProgress    from "./components/cinematic/ScrollProgress";
+import CursorGlow        from "./components/cinematic/CursorGlow";
 
 export default function Home() {
   return (
     <>
-      <Navbar />
+      <ScrollProgress />
+      <CursorGlow />
+      <CinematicNavbar />
       <main>
-        <Hero />
-        <TrustedBy />
-        <ProblemSolution />
-        <Features />
-        <Architecture />
-        <CodeExample />
-        <CLISection />
-        <AirflowSection />
-        <LoadStrategies />
-        <ConnectorsSection />
-        <Stats />
-        <GettingStarted />
-        <Roadmap />
-        <Docs />
-        <CTA />
+        <HeroChapter />
+        <ManifestoChapter />
+        <PipelineChapter />
+        <ConnectorsChapter />
+        <TransformChapter />
+        <CLIChapter />
+        <StatsChapter />
+        <InstallChapter />
       </main>
-      <Footer />
+      <CinematicFooter />
     </>
   );
 }
