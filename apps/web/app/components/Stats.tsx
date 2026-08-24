@@ -7,7 +7,7 @@ const METRICS = [
   { raw: 421,    fmt: (v: number) => (v / 100).toFixed(2) + "s", display: "4.21s",   label: "pipeline duration",  sub: "end-to-end",               c: "#10B981" },
   { raw: 994,    fmt: (v: number) => (v / 10).toFixed(1) + "%",  display: "99.4%",   label: "avg quality score",  sub: "across all datasets",      c: "#F59E0B" },
   { raw: 93,     fmt: (v: number) => v.toString(),                display: "93",      label: "tests",              sub: "ruff + mypy clean",        c: "#8B5CF6" },
-  { raw: 6,      fmt: (v: number) => v.toString(),                display: "6",       label: "milestones shipped", sub: "v1.0 → v3.0.1",            c: "#14B8A6" },
+  { raw: 6,      fmt: (v: number) => v.toString(),                display: "6",       label: "milestones shipped", sub: "v1.0 → v3.0.5",            c: "#14B8A6" },
 ];
 
 export default function Stats() {
@@ -75,7 +75,7 @@ export default function Stats() {
 
         {/* Bottom note */}
         <p className="text-center text-[11px] text-[#1E293B] mt-6 f-mono">
-          Run ID: OI-20260703-3BB09C · PostgreSQL 15 · Python 3.12 · 21 connectors · 93 tests
+          Run ID: OI-20260703-3BB09C · PostgreSQL 15 · Python 3.12 · 17 connectors · 93 tests
         </p>
       </div>
     </section>

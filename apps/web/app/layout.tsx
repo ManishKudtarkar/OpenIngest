@@ -7,7 +7,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "OpenIngest | Configuration-driven Data Ingestion Framework",
   description:
-    "OpenIngest is an open-source Python data ingestion framework with 21 connectors. Automatic dataset discovery, schema validation, data quality, YAML transformations, incremental loading, Airflow orchestration, and metadata tracking.",
+    "OpenIngest is an open-source Python data ingestion framework with 17 connectors. Automatic dataset discovery, schema validation, data quality, YAML transformations, incremental loading, Airflow orchestration, and metadata tracking.",
   keywords: [
     "OpenIngest", "data engineering", "ETL", "ELT", "Apache Airflow", "Python",
     "PostgreSQL", "data pipeline", "open source", "schema validation", "incremental loading",

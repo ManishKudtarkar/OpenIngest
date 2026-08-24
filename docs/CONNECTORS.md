@@ -1,17 +1,15 @@
-# OpenIngest Connectors (v2.0)
+# OpenIngest Connectors (v3.0)
 
-OpenIngest v2.0 ships 9 source connectors. All connectors share the same interface: add a `source:` block to your dataset config and the framework routes reads automatically.
+OpenIngest ships **17 built-in source connectors** across four categories. All share the same interface — add a `source:` block to your dataset config and the framework routes reads automatically.
 
 ---
 
 ## How connectors work
 
-When a dataset config has a `source:` block, OpenIngest uses the `ConnectorRegistry` to resolve and instantiate the correct connector:
-
 ```yaml
 my_dataset:
   source:
-    type: s3        # ← ConnectorRegistry looks up 's3'
+    type: s3          # ConnectorRegistry resolves this
     bucket: my-bucket
     key: data/file.csv
   staging_table: stg_my_dataset
@@ -24,150 +22,95 @@ Without a `source:` block, OpenIngest falls back to reading the `file:` field as
 
 ## File Format Connectors
 
-### CSV
-
-Built-in. No installation required.
+### CSV (built-in)
 
 ```yaml
 source:
   type: csv
   file: customers.csv       # relative to data/raw/, or absolute path
-  encoding: utf-8           # optional, default utf-8
-  separator: ","            # optional, default comma
+  encoding: utf-8           # optional
+  separator: ","            # optional
 ```
 
----
-
-### Excel (.xlsx / .xls)
+### Excel (v2.0)
 
 ```bash
-pip install openingest[excel]   # installs openpyxl
+pip install openingest[excel]
 ```
 
 ```yaml
 source:
   type: excel
   file: data/raw/budget_2026.xlsx
-  sheet: Q1           # sheet name or 0-based index, default 0
-  header: 0           # row to use as column names, default 0
-  skip_rows: 0        # rows to skip before header, default 0
-  use_cols: "A:F"     # optional column range or list
+  sheet: Q1           # sheet name or index, default 0
+  header: 0
+  skip_rows: 0
+  use_cols: "A:F"     # optional
 ```
 
----
-
-### JSON
-
-Built-in. No installation required.
+### JSON (built-in)
 
 ```yaml
-# Flat JSON array
 source:
   type: json
   file: orders.json
-
-# Nested JSON — navigate to records array
-source:
-  type: json
-  file: api_response.json
-  record_path: data.orders    # dot-separated path to the array
-
-# Newline-delimited JSON (NDJSON)
-source:
-  type: json
-  file: events.ndjson
-  lines: true
+  record_path: data.orders    # dot-separated path to records array
+  lines: true                 # for NDJSON
 ```
 
----
-
-### Parquet
+### Parquet (v2.0)
 
 ```bash
-pip install openingest[parquet]   # installs pyarrow
+pip install openingest[parquet]
 ```
 
 ```yaml
 source:
   type: parquet
   file: data/raw/events.parquet
-  columns: [event_id, session_id, timestamp, event_type, amount_usd]  # optional projection
-  filters: [["amount_usd", ">", 0]]   # optional predicate pushdown
-  engine: pyarrow                      # or fastparquet
+  columns: [event_id, session_id, timestamp, event_type]
 ```
 
 ---
 
 ## Cloud Storage Connectors
 
-All cloud connectors auto-detect the file format from the key/object/blob name extension. You can override with `format: csv|parquet|json|excel`.
-
-### Amazon S3
+### Amazon S3 (v2.0)
 
 ```bash
-pip install openingest[s3]   # installs boto3
+pip install openingest[s3]
 ```
-
-**Authentication** (standard boto3 chain):
-1. Environment variables: `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`
-2. `~/.aws/credentials`
-3. IAM role (EC2 / ECS / Lambda)
-4. Explicit keys in config (not recommended for production)
 
 ```yaml
 source:
   type: s3
   bucket: company-data
   key: orders/2026/orders.parquet
-  region: us-east-1                              # optional
-  aws_access_key_id: ${AWS_ACCESS_KEY_ID}        # optional — prefer env vars or IAM
+  region: us-east-1
+  aws_access_key_id: ${AWS_ACCESS_KEY_ID}
   aws_secret_access_key: ${AWS_SECRET_ACCESS_KEY}
-  format: parquet                                # optional — auto-detected from key
-  columns: [order_id, customer_id, total_usd]   # optional — Parquet projection only
+  format: parquet             # auto-detected from key extension
+  columns: [order_id, total]  # Parquet projection only
 ```
 
----
-
-### Azure Blob Storage
+### Azure Blob Storage (v2.0)
 
 ```bash
-pip install openingest[azure]   # installs azure-storage-blob
+pip install openingest[azure]
 ```
 
-**Authentication** — choose one:
-- Connection string (recommended): set `AZURE_STORAGE_CONNECTION_STRING` env var
-- SAS token: provide `azure_account_name` + `azure_sas_token`
-
 ```yaml
-# Connection string (recommended)
 source:
   type: azure
   container: company-data
   blob: products/products.parquet
   connection_string: ${AZURE_STORAGE_CONNECTION_STRING}
-
-# SAS token
-source:
-  type: azure
-  container: company-data
-  blob: orders/orders.csv
-  azure_account_name: mystorageaccount
-  azure_sas_token: ${AZURE_SAS_TOKEN}
 ```
 
----
-
-### Google Cloud Storage
+### Google Cloud Storage (v2.0)
 
 ```bash
-pip install openingest[gcs]   # installs google-cloud-storage
-```
-
-**Authentication** (Application Default Credentials):
-```bash
-gcloud auth application-default login
-# OR
-export GOOGLE_APPLICATION_CREDENTIALS=/path/to/service-account.json
+pip install openingest[gcs]
 ```
 
 ```yaml
@@ -175,21 +118,17 @@ source:
   type: gcs
   bucket: company-data
   object: events/events.csv
-  project: my-gcp-project                          # optional
-  credentials_file: ${GOOGLE_APPLICATION_CREDENTIALS}   # optional explicit creds
+  project: my-gcp-project
+  credentials_file: ${GOOGLE_APPLICATION_CREDENTIALS}
 ```
 
 ---
 
-## REST API Connector
+## REST API Connector (v2.0)
 
 ```bash
-pip install openingest[api]   # installs requests
+pip install openingest[api]
 ```
-
-The REST connector handles GET and POST requests, automatic retry on network errors and rate limits (429), environment variable expansion in headers, and both offset-based and cursor-based pagination.
-
-### Basic GET
 
 ```yaml
 source:
@@ -197,146 +136,238 @@ source:
   url: https://api.company.com/v1/orders
   method: GET
   headers:
-    Authorization: Bearer ${ORDERS_API_TOKEN}
-    Accept: application/json
-  record_path: data          # path to the array in the JSON response
-  timeout: 30                # request timeout in seconds, default 30
-```
-
-### POST with body
-
-```yaml
-source:
-  type: rest
-  url: https://api.company.com/v1/export
-  method: POST
-  headers:
     Authorization: Bearer ${API_TOKEN}
-  body:
-    format: csv
-    start_date: "2026-01-01"
-  record_path: results
-```
-
-### Offset-based pagination
-
-```yaml
-source:
-  type: rest
-  url: https://api.company.com/v1/customers
-  headers:
-    Authorization: Bearer ${TOKEN}
   record_path: data
+  retry_count: 3
+  retry_delay: 1.0
   pagination:
-    type: offset
-    param: offset            # query param name for offset counter
-    limit_param: limit       # query param name for page size
-    limit: 500               # rows per page
-    max_pages: 50            # safety limit
+    type: offset          # or cursor
+    param: offset
+    limit_param: limit
+    limit: 500
+    max_pages: 50
 ```
 
-### Cursor-based pagination (e.g. Stripe)
+Cursor-based pagination (Stripe-style):
 
 ```yaml
-source:
-  type: rest
-  url: https://api.stripe.com/v1/charges
-  headers:
-    Authorization: Bearer ${STRIPE_API_KEY}
-  record_path: data
   pagination:
     type: cursor
-    cursor_path: has_more    # path in response JSON to check for next page
-    param: starting_after    # query param name to pass cursor value
+    cursor_path: has_more
+    param: starting_after
     max_pages: 100
 ```
 
-### Retry configuration
+---
+
+## Database Connectors (v3.0)
+
+### PostgreSQL
+
+```bash
+pip install openingest[postgresql]
+```
 
 ```yaml
 source:
-  type: rest
-  url: https://api.company.com/v1/orders
-  headers:
-    Authorization: Bearer ${TOKEN}
-  retry_count: 3             # retries on network error or 429/5xx, default 3
-  retry_delay: 1.0           # seconds between retries, default 1.0
-  verify_ssl: true           # SSL certificate verification, default true
+  type: postgresql
+  host: ${PG_HOST}
+  port: 5432
+  database: ${PG_DATABASE}
+  username: ${PG_USER}
+  password: ${PG_PASSWORD}
+  query: "SELECT * FROM orders WHERE status = 'active'"
+  # OR: table: orders
+  chunk_size: 10000    # optional batched reads
+```
+
+### MySQL
+
+```bash
+pip install openingest[mysql]
+```
+
+```yaml
+source:
+  type: mysql
+  host: ${MYSQL_HOST}
+  port: 3306
+  database: ${MYSQL_DATABASE}
+  username: ${MYSQL_USER}
+  password: ${MYSQL_PASSWORD}
+  table: users
+  # OR: query: "SELECT * FROM users WHERE active = 1"
+  chunk_size: 10000
+```
+
+### MongoDB
+
+```bash
+pip install openingest[mongodb]
+```
+
+```yaml
+source:
+  type: mongodb
+  uri: ${MONGODB_URI}
+  database: analytics
+  collection: events
+  filter: {"status": "active"}       # optional query filter
+  projection: {"_id": 0, "name": 1}  # optional field projection
+  limit: 50000                        # optional row cap
+  include_id: false                   # suppress _id column
+```
+
+---
+
+## File Transfer Connectors (v3.0)
+
+### SFTP
+
+```bash
+pip install openingest[sftp]
+```
+
+```yaml
+source:
+  type: sftp
+  host: ${SFTP_HOST}
+  port: 22
+  username: ${SFTP_USER}
+  password: ${SFTP_PASSWORD}
+  # OR: private_key_path: ~/.ssh/id_rsa
+  remote_path: /exports/daily_orders.csv
+```
+
+### FTP (built-in)
+
+```yaml
+source:
+  type: ftp
+  host: ${FTP_HOST}
+  port: 21
+  username: ${FTP_USER}
+  password: ${FTP_PASSWORD}
+  remote_path: /reports/monthly_sales.csv
+```
+
+Both SFTP and FTP auto-detect format from the file extension (CSV, JSON, Parquet, Excel).
+
+---
+
+## SaaS Connectors (v3.0)
+
+### Salesforce
+
+```bash
+pip install openingest[salesforce]
+```
+
+```yaml
+source:
+  type: salesforce
+  username: ${SF_USERNAME}
+  password: ${SF_PASSWORD}
+  security_token: ${SF_SECURITY_TOKEN}
+  client_id: ${SF_CLIENT_ID}
+  client_secret: ${SF_CLIENT_SECRET}
+  object: Opportunity
+  fields: [Id, Name, Amount, StageName, CloseDate]
+  where_clause: "StageName = 'Closed Won'"
+  # OR: soql: "SELECT Id, Name FROM Opportunity WHERE ..."
+```
+
+### HubSpot
+
+```bash
+pip install openingest[hubspot]
+```
+
+```yaml
+source:
+  type: hubspot
+  access_token: ${HUBSPOT_ACCESS_TOKEN}
+  object: contacts          # contacts, companies, deals, tickets
+  properties: [firstname, lastname, email, createdate]
+```
+
+### Stripe
+
+```bash
+pip install openingest[stripe]
+```
+
+```yaml
+source:
+  type: stripe
+  api_key: ${STRIPE_API_KEY}
+  resource: charges         # charges, customers, invoices, subscriptions, ...
+  created_after: "2024-01-01T00:00:00"
+  limit: 10000              # optional record cap
+```
+
+### Google Sheets
+
+```bash
+pip install openingest[google_sheets]
+```
+
+```yaml
+source:
+  type: google_sheets
+  spreadsheet_id: 1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms
+  sheet_name: Q1_Budget     # optional, defaults to first sheet
+  range: A1:F500            # optional cell range
+  service_account_file: ${GOOGLE_SERVICE_ACCOUNT_FILE}
+  # OR: service_account_json: ${GOOGLE_SERVICE_ACCOUNT_JSON}
 ```
 
 ---
 
 ## Environment variable expansion
 
-All string values in `source:` blocks support `${VAR_NAME}` expansion at runtime:
-
-```yaml
-source:
-  type: s3
-  bucket: company-data
-  key: orders.csv
-  aws_access_key_id: ${AWS_ACCESS_KEY_ID}       # expands from environment
-  aws_secret_access_key: ${AWS_SECRET_ACCESS_KEY}
-```
-
-OpenIngest raises a `ConnectorError` if a referenced variable is not set, with a clear message showing the variable name.
+All `source:` string values support `${VAR_NAME}` at runtime. OpenIngest loads `.env` automatically and raises a clear `ConnectorError` if a variable is missing.
 
 ---
 
-## Plugin architecture (v3.0)
+## Plugin architecture
 
-Create a custom connector by subclassing `BaseConnector`:
-
-```python
-from core.connectors.base import BaseConnector
-import pandas as pd
-
-class SnowflakeConnector(BaseConnector):
-    def read(self) -> pd.DataFrame:
-        # self.config contains the source: block from datasets.yaml
-        account = self.config["account"]
-        # ... connect and return DataFrame
-        return df
-```
-
-Register it:
+Add any connector in one line:
 
 ```python
 from core.connectors.registry import ConnectorRegistry
+
+class SnowflakeConnector(BaseConnector):
+    def read(self) -> pd.DataFrame:
+        ...
+
 ConnectorRegistry.register("snowflake", SnowflakeConnector)
 ```
 
-Or distribute as a package that auto-registers on import:
-
-```bash
-pip install openingest-snowflake
-```
-
-Then use in YAML:
-
-```yaml
-source:
-  type: snowflake
-  account: myaccount.us-east-1
-  warehouse: COMPUTE_WH
-  database: RAW
-  schema: PUBLIC
-  table: orders
-```
+Then use it in YAML as `type: snowflake`.
 
 ---
 
 ## Install reference
 
-| Connector | Extra | Command |
+| Connector | Type key | Extra |
 |---|---|---|
-| CSV | — | Built-in |
-| JSON | — | Built-in |
-| Excel | `excel` | `pip install openingest[excel]` |
-| Parquet | `parquet` | `pip install openingest[parquet]` |
-| Amazon S3 | `s3` | `pip install openingest[s3]` |
-| Azure Blob | `azure` | `pip install openingest[azure]` |
-| Google Cloud | `gcs` | `pip install openingest[gcs]` |
-| REST API | `api` | `pip install openingest[api]` |
-| All v2.0 | `v2` | `pip install openingest[v2]` |
-| Everything | `all` | `pip install openingest[all]` |
+| CSV | `csv` | built-in |
+| JSON / NDJSON | `json` | built-in |
+| FTP | `ftp` | built-in |
+| Excel | `excel` | `openingest[excel]` |
+| Parquet | `parquet` | `openingest[parquet]` |
+| Amazon S3 | `s3` | `openingest[s3]` |
+| Azure Blob | `azure` | `openingest[azure]` |
+| Google Cloud Storage | `gcs` | `openingest[gcs]` |
+| REST API | `rest` / `api` | `openingest[api]` |
+| PostgreSQL | `postgresql` / `postgres` | `openingest[postgresql]` |
+| MySQL | `mysql` | `openingest[mysql]` |
+| MongoDB | `mongodb` / `mongo` | `openingest[mongodb]` |
+| SFTP | `sftp` | `openingest[sftp]` |
+| Salesforce | `salesforce` | `openingest[salesforce]` |
+| HubSpot | `hubspot` | `openingest[hubspot]` |
+| Stripe | `stripe` | `openingest[stripe]` |
+| Google Sheets | `google_sheets` | `openingest[google_sheets]` |
+| All v3.0 | — | `openingest[connectors]` |
+| Everything | — | `openingest[all]` |

@@ -62,7 +62,7 @@ export default function Footer() {
 
         <div className="border-t border-white/4 pt-6 flex flex-col md:flex-row items-center justify-between gap-3">
           <p className="text-[12px] text-[#475569]">© 2026 OpenIngest · MIT License · Built for modern data engineering</p>
-          <p className="text-[12px] text-[#475569] f-mono">v3.0.1</p>
+          <p className="text-[12px] text-[#475569] f-mono">v3.0.5</p>
         </div>
       </div>
     </footer>

@@ -357,6 +357,8 @@ notifications:
 - ✅ v2.5 — Built-in scheduler, Slack/email notifications with retry, data lineage engine
 - ✅ v3.0 — PostgreSQL, MySQL, MongoDB, SFTP, FTP, Salesforce, HubSpot, Stripe, Google Sheets + transformation engine + 93 tests
 - ✅ v3.0.3 — PyPI · `pip install openingest`
+- ✅ v3.0.4 — docs rewrite for PyPI project description
+- ✅ v3.0.5 — connector docs updated, 17 connectors table, frontend version sync
 - 🔲 v4.0 — Web dashboard, RBAC, multi-environment support, Snowflake/BigQuery connectors
 
 ---

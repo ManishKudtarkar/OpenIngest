@@ -225,6 +225,17 @@ Scan `data/raw/` for CSV files that are not yet registered in `datasets.yaml` an
 openingest discover
 ```
 
+**Example output:**
+
+```
+Found 2 unregistered files in data/raw/:
+
+  invoices.csv       → add entry: invoices
+  returns.csv        → add entry: returns
+
+Run `openingest infer <file>` to auto-generate the full config block.
+```
+
 ---
 
 ## `openingest init`
@@ -267,6 +278,26 @@ Print the installed OpenIngest version.
 
 ```bash
 openingest version
+```
+
+---
+
+## `openingest upgrade`
+
+Upgrade OpenIngest to the latest version from PyPI.
+
+```bash
+openingest upgrade
+```
+
+---
+
+## `openingest graph`
+
+Print an ASCII pipeline dependency graph showing the flow from source datasets through staging tables.
+
+```bash
+openingest graph
 ```
 
 ---

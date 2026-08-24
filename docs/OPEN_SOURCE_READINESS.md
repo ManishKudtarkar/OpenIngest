@@ -64,24 +64,33 @@ All core operations are accessible from the CLI. No need to call Python modules 
 
 ---
 
-## Connector Coverage (v2.0)
+## Connector Coverage (v3.0)
 
 | Connector | Status | Install |
 |---|---|---|
 | CSV | ✅ v1.0 | Built-in |
 | JSON / NDJSON | ✅ v2.0 | Built-in |
+| FTP | ✅ v3.0 | Built-in |
 | Excel (.xlsx) | ✅ v2.0 | `openingest[excel]` |
 | Parquet | ✅ v2.0 | `openingest[parquet]` |
 | Amazon S3 | ✅ v2.0 | `openingest[s3]` |
 | Azure Blob Storage | ✅ v2.0 | `openingest[azure]` |
 | Google Cloud Storage | ✅ v2.0 | `openingest[gcs]` |
 | REST API | ✅ v2.0 | `openingest[api]` |
-| Snowflake | 🔲 v3.0 | `openingest-snowflake` (plugin) |
-| Salesforce | 🔲 v3.0 | `openingest-salesforce` (plugin) |
+| PostgreSQL | ✅ v3.0 | `openingest[postgresql]` |
+| MySQL | ✅ v3.0 | `openingest[mysql]` |
+| MongoDB | ✅ v3.0 | `openingest[mongodb]` |
+| SFTP | ✅ v3.0 | `openingest[sftp]` |
+| Salesforce | ✅ v3.0 | `openingest[salesforce]` |
+| HubSpot | ✅ v3.0 | `openingest[hubspot]` |
+| Stripe | ✅ v3.0 | `openingest[stripe]` |
+| Google Sheets | ✅ v3.0 | `openingest[google_sheets]` |
+| Snowflake | 🔲 v4.0 | `openingest-snowflake` (plugin) |
+| BigQuery | 🔲 v4.0 | `openingest-bigquery` (plugin) |
 
 ---
 
-## Observability (v2.5)
+## Observability (v2.5 / v3.0)
 
 | Feature | Status |
 |---|---|
@@ -90,10 +99,10 @@ All core operations are accessible from the CLI. No need to call Python modules 
 | Incremental watermark state | ✅ |
 | `openingest history` CLI | ✅ |
 | `openingest dashboard` terminal view | ✅ |
-| Slack webhook notifications | ✅ v2.5 |
-| Email (SMTP) notifications | ✅ v2.5 |
+| Slack webhook notifications + retry | ✅ v2.5 |
+| Email (SMTP) notifications + retry | ✅ v2.5 |
 | Data lineage graph (ASCII / Mermaid / JSON) | ✅ v3.0 |
-| Web dashboard | 🔲 v3.0 |
+| Web dashboard | 🔲 v4.0 |
 
 ---
 
@@ -115,21 +124,20 @@ Workflow file: `.github/workflows/ci.yml`
 
 | Document | Status |
 |---|---|
-| `README.md` | ✅ Updated for v2.0 |
-| `docs/GETTING_STARTED.md` | ✅ Full 5-step walkthrough |
-| `docs/CONNECTORS.md` | ✅ All 9 connectors with config examples |
-| `docs/CLI_REFERENCE.md` | ✅ All 19 CLI commands documented |
-| `docs/OPEN_SOURCE_READINESS.md` | ✅ This file |
-| API reference (auto-generated) | 🔲 v3.0 |
+| `README.md` | ✅ Updated for v3.0.4 — PyPI description |
+| `docs/GETTING_STARTED.md` | ✅ Full walkthrough + cloud + v3.0 connectors |
+| `docs/CONNECTORS.md` | ✅ All 17 connectors with config examples |
+| `docs/CLI_REFERENCE.md` | ✅ All CLI commands documented |
+| `docs/USABILITY_AND_OBSERVABILITY.md` | ✅ Metadata tables, notifications, lineage |
+| `docs/OPEN_SOURCE_READINESS.md` | ✅ This file — v3.0.4 |
+| API reference (auto-generated) | 🔲 v4.0 |
 
 ---
 
-## Next steps toward PyPI release (v3.0)
+## Next steps toward v4.0
 
-1. Expand test coverage for connectors, incremental loading, and observability paths
-2. Add integration tests against a real PostgreSQL instance in CI
-3. Add dataset profiling (`openingest profile`)
-4. Build web dashboard
-5. Set up GitHub release workflow to publish to PyPI
-6. Add RBAC for multi-team environments
-7. Create `openingest-snowflake` and `openingest-salesforce` plugin packages
+1. Web dashboard (operational — not the landing page)
+2. RBAC for multi-team environments
+3. Snowflake and BigQuery connectors
+4. Multi-environment config support (dev/staging/prod)
+5. `openingest-snowflake` and `openingest-bigquery` plugin packages

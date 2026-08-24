@@ -221,7 +221,7 @@ stripe_charges:
   required_columns: [id, amount, currency, created]
 ```
 
-See [CONNECTORS.md](CONNECTORS.md) for full documentation on all 9 connectors.
+See [CONNECTORS.md](CONNECTORS.md) for full documentation on all 17 connectors.
 
 ---
 
