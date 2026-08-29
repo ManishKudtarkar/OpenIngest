@@ -1,2 +1,39 @@
-cron: 0 0 * * *
-schedule: '@daily'
+# ─────────────────────────────────────────────────────────────────────────────
+# OpenIngest Pipeline Configuration
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Cron schedule used by both the built-in scheduler and the Airflow DAG.
+# Presets: @hourly | @daily | @midnight | @weekly | @monthly
+# Or any 5-field cron expression: "0 6 * * 1-5"
+cron: "0 0 * * *"
+schedule: "@daily"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Notifications
+# Set the relevant env vars in .env and uncomment the block you need.
+# ─────────────────────────────────────────────────────────────────────────────
+
+# notifications:
+#
+#   # ── Slack ──────────────────────────────────────────────────────────────
+#   slack:
+#     webhook: ${SLACK_WEBHOOK_URL}   # full https://hooks.slack.com/... URL
+#     on:
+#       - success
+#       - failure
+#     retry_count: 3
+#     retry_delay: 2                  # seconds between retries
+#
+#   # ── Email (SMTP) ───────────────────────────────────────────────────────
+#   email:
+#     smtp_host: smtp.gmail.com       # or smtp.company.com
+#     smtp_port: 587
+#     username: ${EMAIL_USERNAME}
+#     password: ${EMAIL_PASSWORD}
+#     from: data-pipeline@company.com
+#     to:
+#       - data-team@company.com
+#       - oncall@company.com
+#     on:
+#       - failure
+#     retry_count: 2

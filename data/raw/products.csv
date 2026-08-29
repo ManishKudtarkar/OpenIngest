@@ -1,0 +1,13 @@
+product_id,name,category,price_usd,stock_qty,sku,active
+P001,Wireless Mouse,Electronics,49.99,250,SKU-WM-001,true
+P002,USB-C Cable 2m,Accessories,29.99,800,SKU-UC-002,true
+P003,Mechanical Keyboard,Electronics,89.00,120,SKU-MK-003,true
+P004,Laptop Stand,Accessories,74.99,180,SKU-LS-004,true
+P005,Monitor 27in,Electronics,149.00,60,SKU-MN-005,true
+P006,Noise Cancelling Headphones,Electronics,199.00,90,SKU-NC-006,true
+P007,Mouse Pad XL,Accessories,34.99,350,SKU-MP-007,true
+P008,Webcam 1080p,Electronics,59.99,140,SKU-WC-008,true
+P009,HDMI Cable 3m,Accessories,119.00,400,SKU-HD-009,true
+P010,Cable Organiser Kit,Accessories,24.99,600,SKU-CO-010,true
+P011,USB Hub 7-port,Electronics,45.99,200,SKU-UH-011,true
+P012,Ergonomic Chair Cushion,Accessories,39.99,110,SKU-EC-012,true

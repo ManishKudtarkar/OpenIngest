@@ -50,4 +50,6 @@ apps/web/.next/
 apps/web/node_modules/
 
 # Data files (keep structure, not content)
+# data/raw/ is intentionally tracked — sample CSVs are included for demos.
+# Add specific files to ignore if you drop sensitive data there.
 data/processed/

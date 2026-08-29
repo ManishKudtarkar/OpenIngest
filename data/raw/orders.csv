@@ -1,0 +1,21 @@
+order_id,customer_id,product_id,order_time,subtotal_usd,tax_usd,total_usd,payment_method,status
+1001,1,P001,2024-06-01 10:12:00,49.99,4.50,54.49,credit_card,completed
+1002,3,P003,2024-06-02 14:35:00,89.00,8.01,97.01,paypal,completed
+1003,5,P002,2024-06-03 09:22:00,29.99,2.70,32.69,credit_card,completed
+1004,2,P005,2024-06-04 17:45:00,149.00,13.41,162.41,bank_transfer,completed
+1005,7,P001,2024-06-05 11:10:00,49.99,4.50,54.49,credit_card,completed
+1006,4,P004,2024-06-06 13:28:00,74.99,6.75,81.74,paypal,completed
+1007,8,P006,2024-06-07 16:05:00,199.00,17.91,216.91,credit_card,completed
+1008,1,P002,2024-06-08 08:50:00,29.99,2.70,32.69,credit_card,completed
+1009,10,P003,2024-06-09 12:15:00,89.00,8.01,97.01,paypal,completed
+1010,6,P007,2024-06-10 15:40:00,34.99,3.15,38.14,credit_card,completed
+1011,11,P001,2024-06-11 10:30:00,49.99,4.50,54.49,credit_card,completed
+1012,13,P005,2024-06-12 14:20:00,149.00,13.41,162.41,bank_transfer,completed
+1013,2,P008,2024-06-13 09:45:00,59.99,5.40,65.39,paypal,completed
+1014,15,P003,2024-06-14 11:55:00,89.00,8.01,97.01,credit_card,completed
+1015,9,P002,2024-06-15 16:30:00,29.99,2.70,32.69,credit_card,completed
+1016,17,P009,2024-06-16 13:10:00,119.00,10.71,129.71,paypal,completed
+1017,3,P004,2024-06-17 10:00:00,74.99,6.75,81.74,credit_card,completed
+1018,19,P001,2024-06-18 14:45:00,49.99,4.50,54.49,credit_card,completed
+1019,12,P006,2024-06-19 09:20:00,199.00,17.91,216.91,bank_transfer,completed
+1020,16,P010,2024-06-20 15:00:00,24.99,2.25,27.24,paypal,completed

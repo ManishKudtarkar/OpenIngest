@@ -1,0 +1,21 @@
+customer_id,name,email,country,age,signup_date
+1,Alice Martin,alice.martin@example.com,US,34,2024-01-15
+2,Bob Singh,bob.singh@example.com,IN,28,2024-02-03
+3,Carol Zhou,carol.zhou@example.com,CN,45,2024-02-17
+4,David Kim,david.kim@example.com,KR,31,2024-03-05
+5,Eva Rossi,eva.rossi@example.com,IT,27,2024-03-12
+6,Frank Müller,frank.muller@example.com,DE,52,2024-03-28
+7,Grace Lee,grace.lee@example.com,US,39,2024-04-02
+8,Haruto Yamada,haruto.yamada@example.com,JP,33,2024-04-19
+9,Ingrid Sven,ingrid.sven@example.com,SE,41,2024-05-01
+10,Jorge Alves,jorge.alves@example.com,BR,29,2024-05-14
+11,Keiko Tanaka,keiko.tanaka@example.com,JP,36,2024-05-22
+12,Liam O'Brien,liam.obrien@example.com,IE,44,2024-06-01
+13,Mia Dupont,mia.dupont@example.com,FR,26,2024-06-08
+14,Noah Patel,noah.patel@example.com,IN,30,2024-06-15
+15,Olivia Brown,olivia.brown@example.com,US,38,2024-07-01
+16,Pierre Leclerc,pierre.leclerc@example.com,FR,47,2024-07-10
+17,Quinn Adams,quinn.adams@example.com,US,25,2024-07-18
+18,Riya Sharma,riya.sharma@example.com,IN,32,2024-08-02
+19,Sebastian Wolf,sebastian.wolf@example.com,DE,43,2024-08-11
+20,Thandi Nkosi,thandi.nkosi@example.com,ZA,35,2024-08-20
