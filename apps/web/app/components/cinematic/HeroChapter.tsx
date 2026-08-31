@@ -114,7 +114,7 @@ export default function HeroChapter() {
           className="grid items-center gap-12 xl:gap-20"
           style={{
             gridTemplateColumns: "1fr 1fr",
-            paddingTop: "clamp(5.5rem, 10vw, 8rem)",
+            paddingTop: "clamp(7.5rem, 12vw, 10rem)",
             paddingBottom: "clamp(4rem, 8vw, 6rem)",
           }}
         >
