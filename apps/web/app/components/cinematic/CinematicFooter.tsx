@@ -122,10 +122,10 @@ export default function CinematicFooter() {
       {/* ── MAIN CONTENT ── */}
       <div style={{
         position: "relative", zIndex: 10,
-        width: "100%", maxWidth: 1200,
+        width: "100%", maxWidth: 1440,
         marginLeft: "auto", marginRight: "auto",
-        paddingLeft: "clamp(1.25rem, 4vw, 3.5rem)",
-        paddingRight: "clamp(1.25rem, 4vw, 3.5rem)",
+        paddingLeft: "clamp(1.25rem, 4.5vw, 5.5rem)",
+        paddingRight: "clamp(1.25rem, 4.5vw, 5.5rem)",
         paddingTop: "clamp(4rem, 7vw, 6rem)",
         paddingBottom: "2rem",
       }}>

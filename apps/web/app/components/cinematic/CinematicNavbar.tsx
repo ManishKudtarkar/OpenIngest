@@ -138,11 +138,11 @@ export default function CinematicNavbar() {
         <div
           style={{
             width: "100%",
-            maxWidth: 1200,
+            maxWidth: 1440,
             marginLeft: "auto",
             marginRight: "auto",
-            paddingLeft: "clamp(1.25rem, 4vw, 3.5rem)",
-            paddingRight: "clamp(1.25rem, 4vw, 3.5rem)",
+            paddingLeft: "clamp(1.25rem, 4.5vw, 5.5rem)",
+            paddingRight: "clamp(1.25rem, 4.5vw, 5.5rem)",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
