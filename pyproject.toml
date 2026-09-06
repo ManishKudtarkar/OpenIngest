@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "openingest"
-version = "3.0.5"
+version = "3.0.6"
 description = "Configuration-driven data ingestion framework — 17 connectors, YAML transforms, quality checks, incremental loading, Airflow DAG generation, and metadata tracking"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -42,7 +42,15 @@ Repository = "https://github.com/ManishKudtarkar/OpenIngest"
 Changelog = "https://github.com/ManishKudtarkar/OpenIngest/releases"
 
 [project.optional-dependencies]
+# dev tools — renamed from 'dev' to avoid pip<24.1 marker-evaluation bug
 dev = [
+  "pytest>=8.0",
+  "pytest-cov>=5.0",
+  "ruff>=0.4",
+  "mypy>=1.10"
+]
+# alias so existing CI that uses openingest[testing] also works
+testing = [
   "pytest>=8.0",
   "pytest-cov>=5.0",
   "ruff>=0.4",
@@ -93,7 +101,7 @@ hubspot = [
 stripe = [
   "requests>=2.31.0"
 ]
-google_sheets = [
+google-sheets = [
   "google-api-python-client>=2.120.0",
   "google-auth>=2.28.0",
   "google-auth-httplib2>=0.2.0",
