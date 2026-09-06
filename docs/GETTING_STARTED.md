@@ -25,7 +25,7 @@ No Python per dataset. No SQL DDL. No DAG edits.
 ```bash
 git clone https://github.com/ManishKudtarkar/OpenIngest.git
 cd OpenIngest
-pip install -e ".[dev]"
+pip install -e ".[devel]"
 ```
 
 This installs OpenIngest as an editable package and registers the `openingest` CLI.
