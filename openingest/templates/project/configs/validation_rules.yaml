@@ -1,1 +1,28 @@
-rules: {}
+# ─────────────────────────────────────────────────────────────────────────────
+# Data Quality Validation Rules
+# Add one block per dataset. All rules are optional.
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Supported rule types:
+#   type_checks    — assert a column matches a type (integer, float, string, datetime, boolean)
+#   range_checks   — min/max bounds for numeric columns
+#   regex_checks   — regex pattern match for string columns
+#   custom_rules   — arbitrary pandas df.eval() boolean expressions
+
+# Example:
+# customers:
+#   type_checks:
+#     customer_id: integer
+#     age: integer
+#     email: string
+#     signup_date: datetime
+#   range_checks:
+#     age:
+#       min: 0
+#       max: 120
+#   regex_checks:
+#     email: '^[^@\s]+@[^@\s]+\.[^@\s]+$'
+#   custom_rules:
+#     - name: no_placeholder_emails
+#       condition: "email.str.lower() != 'test@example.com'"
+#       message: "Customer email must not be a placeholder"

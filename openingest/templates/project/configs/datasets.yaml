@@ -1,19 +1,42 @@
 datasets:
 
-  # Example dataset - replace with your own
-  customers:
-    file: customers.csv
-    staging_table: stg_customers
-    load_strategy: replace
+# ─────────────────────────────────────────────────────────────────────────────
+# Add your datasets here. Each entry tells OpenIngest:
+#   - where to find the data (file: or source: block)
+#   - where to load it (staging_table)
+#   - how to load it (load_strategy: replace | append | incremental)
+# ─────────────────────────────────────────────────────────────────────────────
 
-    primary_key:
-      - customer_id
+# Example — local CSV with replace strategy:
+# customers:
+#   file: customers.csv              # relative to data/raw/
+#   staging_table: stg_customers
+#   load_strategy: replace
+#   primary_key: [customer_id]
+#   required_columns: [customer_id, name, email]
+#   non_null_columns: [customer_id, email]
+#   unique_columns: [customer_id]
 
-    required_columns:
-      - customer_id
-      - name
-      - email
+# Example — local CSV with incremental strategy:
+# orders:
+#   file: orders.csv
+#   staging_table: stg_orders
+#   load_strategy: incremental
+#   incremental_column: order_time   # watermark column
+#   primary_key: [order_id]
+#   hash_columns: [customer_id, total_usd, payment_method]
+#   required_columns: [order_id, customer_id, order_time, total_usd]
 
-    non_null_columns:
-      - customer_id
-      - email
+# Example — Amazon S3 source:
+# orders_s3:
+#   source:
+#     type: s3
+#     bucket: my-bucket
+#     key: orders/orders.parquet
+#     region: us-east-1
+#     aws_access_key_id: ${AWS_ACCESS_KEY_ID}
+#     aws_secret_access_key: ${AWS_SECRET_ACCESS_KEY}
+#   staging_table: stg_orders
+#   load_strategy: replace
+
+# See docs/CONNECTORS.md for all 17 connector types.

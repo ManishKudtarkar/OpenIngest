@@ -13,7 +13,7 @@ OpenIngest is installable as a Python package via `pyproject.toml`.
 pip install -e .
 
 # With development tools (pytest, ruff, mypy)
-pip install -e ".[dev]"
+pip install -e ".[devel]"
 
 # With v2.0 connectors
 pip install -e ".[v2]"       # all cloud + format connectors

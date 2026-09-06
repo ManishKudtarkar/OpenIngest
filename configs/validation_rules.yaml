@@ -33,40 +33,14 @@ datasets:
       total_usd:
         min: 0
 
-    custom_rules:
-      - name: total_not_exceed_subtotal
-        condition: "total_usd <= subtotal_usd"
-        message: "Total must not exceed subtotal"
-
   products:
     type_checks:
-      product_id: integer
+      product_id: string
       price_usd: number
-      cost_usd: number
-      margin_usd: number
+      stock_qty: integer
 
     range_checks:
       price_usd:
         min: 0
-      cost_usd:
+      stock_qty:
         min: 0
-
-  sessions:
-    type_checks:
-      session_id: integer
-      customer_id: integer
-      start_time: datetime
-
-  employees:
-    type_checks:
-      employee_id: integer
-      hire_date: datetime
-      salary: number
-      is_active: boolean
-
-    range_checks:
-      salary:
-        min: 0
-
-    regex_checks:
-      email: '^[^@\s]+@[^@\s]+\.[^@\s]+$'

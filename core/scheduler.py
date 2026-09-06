@@ -7,15 +7,15 @@ Designed for users who want simple periodic execution without full Airflow.
 Usage
 -----
 CLI:
-    openingest run --schedule "0 * * * *"     # run at top of every hour
-    openingest scheduler start                 # start daemon using pipeline.yaml schedule
+    openingest scheduler start --cron "0 * * * *"   # run at top of every hour
+    openingest scheduler start                       # uses schedule in pipeline.yaml
 
 Python:
     from core.scheduler import Scheduler
     s = Scheduler(cron_expression="0 0 * * *")
     s.start()
 
-Requires: schedule (pip install schedule)
+No extra dependencies required — uses stdlib only (time, signal).
 
 Cron presets
 ------------
