@@ -172,4 +172,4 @@ addopts = "-q"
 testpaths = ["tests"]
 
 [tool.ruff]
-exclude = ["build"]
+exclude = ["build", "notebooks"]
