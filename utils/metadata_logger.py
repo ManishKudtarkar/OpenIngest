@@ -9,7 +9,7 @@ from sqlalchemy.engine import Engine
 
 from models.dataset import Dataset
 from models.pipeline_run import PipelineRun
-from utils.db import get_engine
+from utils.db import get_engine, reset_engine
 
 
 def ensure_metadata_schema(engine: Engine) -> None:
@@ -165,7 +165,8 @@ class MetadataLogger:
             with self.engine.begin() as conn:
                 df.to_sql("pipeline_quality_runs", conn, if_exists="append", index=False)
         except Exception:  # noqa: BLE001
-            # Reconnect and retry once on stale connection
+            # Stale connection — reset engine and retry once
+            reset_engine()
             self.engine = get_engine()
             with self.engine.begin() as conn:
                 df.to_sql("pipeline_quality_runs", conn, if_exists="append", index=False)

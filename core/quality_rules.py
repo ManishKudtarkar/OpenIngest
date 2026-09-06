@@ -13,11 +13,30 @@ if TYPE_CHECKING:
 QUALITY_RULES_FILE = Path(__file__).resolve().parents[1] / "configs" / "validation_rules.yaml"
 
 
-def load_quality_rules() -> dict[str, Any]:
-    if not QUALITY_RULES_FILE.exists():
-        return {}
+def _find_rules_file() -> Path | None:
+    """
+    Find validation_rules.yaml, checking the user's project first.
 
-    with open(QUALITY_RULES_FILE, encoding="utf-8") as handle:
+    Search order:
+    1. The active OpenIngest project root (found via .openingest marker / pipeline.yaml)
+    2. The package-level configs/ (for development/test use only)
+    """
+    from utils.project import find_project_root
+    root = find_project_root()
+    if root is not None:
+        candidate = root / "configs" / "validation_rules.yaml"
+        if candidate.exists():
+            return candidate
+    # Fallback: package-level configs (useful during tests)
+    fallback = Path(__file__).resolve().parents[1] / "configs" / "validation_rules.yaml"
+    return fallback if fallback.exists() else None
+
+
+def load_quality_rules() -> dict[str, Any]:
+    path = _find_rules_file()
+    if path is None:
+        return {}
+    with open(path, encoding="utf-8") as handle:
         return yaml.safe_load(handle) or {}
 
 

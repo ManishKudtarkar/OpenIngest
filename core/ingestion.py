@@ -123,22 +123,24 @@ def ingest_dataset(dataset: Dataset, df: pd.DataFrame | None = None) -> Dataset:
         )
 
     # --------------------------------------------------
-    # Schema Validation
+    # Schema Validation (skip if df was pre-validated by pipeline.py)
     # --------------------------------------------------
 
-    validation = validate_dataset(dataset)
+    if df is None:
+        # Only validate here when called standalone (not via run_pipeline)
+        validation = validate_dataset(dataset)
+        dataset.schema_valid = validation["valid"]
 
-    dataset.schema_valid = validation["valid"]
-
-    if not dataset.schema_valid:
-
-        message = (
-            f"\nSchema validation failed for '{dataset.name}'\n\n"
-            f"Missing Columns : {validation['missing']}\n"
-            f"Extra Columns   : {validation['extra']}"
-        )
-
-        raise DatasetIngestionError(message)
+        if not dataset.schema_valid:
+            message = (
+                f"\nSchema validation failed for '{dataset.name}'\n\n"
+                f"Missing Columns : {validation['missing']}\n"
+                f"Extra Columns   : {validation['extra']}"
+            )
+            raise DatasetIngestionError(message)
+    else:
+        # df already validated upstream — trust the caller
+        dataset.schema_valid = True
 
     # --------------------------------------------------
     # Start Timer
